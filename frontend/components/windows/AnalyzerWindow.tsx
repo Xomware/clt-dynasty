@@ -7,10 +7,12 @@ import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
 import { type Tab, Tabs } from "@/components/xp/Tabs";
 import { analyze, AXES, type AxisValues, leagueShape, standing, type TeamAnalysis } from "@/lib/analyzer/analysis";
-import { values as valuesResource } from "@/lib/analyzer/values";
+import { recommendTrades, type TradePlayer } from "@/lib/analyzer/trades";
+import { type Values, values as valuesResource } from "@/lib/analyzer/values";
 import { LEAGUE_ID } from "@/lib/config";
 import type { WindowParams } from "@/lib/desktop/windows";
-import { players as playersResource } from "@/lib/players";
+import { type PlayerMap, players as playersResource } from "@/lib/players";
+import type { SleeperRoster } from "@/lib/sleeper/league";
 import { loadLeagueData, useMySleeperId } from "@/lib/team/data";
 import { teamLink } from "@/lib/team/links";
 import { rosterOwnedBy } from "@/lib/team/team";
@@ -41,6 +43,11 @@ export function AnalyzerWindow({ params }: { params: WindowParams }) {
   const tabs: Tab[] = [
     { id: "compare", label: "Compare", panel: () => <Compare teams={teams} mine={mine} /> },
     { id: "league", label: "League", panel: () => <LeagueRanks teams={teams} mine={mine} /> },
+    {
+      id: "trades",
+      label: "Trades",
+      panel: () => <Trades teams={teams} mine={mine} rosters={rosters} players={players.players} values={values.values} />,
+    },
   ];
   return (
     <div className="flex flex-col gap-2">
@@ -249,6 +256,92 @@ function LeagueRanks({ teams, mine }: ViewProps) {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+interface TradesProps extends ViewProps {
+  rosters: SleeperRoster[];
+  players: PlayerMap;
+  values: Values;
+}
+
+const pct = (n: number) => `${Math.round(n * 100)}%`;
+
+function Trades({ teams, mine, rosters, players, values }: TradesProps) {
+  const id = useId();
+  const ranked = byTotal(teams);
+  const [teamId, setTeamId] = useState(mine ?? ranked[0].rosterId);
+  const team = teams.find((t) => t.rosterId === teamId) ?? ranked[0];
+  const { weak, strong, trades } = recommendTrades(team, teams, rosters, players, values);
+  const yours = team.rosterId === mine;
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="analyzer-pickers">
+        <label htmlFor={`${id}-team`} className="font-bold">
+          Trades for
+        </label>
+        <select id={`${id}-team`} className="xp-select" value={team.rosterId} onChange={(e) => setTeamId(Number(e.target.value))}>
+          {ranked.map((t) => (
+            <option key={t.rosterId} value={t.rosterId}>
+              {t.name}
+              {t.rosterId === mine ? " (you)" : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+      <p className="text-xs">
+        One-for-one swaps within 5% in value: a player from a position where {yours ? "you are" : "the team is"} 5% over
+        the league average, for a partner&rsquo;s best player where {yours ? "you are" : "it is"} 15% under.
+      </p>
+      <div aria-live="polite">
+        {weak.length === 0 ? (
+          <p className="analyzer-empty">No starting position is 15% under the league average, so there is no hole to fill.</p>
+        ) : strong.length === 0 ? (
+          <p className="analyzer-empty">
+            Short at {weak.join(", ")}, but no starting position is 5% over the league average to trade from.
+          </p>
+        ) : trades.length === 0 ? (
+          <p className="analyzer-empty">
+            Short at {weak.join(", ")} and deep at {strong.join(", ")}, but no partner has a fair one-for-one to offer.
+          </p>
+        ) : (
+          <ol className="analyzer-trades">
+            {trades.map((t) => (
+              <li key={`${t.partner.rosterId}:${t.give.id}:${t.receive.id}`} className="analyzer-trade">
+                <h3 className="analyzer-trade-head">
+                  <span>With</span>
+                  <DrillLink to={teamLink(LEAGUE_ID, t.partner.rosterId)}>
+                    <span className="truncate font-bold">{t.partner.name}</span>
+                  </DrillLink>
+                </h3>
+                <dl className="analyzer-trade-sides">
+                  <TradeSide label="Give" player={t.give} />
+                  <TradeSide label="Get" player={t.receive} />
+                </dl>
+                <p className="text-xs">
+                  Adds {fmt(t.improvement)} at {t.receive.position}. Values {t.gap === 0 ? "match" : `${pct(t.gap)} apart`}.
+                </p>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TradeSide({ label, player }: { label: string; player: TradePlayer }) {
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd>
+        <span className="font-bold break-words">{player.name}</span>
+        <span className="analyzer-trade-meta">
+          {player.position} · {fmt(player.value)}
+        </span>
+      </dd>
     </div>
   );
 }

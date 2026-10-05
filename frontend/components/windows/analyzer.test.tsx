@@ -81,6 +81,34 @@ describe("Team Analyzer", () => {
     expect(within(screen.getByLabelText("League averages")).getByText("7,500")).toBeTruthy();
   });
 
+  it("explains when no fair trade fills the member's hole", async () => {
+    renderAnalyzer();
+    fireEvent.click(await screen.findByRole("tab", { name: "Trades" }));
+    expect(screen.getByLabelText("Trades for")).toHaveProperty("value", "4");
+    expect(screen.getByText(/^Short at QB, WR and deep at RB, but no partner has a fair one-for-one/)).toBeTruthy();
+  });
+
+  it("lists a fair one-for-one with the partner, both players and the lift", async () => {
+    routes["/values/current"] = [200, [...VALUES, { player: { sleeperId: "3", position: "RB", name: "C" }, value: 7800 }].slice(1)];
+    routes[`/v1/league/${LEAGUE_ID}/rosters`] = [200, [roster(4, ["3", "1"], ["3", "1"]), roster(6, ["2", "5"], ["2", "5"])]];
+    routes["/values/current"] = [
+      200,
+      [
+        { player: { sleeperId: "1", position: "QB", name: "A" }, value: 3000 },
+        { player: { sleeperId: "3", position: "RB", name: "C" }, value: 8000 },
+        { player: { sleeperId: "2", position: "WR", name: "B" }, value: 7800 },
+        { player: { sleeperId: "5", position: "QB", name: "D" }, value: 3000 },
+      ],
+    ];
+    renderAnalyzer();
+    fireEvent.click(await screen.findByRole("tab", { name: "Trades" }));
+    const trade = within(screen.getByRole("listitem"));
+    expect(trade.getByRole("button", { name: "Team Name 6" })).toBeTruthy();
+    expect(trade.getByText("Give").nextSibling?.textContent).toBe("Player 3RB · 8,000");
+    expect(trade.getByText("Get").nextSibling?.textContent).toBe("Player 2WR · 7,800");
+    expect(trade.getByText("Adds 3,900 at WR. Values 3% apart.")).toBeTruthy();
+  });
+
   it("says when FantasyCalc fails and retries it", async () => {
     routes["/values/current"] = [503, {}];
     renderAnalyzer();
