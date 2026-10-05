@@ -1,0 +1,33 @@
+.ai-list {
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-cream);
+}
+
+.ai-list li + li {
+  border-top: 1px solid var(--xp-face-shadow);
+}
+
+.xp-drill.ai-list-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.xp-drill.ai-list-link:hover {
+  background: var(--xp-balloon);
+}
+
+.ai-redacted {
+  border-color: var(--xp-red);
+  color: var(--xp-red);
+  background: var(--xp-cream);
+}
+
+.ai-body {
+  padding: 0.75rem;
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-cream);
+}

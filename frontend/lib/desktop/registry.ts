@@ -1,5 +1,6 @@
 import type { ComponentType, SVGProps } from "react";
 
+import { AIReportWindow, AIReviewWindow, readReportLink, reportTitle } from "@/components/windows/AIReviewWindow";
 import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
 import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
 import { HistoryWindow } from "@/components/windows/HistoryWindow";
@@ -21,6 +22,7 @@ import {
   ControlPanelIcon,
   FolderIcon,
   MembersIcon,
+  NewsFeedIcon,
   NewspaperIcon,
   RosterMoveIcon,
   ScoresIcon,
@@ -74,6 +76,16 @@ const SPECS = {
   "world-cup": { label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
   proposals: { label: "Proposals", title: "Rule Proposals", Icon: BallotIcon, component: ProposalsWindow, defaultSize: { w: 600, h: 640 } },
   taxi: { label: "Taxi Squads", title: "Taxi Squads", Icon: TaxiIcon, component: TaxiWindow, defaultSize: { w: 600, h: 640 } },
+  "ai-review": { label: "AI Review", title: "AI Review", Icon: NewsFeedIcon, component: AIReviewWindow, defaultSize: { w: 640, h: 640 } },
+  "ai-report": {
+    label: "AI Report",
+    title: reportTitle,
+    Icon: NewsFeedIcon,
+    component: AIReportWindow,
+    defaultSize: { w: 680, h: 680 },
+    link: readReportLink,
+    drillOnly: true,
+  },
   rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
   members: {
