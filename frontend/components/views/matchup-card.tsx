@@ -2,14 +2,19 @@
 
 import { useId, useState } from "react";
 
+import { DrillLink } from "@/components/xp/DrillLink";
 import { TeamName } from "@/components/xp/TeamName";
 import { type Player, playerName } from "@/lib/api/players";
+import { LEAGUE_ID } from "@/lib/config";
 import { usePlayers } from "@/lib/league/players";
 import type { Team } from "@/lib/league/use-league";
 import type { Game, Side } from "@/lib/league/use-week-games";
+import { teamLink } from "@/lib/team/links";
 
 interface MatchupCardProps {
   game: Game;
+  // The season the game is from, so a lineup's team opens that season's Team Profile.
+  leagueId?: string;
   teamFor: (rosterId: number) => Team;
   myRosterId: number | null;
   // A tag beside the game, like "Consolation".
@@ -17,7 +22,7 @@ interface MatchupCardProps {
 }
 
 // Two teams and their scores; opening it shows both lineups.
-export function MatchupCard({ game, teamFor, myRosterId, note }: MatchupCardProps) {
+export function MatchupCard({ game, leagueId, teamFor, myRosterId, note }: MatchupCardProps) {
   const [open, setOpen] = useState(false);
   const lineups = useId();
   const top = Math.max(...game.sides.map((s) => s.points));
@@ -50,7 +55,7 @@ export function MatchupCard({ game, teamFor, myRosterId, note }: MatchupCardProp
         <div id={lineups} className="@container mt-2">
           <div className="grid gap-2 @md:grid-cols-2">
             {game.sides.map((s) => (
-              <Lineup key={s.rosterId} side={s} team={teamFor(s.rosterId).name} />
+              <Lineup key={s.rosterId} side={s} team={teamFor(s.rosterId).name} leagueId={leagueId} />
             ))}
           </div>
         </div>
@@ -59,20 +64,25 @@ export function MatchupCard({ game, teamFor, myRosterId, note }: MatchupCardProp
   );
 }
 
-function Lineup({ side, team }: { side: Side; team: string }) {
+function Lineup({ side, team, leagueId = LEAGUE_ID }: { side: Side; team: string; leagueId?: string }) {
+  const heading = (
+    <h3 className="font-bold">
+      <DrillLink to={teamLink(leagueId, side.rosterId)}>{team}</DrillLink>
+    </h3>
+  );
   const players = usePlayers();
   const names = players.status === "ok" ? players.players : {};
   if (side.starters === null || side.bench === null) {
     return (
       <div className="min-w-0">
-        <h3 className="font-bold">{team}</h3>
+        {heading}
         <p className="xp-note mt-1">Sleeper has no lineup for this team yet.</p>
       </div>
     );
   }
   return (
     <div className="min-w-0">
-      <h3 className="font-bold">{team}</h3>
+      {heading}
       {players.status === "loading" && <p role="status">Loading player names...</p>}
       {players.status === "error" && <p role="alert">Couldn&rsquo;t load player names, so these are Sleeper ids.</p>}
       <ul aria-label={`${team} starters`} className="mt-1 bg-(--xp-cream)">

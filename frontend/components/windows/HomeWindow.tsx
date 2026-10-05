@@ -138,7 +138,9 @@ function DraftCountdown() {
       <div className="home-draft-body">
         <CalendarIcon width={32} height={32} className="flex-none" />
         <div className="min-w-0">
-          <p className="font-bold">{draft.season} Rookie Draft</p>
+          <DrillLink to={{ kind: "drafts", params: {} }}>
+            <span className="font-bold">{draft.season} Rookie Draft</span>
+          </DrillLink>
           {start !== null ? <p className="text-xs">Starts {START.format(start)}</p> : <p className="text-xs">Start time not set yet.</p>}
         </div>
         {/* Not a live region: a per-second announcement would drown everything else. */}

@@ -36,8 +36,9 @@ export type WindowAction =
 
 // Matches --taskbar-height; windows live in the viewport above it.
 export const TASKBAR_HEIGHT = 44;
-// Desktop icons take the left edge, so new windows open clear of them.
-const ICON_COLUMN = 112;
+// Desktop icons take the left edge, so new windows open clear of them. Two
+// columns of 5.5rem icons: the launchers wrap into a second at 1280x800.
+const ICON_COLUMN = 192;
 
 export function windowId(kind: string, params: WindowParams): string {
   return [kind, ...Object.keys(params).sort().map((k) => params[k])].join(":");

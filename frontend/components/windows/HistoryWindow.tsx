@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 
 import { Tabs } from "@/components/xp/Tabs";
-import { TeamName } from "@/components/xp/TeamName";
+import { TeamLink } from "@/components/xp/TeamLink";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { headToHead, type PastGame, type Season, seasonTeam, useHistory } from "@/lib/league/history";
 import { type Team, useLeague } from "@/lib/league/use-league";
@@ -34,12 +34,12 @@ function Champions({ seasons, myRosterId }: { seasons: Season[]; myRosterId: num
               <dl className="xp-summary items-center">
                 <dt>Champion</dt>
                 <dd className="flex min-w-0 items-center gap-2">
-                  <TeamName {...seasonTeam(s, champ)} isMine={champ === myRosterId} />
+                  <TeamLink leagueId={s.league.league_id} rosterId={champ} {...seasonTeam(s, champ)} isMine={champ === myRosterId} />
                   {final && <span className="xp-score">{score(champ)}</span>}
                 </dd>
                 <dt>Runner-up</dt>
                 <dd className="flex min-w-0 items-center gap-2 font-normal">
-                  <TeamName {...seasonTeam(s, runner)} isMine={runner === myRosterId} />
+                  <TeamLink leagueId={s.league.league_id} rosterId={runner} {...seasonTeam(s, runner)} isMine={runner === myRosterId} />
                   {final && <span className="xp-score">{score(runner)}</span>}
                 </dd>
               </dl>
@@ -103,7 +103,7 @@ function Standings({ seasons, myRosterId }: { seasons: Season[]; myRosterId: num
               <tr key={row.rosterId}>
                 <td className="tabular-nums">{i + 1}</td>
                 <td className="md:max-w-0">
-                  <TeamName {...seasonTeam(s, row.rosterId)} isMine={row.rosterId === myRosterId} />
+                  <TeamLink leagueId={s.league.league_id} rosterId={row.rosterId} {...seasonTeam(s, row.rosterId)} isMine={row.rosterId === myRosterId} />
                 </td>
                 <td className="tabular-nums">{record(row.wins, row.losses, row.ties)}</td>
                 <td className="text-right tabular-nums">{row.pf.toFixed(2)}</td>
@@ -178,7 +178,7 @@ function Rivals({ games, rosterIds, teamFor, myRosterId }: RivalsProps) {
               {rows.map((r) => (
                 <tr key={r.opponent}>
                   <td className="md:max-w-0">
-                    <TeamName {...teamFor(r.opponent)} isMine={r.opponent === myRosterId} />
+                    <TeamLink rosterId={r.opponent} {...teamFor(r.opponent)} isMine={r.opponent === myRosterId} />
                   </td>
                   <td className="tabular-nums">{record(r.wins, r.losses, r.ties)}</td>
                   <td className="text-right tabular-nums">{r.pf.toFixed(2)}</td>
