@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react"
 
 import { useAuth } from "@/lib/auth/use-auth";
 import { useDesktop } from "@/lib/desktop/desktop-context";
-import { REGISTRY, windowTitle } from "@/lib/desktop/registry";
+import { REGISTRY, useWindowTitle } from "@/lib/desktop/registry";
 import { defaultLayout } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { CrownIcon } from "./icons";
@@ -36,6 +36,7 @@ export function Taskbar() {
   const start = useRef<HTMLButtonElement>(null);
   const time = useSyncExternalStore(subscribeToClock, readClock, readServerClock);
   const name = (state.status === "member" && state.me.member.displayName) || "CLT Dynasty League";
+  const title = useWindowTitle();
 
   useEffect(() => {
     if (!open) return;
@@ -97,7 +98,7 @@ export function Taskbar() {
                   onClick={() => dispatch({ type: pressed ? "minimize" : "focus", id: w.id })}
                 >
                   <Icon className="shrink-0" />
-                  <span className="truncate">{windowTitle(w)}</span>
+                  <span className="truncate">{title(w)}</span>
                 </button>
               </li>
             );

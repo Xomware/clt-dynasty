@@ -1,7 +1,14 @@
-import type { ComponentType, SVGProps } from "react";
+import { type ComponentType, type SVGProps, useSyncExternalStore } from "react";
 
+import { LeagueWindow } from "@/components/windows/LeagueWindow";
+import { ProfileWindow } from "@/components/windows/ProfileWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
-import { ControlPanelIcon } from "@/components/xp/icons";
+import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
+import { ControlPanelIcon, ProfileIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
+import { LEAGUE_ID } from "@/lib/config";
+import { loadedAccount, loadedLeague, loadedRosters, loadedUsers, loadedVersion, subscribeLoaded } from "@/lib/sleeper/league";
+import { readIdLink, readTeamLink } from "@/lib/team/links";
+import { teamName } from "@/lib/team/team";
 
 import type { WindowParams, WindowView } from "./windows";
 
@@ -20,9 +27,51 @@ export interface WindowSpec {
   drillOnly?: boolean;
 }
 
+// Titles name what the window shows once Sleeper has answered for it.
+function teamTitle(p: WindowParams): string {
+  const leagueId = String(p.leagueId ?? LEAGUE_ID);
+  const rosterId = Number(p.rosterId);
+  const [users, rosters] = [loadedUsers(leagueId), loadedRosters(leagueId)];
+  if (!users || !rosters) return "Team Profile";
+  return `Team Profile - ${teamName(rosters.find((r) => r.roster_id === rosterId), users, rosterId)}`;
+}
+
+function profileTitle(p: WindowParams): string {
+  if (!p.userId) return "My Profile";
+  const name = loadedAccount(String(p.userId))?.display_name;
+  return name ? `Profile - ${name}` : "Profile";
+}
+
 // One entry per window kind, in launcher order. Each league window adds itself here.
 const SPECS = {
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
+  "my-team": { label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
+  profile: {
+    label: "Profile",
+    title: profileTitle,
+    Icon: ProfileIcon,
+    component: ProfileWindow,
+    defaultSize: { w: 520, h: 560 },
+    link: readIdLink("userId"),
+  },
+  team: {
+    label: "Team",
+    title: teamTitle,
+    Icon: ProfileIcon,
+    component: TeamWindow,
+    defaultSize: { w: 640, h: 640 },
+    link: readTeamLink,
+    drillOnly: true,
+  },
+  league: {
+    label: "League",
+    title: (p) => loadedLeague(String(p.leagueId))?.name ?? "League",
+    Icon: TrophyIcon,
+    component: LeagueWindow,
+    defaultSize: { w: 600, h: 600 },
+    link: readIdLink("leagueId"),
+    drillOnly: true,
+  },
 } satisfies Record<string, WindowSpec>;
 
 export type WindowKind = keyof typeof SPECS;
@@ -39,4 +88,10 @@ export const launchers = () =>
 export function windowTitle({ kind, params }: WindowView): string {
   const { title } = REGISTRY[kind];
   return typeof title === "string" ? title : title(params);
+}
+
+// Re-renders the caller when Sleeper data lands, so a title that names a team or league catches up.
+export function useWindowTitle(): (view: WindowView) => string {
+  useSyncExternalStore(subscribeLoaded, loadedVersion, loadedVersion);
+  return windowTitle;
 }
