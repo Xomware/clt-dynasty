@@ -4,7 +4,8 @@ import { type FormEvent, useContext, useId, useState } from "react";
 
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import type { WindowParams } from "@/lib/desktop/windows";
-import { getAccount, getLeague, SleeperError } from "@/lib/sleeper/league";
+import { account, league as getLeague } from "@/lib/league/cache";
+import { SleeperError } from "@/lib/sleeper/client";
 import { leagueLink, profileLink } from "@/lib/team/links";
 import { ViewParamsContext } from "@/lib/view-params";
 
@@ -22,8 +23,8 @@ const MODES: Record<Mode, { label: string; field: string; hint: string }> = {
 // Resolves the search to the window it opens, or says why it can't.
 async function find(mode: Mode, term: string) {
   if (mode === "user") {
-    const account = await getAccount(term);
-    return account ? profileLink(account.user_id) : `No Sleeper user named ${term}.`;
+    const found = await account(term);
+    return found ? profileLink(found.user_id) : `No Sleeper user named ${term}.`;
   }
   if (!/^\d+$/.test(term)) return "A league ID is all digits.";
   const league = await getLeague(term).catch((e: Error) => {

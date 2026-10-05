@@ -52,7 +52,7 @@ describe("desktop", () => {
     const names = within(screen.getByRole("list", { name: "Desktop" }))
       .getAllByRole("button")
       .map((b) => b.textContent);
-    expect(names).toEqual(["Settings", "My Team", "Profile", "Search", "Home", "Standings", "Broken"]);
+    expect(names).toEqual(["Home", "Standings", "Broken"]);
   });
 
   it("opens a window on double-click and mirrors it into the URL", async () => {

@@ -8,9 +8,10 @@ vi.mock("aws-amplify/auth", () => ({
 import { LEAGUE_ID } from "@/lib/config";
 import { NavigateContext } from "@/lib/desktop/navigation";
 import { MemberProvider } from "@/lib/member/use-member";
-import { clearSleeperCache } from "@/lib/sleeper/league";
+import { AlertsProvider } from "@/lib/alerts/alerts";
 import { LeagueWindow } from "./LeagueWindow";
 import { ProfileWindow } from "./ProfileWindow";
+import { SettingsWindow } from "./SettingsWindow";
 import { MyTeamWindow, TeamWindow } from "./TeamWindow";
 
 const OTHER = "1180000000000000001";
@@ -49,11 +50,11 @@ const LEAGUE = {
 };
 
 const PLAYERS = {
-  "4984": { player_id: "4984", full_name: "Josh Allen", position: "QB", team: "BUF", age: 30, years_exp: 8 },
-  "9509": { player_id: "9509", full_name: "Bijan Robinson", position: "RB", team: "ATL", age: 24, years_exp: 3, injury_status: "Questionable" },
-  "12500": { player_id: "12500", full_name: "Rookie Wideout", position: "WR", age: 21, years_exp: 0 },
+  "4984": { player_id: "4984", first_name: "Josh", last_name: "Allen", position: "QB", team: "BUF", age: 30, years_exp: 8 },
+  "9509": { player_id: "9509", first_name: "Bijan", last_name: "Robinson", position: "RB", team: "ATL", age: 24, years_exp: 3, injury_status: "Questionable" },
+  "12500": { player_id: "12500", first_name: "Rookie", last_name: "Wideout", position: "WR", age: 21, years_exp: 0 },
   DAL: { player_id: "DAL", first_name: "Dallas", last_name: "Cowboys", position: "DEF", team: "DAL" },
-  "7777": { player_id: "7777", full_name: "Taxi Back", position: "RB", team: "CAR" },
+  "7777": { player_id: "7777", first_name: "Taxi", last_name: "Back", position: "RB", team: "CAR" },
 };
 
 const ROSTERS = [
@@ -87,7 +88,6 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.restoreAllMocks();
-  clearSleeperCache();
 });
 
 const inMember = (ui: React.ReactNode) => render(<MemberProvider>{ui}</MemberProvider>);
@@ -194,6 +194,29 @@ describe("My Team window", () => {
     routes["GET /clt/me"] = [200, { member: { email: "m@example.com", displayName: "", role: "member", sleeperUserId: "" }, linkedSleeperUserId: "u99" }];
     inMember(<MyTeamWindow />);
     expect((await screen.findByRole("alert")).textContent).toMatch(/doesn’t own a team/);
+  });
+});
+
+describe("after linking in Settings", () => {
+  it("My Team finds the team without a reload", async () => {
+    const unlinked = { email: "m@example.com", displayName: "", role: "member", sleeperUserId: "" };
+    routes["GET /clt/me"] = [200, { member: unlinked, linkedSleeperUserId: "" }];
+    const platform = { userId: "s", email: "m@example.com", sleeperUserId: "", sleeperUsername: "", sleeperAvatar: "", displayName: "", hasLinkedSleeper: false, createdAt: "", updatedAt: "" };
+    routes["GET /me/profile"] = [200, { user: platform }];
+    routes["PUT /me/sleeper-link"] = () => {
+      routes["GET /clt/me"] = [200, { member: unlinked, linkedSleeperUserId: "u4" }];
+      return [200, { user: { ...platform, sleeperUserId: "u4", sleeperUsername: "handle4", hasLinkedSleeper: true } }];
+    };
+    inMember(
+      <AlertsProvider>
+        <SettingsWindow />
+        <MyTeamWindow />
+      </AlertsProvider>,
+    );
+    expect(await screen.findByText(/link your sleeper account in settings so/i)).toBeTruthy();
+    fireEvent.change(await screen.findByLabelText("Sleeper username"), { target: { value: "handle4" } });
+    fireEvent.click(screen.getByRole("button", { name: "Link" }));
+    expect(await screen.findByRole("region", { name: "Team Name 4" })).toBeTruthy();
   });
 });
 
