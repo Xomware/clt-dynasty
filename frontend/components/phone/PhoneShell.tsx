@@ -8,7 +8,7 @@ import { SpeakerToggle } from "@/components/xp/SpeakerToggle";
 import { useAuth } from "@/lib/auth/use-auth";
 import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
-import { launchers, REGISTRY, windowTitle } from "@/lib/desktop/registry";
+import { REGISTRY, useLaunchers, windowTitle } from "@/lib/desktop/registry";
 import { patchParams, windowId, type WindowParams } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { ViewParamsContext } from "@/lib/view-params";
@@ -121,7 +121,7 @@ function Programs({ onOpen }: { onOpen: (kind: WindowLink["kind"]) => void }) {
     <nav className="m-programs" aria-label="Programs">
       <h2 className="m-programs-title">Programs</h2>
       <ul>
-        {launchers().map(({ kind, label, Icon }) => (
+        {useLaunchers().map(({ kind, label, Icon }) => (
           <li key={kind}>
             <button type="button" className="m-program" onClick={() => onOpen(kind)}>
               <Icon width={32} height={32} />

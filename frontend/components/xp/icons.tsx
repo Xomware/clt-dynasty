@@ -238,6 +238,18 @@ export function TaxiIcon(props: IconProps) {
   );
 }
 
+// Admin Members: two heads, the front one with the commissioner's gold collar.
+export function MembersIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="10.5" cy="4.5" r="2.5" className="fill-(--xp-sky-bottom) stroke-(--xp-text)" />
+      <path d="M6.5 12a4 4 0 0 1 8 0v1.5h-8z" className="fill-(--xp-title-light) stroke-(--xp-text)" />
+      <circle cx="5.5" cy="6" r="2.5" className="fill-(--xp-cream) stroke-(--xp-text)" />
+      <path d="M1.5 14.5v-1a4 4 0 0 1 8 0v1z" className="fill-(--xp-gold) stroke-(--xp-text)" />
+    </Icon>
+  );
+}
+
 export function TradeIcon(props: IconProps) {
   return (
     <Icon {...props}>
