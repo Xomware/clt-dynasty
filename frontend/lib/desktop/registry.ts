@@ -2,9 +2,10 @@ import { type ComponentType, type SVGProps, useSyncExternalStore } from "react";
 
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
+import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
-import { ControlPanelIcon, ProfileIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
+import { ControlPanelIcon, ProfileIcon, SearchIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
 import { LEAGUE_ID } from "@/lib/config";
 import { loadedAccount, loadedLeague, loadedRosters, loadedUsers, loadedVersion, subscribeLoaded } from "@/lib/sleeper/league";
 import { readIdLink, readTeamLink } from "@/lib/team/links";
@@ -53,6 +54,18 @@ const SPECS = {
     component: ProfileWindow,
     defaultSize: { w: 520, h: 560 },
     link: readIdLink("userId"),
+  },
+  search: {
+    label: "Search",
+    title: "Search Sleeper",
+    Icon: SearchIcon,
+    component: SearchWindow,
+    defaultSize: { w: 460, h: 360 },
+    // `search:user:<name>` or `search:league:<id>`, the search Back returns to.
+    link: (v) => {
+      const [mode, ...q] = v.split(":");
+      return mode === "user" || mode === "league" ? { mode, q: q.join(":") } : null;
+    },
   },
   team: {
     label: "Team",

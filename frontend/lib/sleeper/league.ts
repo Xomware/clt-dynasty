@@ -68,9 +68,19 @@ const settled = new Map<string, unknown>();
 const listeners = new Set<() => void>();
 let version = 0;
 
+export class SleeperError extends Error {
+  constructor(
+    readonly status: number,
+    path: string,
+  ) {
+    super(`Sleeper ${path} failed (${status})`);
+    this.name = "SleeperError";
+  }
+}
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
-  if (!res.ok) throw new Error(`Sleeper ${path} failed (${res.status})`);
+  if (!res.ok) throw new SleeperError(res.status, path);
   return (await res.json()) as T;
 }
 

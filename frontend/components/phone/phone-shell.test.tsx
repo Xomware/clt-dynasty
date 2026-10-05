@@ -55,7 +55,7 @@ afterEach(() => {
 describe("phone shell", () => {
   it("lists the programs instead of the desktop, without drill-only windows", async () => {
     await renderPhone();
-    expect(programs().getAllByRole("button").map((b) => b.textContent)).toEqual(["Settings", "My Team", "Profile", "Home", "Standings", "Broken"]);
+    expect(programs().getAllByRole("button").map((b) => b.textContent)).toEqual(["Settings", "My Team", "Profile", "Search", "Home", "Standings", "Broken"]);
     expect(screen.queryByRole("list", { name: "Desktop" })).toBeNull();
   });
 
