@@ -588,4 +588,407 @@
     outline: 2px dotted var(--xp-text);
     outline-offset: -3px;
   }
+
+  .xp-taskbar {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 50;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    height: var(--taskbar-top);
+    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background: linear-gradient(var(--xp-taskbar-light), var(--xp-taskbar) 15%, var(--xp-taskbar) 85%, var(--xp-taskbar-dark));
+  }
+
+  .xp-start {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 6.5rem;
+    padding: 0 1.25rem 0 0.75rem;
+    border-radius: 0 12px 12px 0;
+    color: var(--xp-text-inverse);
+    font: italic bold 1.25rem var(--xp-title-font);
+    text-shadow: 1px 1px 2px var(--xp-start-dark);
+    background: linear-gradient(var(--xp-start-light), var(--xp-start) 30%, var(--xp-start-dark));
+    box-shadow: inset -2px 0 3px var(--xp-start-dark);
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-start:hover {
+    filter: brightness(1.12);
+  }
+
+  .xp-start:active,
+  .xp-start[aria-expanded="true"] {
+    background: linear-gradient(var(--xp-start-dark), var(--xp-start) 70%, var(--xp-start-light));
+  }
+
+  .xp-start:focus-visible,
+  .xp-start-menu-link:focus-visible {
+    outline: 2px dotted var(--xp-text-inverse);
+    outline-offset: -5px;
+  }
+
+  .xp-tray {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem 0 0.5rem;
+    border-left: 1px solid var(--xp-tray-dark);
+    color: var(--xp-text-inverse);
+    font-size: 0.8125rem;
+    background: linear-gradient(var(--xp-tray), var(--xp-tray-dark));
+  }
+
+
+  /* Set on body by XpCursor, only while the XP desktop shell is mounted. The
+     CSS elsewhere reads the two variables, so the phone shell keeps the system cursors. */
+  @media (pointer: fine) {
+    .xp-cursor {
+      --cursor-default: url("/cursors/arrow.svg") 0 0, default;
+      --cursor-pointer: url("/cursors/hand.svg") 5 0, pointer;
+      cursor: var(--cursor-default);
+    }
+
+    .xp-cursor a[href] {
+      cursor: var(--cursor-pointer);
+    }
+
+    .xp-cursor
+      :is(
+        textarea,
+        [contenteditable],
+        input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="color"])
+      ) {
+      cursor: text;
+    }
+  }
+
+  .xp-start-menu {
+    position: fixed;
+    bottom: var(--taskbar-top);
+    left: env(safe-area-inset-left);
+    z-index: 50;
+    max-height: calc(100dvh - var(--taskbar-top) - env(safe-area-inset-top));
+  }
+
+  .xp-start-menu {
+    display: flex;
+    flex-direction: column;
+    width: min(20rem, 100vw);
+    border: 2px solid var(--xp-taskbar-dark);
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    background: var(--xp-cream);
+    box-shadow: 3px -2px 10px rgb(10 30 80 / 0.5);
+  }
+
+  .xp-start-menu-header,
+  .xp-start-menu-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--xp-text-inverse);
+    background: linear-gradient(var(--xp-title-light), var(--xp-title-dark));
+  }
+
+  .xp-start-menu-header {
+    font: bold 1rem var(--xp-title-font);
+    text-shadow: 1px 1px var(--xp-frame);
+  }
+
+  .xp-start-menu-footer {
+    background: linear-gradient(var(--xp-title), var(--xp-title-dark));
+    font-size: 0.75rem;
+  }
+
+  .xp-start-menu-avatar {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 2px solid var(--xp-text-inverse);
+    border-radius: 4px;
+    background: var(--clt-sky);
+  }
+
+  .xp-start-menu-header,
+  .xp-start-menu-footer {
+    flex: none;
+  }
+
+  .xp-start-menu-list {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.25rem;
+    border-right: 4rem solid var(--xp-menu-side);
+  }
+
+  .xp-start-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding: 0 0.625rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+  }
+
+  .xp-start-menu-link:hover,
+  .xp-start-menu-link:focus-visible,
+  .xp-start-menu-link[aria-expanded="true"] {
+    color: var(--xp-text-inverse);
+    background: var(--xp-select);
+  }
+
+  .xp-start-submenu {
+    position: fixed;
+    z-index: 51;
+    min-width: 12rem;
+    padding: 0.25rem;
+    border: 1px solid var(--xp-face-shadow);
+    background: var(--xp-cream);
+    box-shadow: 2px 2px 6px rgb(10 30 80 / 0.4);
+  }
+
+  .xp-team {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .xp-avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid var(--xp-face-shadow);
+    border-radius: 3px;
+    font-weight: bold;
+    background: var(--xp-cream);
+  }
+
+  .xp-team-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+
+  .xp-desktop {
+    position: fixed;
+    inset: 0 0 var(--taskbar-top) 0;
+    overflow: hidden;
+    background: var(--xp-sky-bottom) url("/brand/wallpaper-hill-1600.jpg") center / cover no-repeat;
+  }
+
+  .xp-wallpaper-credit {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.25rem;
+    font-size: 0.75rem;
+    color: rgb(255 255 255 / 0.75);
+    text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+  }
+
+  .xp-desktop-icons {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.75rem 0.25rem;
+    /* A short screen wraps icons into a second column, as XP did, rather than under the taskbar. */
+    max-height: calc(100dvh - var(--taskbar-top) - 1.5rem);
+  }
+
+  .xp-desktop-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    width: 5.5rem;
+    padding: 0.25rem;
+    color: var(--xp-text-inverse);
+    font-size: 0.75rem;
+  }
+
+  .xp-desktop-icon-label {
+    padding: 0 0.25rem;
+    text-align: center;
+    text-shadow: 1px 1px 1px var(--xp-screen);
+  }
+
+  .xp-desktop-icon:hover :is(svg, img) {
+    filter: brightness(1.12);
+  }
+
+  .xp-desktop-icon:focus :is(svg, img) {
+    filter: brightness(0.8) sepia(1) hue-rotate(180deg) saturate(3);
+  }
+
+  .xp-desktop-icon:focus .xp-desktop-icon-label {
+    background: var(--xp-select);
+    text-shadow: none;
+  }
+
+  .xp-desktop-icon:focus-visible .xp-desktop-icon-label {
+    outline: 1px dotted var(--xp-text-inverse);
+  }
+
+  .xp-desktop-window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .xp-desktop-window:focus {
+    outline: none;
+  }
+
+  .xp-desktop-window[data-maximized] {
+    inset: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+    width: auto;
+    border-radius: 0;
+  }
+
+  .xp-desktop-window:not([data-active]) {
+    border-color: var(--xp-title-inactive);
+  }
+
+  .xp-desktop-window:not([data-active]) .xp-titlebar {
+    background: linear-gradient(var(--xp-title-inactive-light), var(--xp-title-inactive));
+  }
+
+  .xp-desktop-window .xp-titlebar {
+    flex: none;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .xp-toolbar {
+    display: flex;
+    flex: none;
+    gap: 2px;
+    padding: 2px 4px;
+    border-bottom: 1px solid var(--xp-face-shadow);
+    background: linear-gradient(var(--xp-cream), var(--xp-face));
+  }
+
+  .xp-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2rem;
+    padding: 2px 6px 2px 2px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    font: inherit;
+    font-size: 0.8125rem;
+    color: var(--xp-text);
+    background: none;
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-nav:hover:enabled {
+    border-color: var(--xp-face-shadow);
+    background: var(--xp-cream);
+  }
+
+  .xp-nav:active:enabled {
+    background: var(--xp-face);
+    box-shadow: inset 1px 1px 2px rgb(10 30 80 / 0.25);
+  }
+
+  .xp-nav:focus-visible {
+    outline: 2px dotted var(--xp-text);
+    outline-offset: -3px;
+  }
+
+  .xp-nav:disabled {
+    cursor: var(--cursor-default, default);
+    color: var(--xp-face-shadow);
+  }
+
+  .xp-nav:disabled svg {
+    filter: grayscale(1);
+    opacity: 0.5;
+  }
+
+  .xp-desktop-window .xp-window-body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  /* An iframe under the pointer would swallow the drag. */
+  .xp-desktop-window:has(.xp-titlebar:active, .xp-resize:active) iframe {
+    pointer-events: none;
+  }
+
+  .xp-resize {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 1rem;
+    height: 1rem;
+    cursor: nwse-resize;
+    touch-action: none;
+    background: linear-gradient(135deg, transparent 50%, var(--xp-face-shadow) 50% 60%, transparent 60% 70%, var(--xp-face-shadow) 70% 80%, transparent 80%);
+  }
+
+  .xp-tasks {
+    display: flex;
+    flex: 1;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.25rem 0.5rem;
+    overflow-x: auto;
+  }
+
+  .xp-tasks > li {
+    flex: 0 1 10rem;
+    min-width: 2.75rem;
+  }
+
+  .xp-task {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    width: 100%;
+    height: 100%;
+    padding: 0 0.5rem;
+    border: 1px solid var(--xp-taskbar-dark);
+    border-radius: 3px;
+    color: var(--xp-text-inverse);
+    font-size: 0.75rem;
+    background: linear-gradient(var(--xp-taskbar-light), var(--xp-taskbar));
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-task:hover {
+    filter: brightness(1.12);
+  }
+
+  .xp-task[aria-pressed="true"] {
+    background: var(--xp-taskbar-dark);
+    box-shadow: inset 1px 1px 3px var(--xp-screen);
+  }
+
+  .xp-task:focus-visible {
+    outline: 2px dotted var(--xp-text-inverse);
+    outline-offset: -4px;
+  }
+  .xp-start-menu-empty {
+    padding: 0.5rem 0.625rem;
+    color: var(--xp-text);
+    font-size: 0.8125rem;
+    font-style: italic;
+  }
 }

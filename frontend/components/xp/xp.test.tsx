@@ -5,6 +5,7 @@ import { ViewParamsContext } from "@/lib/view-params";
 import { BrandLoader } from "./BrandLoader";
 import { SpeakerToggle } from "./SpeakerToggle";
 import { Tabs } from "./Tabs";
+import { TeamName } from "./TeamName";
 import { Window } from "./Window";
 
 const reduced = (on: boolean) =>
@@ -96,5 +97,19 @@ describe("SpeakerToggle", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Unmute sounds" }));
     expect(localStorage.getItem("clt.muted")).toBe("0");
+  });
+});
+
+describe("TeamName", () => {
+  it("falls back to the initial and stars the member's own team", () => {
+    const { container } = render(<TeamName name="queen city" isMine />);
+    expect(container.querySelector(".xp-avatar")?.textContent).toBe("Q");
+    expect(screen.getByRole("img", { name: "Your team" })).toBeTruthy();
+  });
+
+  it("shows the avatar and no star for another team", () => {
+    const { container } = render(<TeamName name="Rival" avatarUrl="https://sleepercdn.com/avatars/thumbs/abc" />);
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("https://sleepercdn.com/avatars/thumbs/abc");
+    expect(screen.queryByRole("img", { name: "Your team" })).toBeNull();
   });
 });
