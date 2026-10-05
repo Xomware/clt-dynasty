@@ -9,6 +9,7 @@ import { RulesWindow } from "@/components/windows/RulesWindow";
 import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
+import { WorldCupWindow } from "@/components/windows/WorldCupWindow";
 import {
   BracketIcon,
   CalendarIcon,
@@ -19,6 +20,7 @@ import {
   RosterMoveIcon,
   ScoresIcon,
   StandingsIcon,
+  TrophyIcon,
 } from "@/components/xp/icons";
 
 import type { WindowParams, WindowView } from "./windows";
@@ -59,6 +61,7 @@ const SPECS = {
     component: DraftOrderWindow,
     defaultSize: { w: 600, h: 620 },
   },
+  "world-cup": { label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
   rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
 } satisfies Record<string, WindowSpec>;

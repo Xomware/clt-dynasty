@@ -14,3 +14,32 @@ export interface CltMe {
 }
 
 export const getCltMe = () => request<CltMe>("/clt/me");
+
+// GET /clt/world-cup (api_clt_worldcup): divisional records across every
+// season, keyed by Sleeper user. Teams arrive sorted; the top two qualify.
+export interface WorldCupTeam {
+  userId: string;
+  username: string;
+  teamName: string;
+  wins: number;
+  losses: number;
+  ties: number;
+  pointsFor: number;
+  pointsAgainst: number;
+  status: "alive" | "clinched" | "eliminated";
+}
+
+export interface WorldCupDivision {
+  division: number;
+  name: string;
+  gamesRemaining: number;
+  teams: WorldCupTeam[];
+}
+
+export interface WorldCup {
+  leagueId: string;
+  season: string;
+  divisions: WorldCupDivision[];
+}
+
+export const getWorldCup = () => request<WorldCup>("/clt/world-cup");

@@ -201,6 +201,16 @@
   opacity: 0.4;
 }
 
+.world-cup-status[data-status="clinched"] {
+  background: var(--xp-gold);
+}
+
+.world-cup-status[data-status="eliminated"] {
+  border-color: var(--xp-face-shadow);
+  color: var(--xp-text);
+  background: var(--xp-face);
+}
+
 @media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
   /* A phone has room for rank, team, record, points and seed. */
   .standings-extra {
