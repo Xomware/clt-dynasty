@@ -52,4 +52,21 @@
   display: grid;
   gap: 0.25rem;
   padding: 0.5rem;
+.ai-headline {
+  display: grid;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-cream);
+}
+
+.ai-headline-title {
+  font-family: var(--xp-title-font);
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  color: var(--xp-title-dark);
+}
+
+.ai-headline-excerpt {
+  line-height: 1.5;
 }

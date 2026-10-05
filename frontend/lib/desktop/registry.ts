@@ -1,20 +1,26 @@
-import type { ComponentType, SVGProps } from "react";
+import { type ComponentType, type SVGProps, useSyncExternalStore } from "react";
 
 import { AdminAIWindow } from "@/components/windows/AdminAIWindow";
 import { AdminAnnouncementsWindow } from "@/components/windows/AdminAnnouncementsWindow";
 import { AIReportWindow, AIReviewWindow, readReportLink, reportTitle } from "@/components/windows/AIReviewWindow";
+import { AnalyzerWindow } from "@/components/windows/AnalyzerWindow";
 import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
 import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
 import { HistoryWindow } from "@/components/windows/HistoryWindow";
+import { HomeWindow } from "@/components/windows/HomeWindow";
+import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
 import { MembersWindow } from "@/components/windows/MembersWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
+import { ProfileWindow } from "@/components/windows/ProfileWindow";
 import { ProposalsWindow } from "@/components/windows/ProposalsWindow";
 import { RulesWindow } from "@/components/windows/RulesWindow";
 import { ScoresWindow } from "@/components/windows/ScoresWindow";
+import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
 import { TaxiWindow } from "@/components/windows/TaxiWindow";
+import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
 import { WorldCupWindow } from "@/components/windows/WorldCupWindow";
 import {
   AdminReportIcon,
@@ -25,15 +31,25 @@ import {
   ChartIcon,
   ControlPanelIcon,
   FolderIcon,
+  HomeIcon,
   MembersIcon,
   NewsFeedIcon,
   NewspaperIcon,
+  ProfileIcon,
   RosterMoveIcon,
   ScoresIcon,
+  SearchIcon,
   StandingsIcon,
+  StarIcon,
   TaxiIcon,
+  TradeIcon,
   TrophyIcon,
 } from "@/components/xp/icons";
+import { LEAGUE_ID } from "@/lib/config";
+import { settled, settledVersion, subscribeSettled } from "@/lib/league/cache";
+import { teamOf } from "@/lib/league/use-league";
+import type { SleeperAccount, SleeperLeague, SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
+import { readIdLink, readTeamLink } from "@/lib/team/links";
 
 import { useMember } from "@/lib/member/use-member";
 
@@ -56,8 +72,25 @@ export interface WindowSpec {
   adminOnly?: boolean;
 }
 
+// Titles name what the window shows once Sleeper has answered for it.
+function teamTitle(p: WindowParams): string {
+  const leagueId = String(p.leagueId ?? LEAGUE_ID);
+  const rosterId = Number(p.rosterId);
+  const users = settled<SleeperUser[]>(`users/${leagueId}`);
+  const rosters = settled<SleeperRoster[]>(`rosters/${leagueId}`);
+  if (!users || !rosters) return "Team Profile";
+  return `Team Profile - ${teamOf(users, rosters.find((r) => r.roster_id === rosterId), rosterId).name}`;
+}
+
+function profileTitle(p: WindowParams): string {
+  if (!p.userId) return "My Profile";
+  const name = settled<SleeperAccount | null>(`account/${p.userId}`)?.display_name;
+  return name ? `Profile - ${name}` : "Profile";
+}
+
 // One entry per window kind, in launcher order. Each league window adds itself here.
 const SPECS = {
+  home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: HomeWindow, defaultSize: { w: 640, h: 640 } },
   standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
   scores: { label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
   playoffs: { label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 720, h: 560 } },
@@ -92,6 +125,46 @@ const SPECS = {
   },
   rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
+  "my-team": { label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
+  profile: {
+    label: "Profile",
+    title: profileTitle,
+    Icon: ProfileIcon,
+    component: ProfileWindow,
+    defaultSize: { w: 520, h: 560 },
+    link: readIdLink("userId"),
+  },
+  analyzer: { label: "Team Analyzer", title: "Team Analyzer", Icon: TradeIcon, component: AnalyzerWindow, defaultSize: { w: 760, h: 620 } },
+  search: {
+    label: "Search",
+    title: "Search Sleeper",
+    Icon: SearchIcon,
+    component: SearchWindow,
+    defaultSize: { w: 460, h: 360 },
+    // `search:user:<name>` or `search:league:<id>`, the search Back returns to.
+    link: (v) => {
+      const [mode, ...q] = v.split(":");
+      return mode === "user" || mode === "league" ? { mode, q: q.join(":") } : null;
+    },
+  },
+  team: {
+    label: "Team",
+    title: teamTitle,
+    Icon: ProfileIcon,
+    component: TeamWindow,
+    defaultSize: { w: 640, h: 640 },
+    link: readTeamLink,
+    drillOnly: true,
+  },
+  league: {
+    label: "League",
+    title: (p) => settled<SleeperLeague>(`league/${p.leagueId}`)?.name ?? "League",
+    Icon: TrophyIcon,
+    component: LeagueWindow,
+    defaultSize: { w: 600, h: 600 },
+    link: readIdLink("leagueId"),
+    drillOnly: true,
+  },
   members: {
     label: "Members",
     title: "Admin: Members",
@@ -135,4 +208,10 @@ export function useLaunchers() {
 export function windowTitle({ kind, params }: WindowView): string {
   const { title } = REGISTRY[kind];
   return typeof title === "string" ? title : title(params);
+}
+
+// Re-renders the caller when Sleeper data lands, so a title that names a team or league catches up.
+export function useWindowTitle(): (view: WindowView) => string {
+  useSyncExternalStore(subscribeSettled, settledVersion, settledVersion);
+  return windowTitle;
 }

@@ -33,6 +33,7 @@ export function SettingsWindow({ params }: { params: WindowParams }) {
 }
 
 function Account() {
+  const { sync } = useMember();
   const [load, setLoad] = useState<Load>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
 
@@ -46,6 +47,12 @@ function Account() {
       live = false;
     };
   }, [attempt]);
+
+  // My Team and Profile read the link from /clt/me.
+  const changed = (user: PlatformUser) => {
+    setLoad({ status: "ready", user });
+    sync();
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -72,9 +79,9 @@ function Account() {
         )}
         {load.status === "ready" &&
           (load.user.hasLinkedSleeper ? (
-            <Linked user={load.user} onChange={(user) => setLoad({ status: "ready", user })} />
+            <Linked user={load.user} onChange={(user) => changed(user)} />
           ) : (
-            <LinkForm onLinked={(user) => setLoad({ status: "ready", user })} />
+            <LinkForm onLinked={(user) => changed(user)} />
           ))}
       </section>
     </div>

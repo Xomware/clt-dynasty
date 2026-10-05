@@ -61,6 +61,7 @@ function Week({ season, week, games, open, onToggle, myRosterId }: WeekProps) {
                 <MatchupCard
                   key={g.id}
                   game={g}
+                  leagueId={league.league_id}
                   teamFor={(id) => seasonTeam(season, id)}
                   myRosterId={myRosterId}
                   note={kindOf(g.id) === "consolation" ? "Consolation" : kindOf(g.id) === "playoff" ? "Playoffs" : undefined}
