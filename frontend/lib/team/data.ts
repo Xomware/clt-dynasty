@@ -21,9 +21,10 @@ export const loadLeagueData = async (leagueId: string): Promise<LeagueData> => {
   return { league, users, rosters };
 };
 
-// The member's Sleeper account: the roster mapping, else what they linked.
+// The account they linked in Settings, else the one the roster lists for
+// them: the same order as lib/league/use-league's myRosterId.
 export function useMySleeperId(): string {
   const { state } = useMember();
   if (state.status !== "member") return "";
-  return state.me.member.sleeperUserId || state.me.linkedSleeperUserId;
+  return state.me.linkedSleeperUserId || state.me.member.sleeperUserId;
 }

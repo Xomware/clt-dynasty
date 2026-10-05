@@ -178,6 +178,12 @@ describe("My Team window", () => {
     expect(await screen.findByRole("region", { name: "Team Name 4" })).toBeTruthy();
   });
 
+  it("prefers the account linked in Settings over the roster's mapping", async () => {
+    routes["GET /clt/me"] = [200, { member: { email: "m@example.com", displayName: "", role: "member", sleeperUserId: "u4" }, linkedSleeperUserId: "u6" }];
+    inMember(<MyTeamWindow />);
+    expect(await screen.findByRole("region", { name: "Team Name 6" })).toBeTruthy();
+  });
+
   it("asks an unlinked member to link Sleeper", async () => {
     routes["GET /clt/me"] = [200, { member: { email: "m@example.com", displayName: "", role: "member", sleeperUserId: "" }, linkedSleeperUserId: "" }];
     inMember(<MyTeamWindow />);
