@@ -1,0 +1,160 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home-news {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.home-news-item {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-cream);
+}
+
+.home-news-item[data-priority="critical"] {
+  border-color: var(--xp-wood);
+  background: var(--xp-balloon);
+  box-shadow: inset 3px 0 var(--xp-red);
+}
+
+.home-news-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: bold;
+}
+
+.home-news-body {
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.home-draft-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.home-countdown {
+  margin-left: auto;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--clt-navy-dark);
+  border-radius: 3px;
+  font: bold 1rem var(--xp-title-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--clt-crown);
+  background: var(--clt-navy);
+}
+
+.home-chips {
+  display: flex;
+  gap: 0.375rem;
+  overflow-x: auto;
+  padding: 0.125rem 0.125rem 0.375rem;
+  scroll-snap-type: x proximity;
+}
+
+.home-chip {
+  flex: none;
+  max-width: 12rem;
+  scroll-snap-align: start;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: linear-gradient(var(--xp-cream), var(--xp-face));
+}
+
+.home-chip[data-mine] {
+  border-color: var(--clt-crown-dark);
+  box-shadow: inset 0 0 0 1px var(--clt-crown);
+}
+
+.home-chip-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.125rem 0.375rem;
+  align-items: center;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.home-chip-rank {
+  grid-row: span 2;
+  font: bold 1rem var(--xp-title-font);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-chip-record {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-games {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.home-game {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.375rem 0.25rem;
+  border-bottom: 1px solid var(--xp-face-shadow);
+}
+
+.home-game[data-mine] {
+  background: var(--clt-sky);
+}
+
+.home-game-side {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.home-game-side[data-side="b"] {
+  flex-direction: row-reverse;
+}
+
+.home-game-points {
+  flex: none;
+  margin-left: auto;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-game-side[data-side="b"] .home-game-points {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.home-more {
+  margin-top: 0.5rem;
+  color: var(--xp-title-dark);
+  text-decoration: underline;
+}
+
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  /* One team per line, scores lined up on the right. */
+  .home-game {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+  }
+
+  .home-game-side[data-side="b"] {
+    flex-direction: row;
+  }
+
+  .home-game-side[data-side="b"] .home-game-points {
+    margin-left: auto;
+    margin-right: 0;
+  }
+}

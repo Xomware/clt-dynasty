@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { Tabs } from "@/components/xp/Tabs";
-import { TeamName } from "@/components/xp/TeamName";
+import { TeamLink } from "@/components/xp/TeamLink";
 import { divisionName, playoffSeeds, type Standing, sortStandings } from "@/lib/league/standings";
 import { type Team, useLeague } from "@/lib/league/use-league";
 import type { WindowParams } from "@/lib/desktop/windows";
@@ -58,7 +58,7 @@ function StandingsTable({ label, rows, seedOf, playoffTeams, teamFor, myRosterId
               <tr key={s.rosterId} className={seed <= playoffTeams ? "xp-in" : undefined}>
                 <td className="tabular-nums">{i + 1}</td>
                 <td className="md:max-w-0">
-                  <TeamName name={team.name} avatarUrl={team.avatarUrl} isMine={s.rosterId === myRosterId} />
+                  <TeamLink rosterId={s.rosterId} name={team.name} avatarUrl={team.avatarUrl} isMine={s.rosterId === myRosterId} />
                 </td>
                 <td className="tabular-nums">
                   {s.wins}-{s.losses}

@@ -3,7 +3,7 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 
 import { Tabs } from "@/components/xp/Tabs";
-import { TeamName } from "@/components/xp/TeamName";
+import { TeamLink } from "@/components/xp/TeamLink";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { finishOrder, fromSleeper, lastFinishedWeek } from "@/lib/league/brackets";
 import { leagueMatchups, tradedPicks, winnersBracket } from "@/lib/league/cache";
@@ -66,7 +66,7 @@ function OrderTable({ label, order, standings, hpp, heldBy, teamFor, myRosterId 
               <tr key={d.rosterId} className={d.playoff && !order[i - 1]?.playoff ? "xp-group-start" : undefined}>
                 <td className="tabular-nums">{d.pick}</td>
                 <td className="md:max-w-0">
-                  <TeamName {...teamFor(d.rosterId)} isMine={d.rosterId === myRosterId} />
+                  <TeamLink rosterId={d.rosterId} {...teamFor(d.rosterId)} isMine={d.rosterId === myRosterId} />
                   {d.playoff && <span className="xp-tag mt-1 block w-fit">Playoffs</span>}
                   {holder !== undefined && (
                     <span className="block text-xs">1st-round pick held by {teamFor(holder).name}</span>

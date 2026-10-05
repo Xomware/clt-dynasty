@@ -1,0 +1,169 @@
+/* Team, profile and league windows: an XP "properties" header over grouped tables. */
+.team-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: linear-gradient(var(--xp-cream), var(--xp-face));
+}
+
+.team-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  overflow: hidden;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  font-family: var(--xp-title-font);
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: var(--xp-cream);
+}
+
+.team-who {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.team-name {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  font-family: var(--xp-title-font);
+  font-size: 1.125rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.team-stats {
+  display: flex;
+  flex: 1 1 18rem;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.5rem;
+}
+
+.team-stats dt {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.team-stats dd {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.team-streak {
+  padding: 0 0.25rem;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.team-streak[data-result="W"] {
+  color: var(--xp-start-dark);
+}
+
+.team-streak[data-result="L"] {
+  color: var(--xp-red);
+}
+
+.team-count {
+  font-weight: normal;
+  color: var(--xp-text);
+}
+
+.team-table td {
+  vertical-align: middle;
+}
+
+.team-player {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.team-player-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.team-player-meta {
+  display: block;
+  font-size: 0.75rem;
+}
+
+.team-face {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  overflow: hidden;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: var(--xp-face);
+}
+
+.team-injury {
+  margin-left: auto;
+  color: var(--xp-red);
+  border-color: var(--xp-red);
+}
+
+.team-open {
+  font-style: italic;
+}
+
+.team-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.team-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-list li + li {
+  border-top: 1px solid var(--xp-face-shadow);
+}
+
+.team-list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0;
+}
+
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  /* Long team names truncate rather than push W-L and PF off a phone. */
+  .xp-table.team-league-table {
+    table-layout: fixed;
+  }
+
+  .team-division {
+    display: none;
+  }
+
+  .team-streak,
+  .team-stats dt {
+    font-size: 0.75rem;
+  }
+}
