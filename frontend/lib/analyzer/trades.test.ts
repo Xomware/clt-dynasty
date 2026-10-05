@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { SleeperRoster } from "@/lib/sleeper/league";
+import type { SleeperRoster } from "@/lib/sleeper/types";
 import { analyze } from "./analysis";
 import { recommendTrades } from "./trades";
 import { parseValues } from "./values";
@@ -22,7 +22,7 @@ const roster = (roster_id: number, players: string[]): SleeperRoster => ({
   players,
   taxi: null,
   reserve: null,
-  settings: { wins: 0, losses: 0, ties: 0 },
+  settings: { wins: 0, losses: 0, ties: 0, fpts: 0 },
   metadata: null,
 });
 

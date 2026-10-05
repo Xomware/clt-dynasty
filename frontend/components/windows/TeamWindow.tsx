@@ -9,24 +9,16 @@ import { StarIcon } from "@/components/xp/icons";
 import { LEAGUE_ID } from "@/lib/config";
 import { DrillContext } from "@/lib/desktop/navigation";
 import type { WindowParams } from "@/lib/desktop/windows";
-import { type Player, type PlayerMap, playerName, players as playersResource } from "@/lib/players";
-import { avatarUrl, getLeagueRosters, type SleeperLeague, type SleeperRoster } from "@/lib/sleeper/league";
+import { type Player, playerName } from "@/lib/api/players";
+import { rosters as leagueRosters } from "@/lib/league/cache";
+import { refreshPlayers, usePlayers } from "@/lib/league/players";
+import { divisionName } from "@/lib/league/standings";
+import { teamOf } from "@/lib/league/use-league";
+import { rosterOf } from "@/lib/sleeper/rosters";
+import type { SleeperLeague, SleeperRoster } from "@/lib/sleeper/types";
 import { type LeagueData, loadLeagueData, useMySleeperId } from "@/lib/team/data";
 import { leagueLink, profileLink } from "@/lib/team/links";
-import {
-  divisionName,
-  injuryTag,
-  ordinal,
-  ownerOf,
-  pointsAgainst,
-  pointsFor,
-  rankOf,
-  rosterGroups,
-  rosterOwnedBy,
-  slotLabel,
-  streakOf,
-  teamName,
-} from "@/lib/team/team";
+import { injuryTag, ordinal, rankOf, rosterGroups, slotLabel } from "@/lib/team/team";
 import { useLoad } from "@/lib/use-load";
 
 import "./team.css";
@@ -39,7 +31,7 @@ export function TeamWindow({ params }: { params: WindowParams }) {
 export function MyTeamWindow() {
   const me = useMySleeperId();
   const open = useContext(DrillContext);
-  const [load, retry] = useLoad(() => getLeagueRosters(LEAGUE_ID), LEAGUE_ID);
+  const [load, retry] = useLoad(() => leagueRosters(LEAGUE_ID), LEAGUE_ID);
 
   if (!me) {
     return (
@@ -53,8 +45,8 @@ export function MyTeamWindow() {
   }
   if (load.status === "loading") return <p role="status">Finding your team...</p>;
   if (load.status === "error") return <LoadError what="the league's rosters" message={load.message} onRetry={retry} />;
-  const roster = rosterOwnedBy(load.value, me);
-  if (!roster) {
+  const rosterId = rosterOf(load.value, me);
+  if (rosterId === null) {
     return (
       <div className="team-empty" role="alert">
         <p>Your linked Sleeper account doesn&rsquo;t own a team in the CLT Dynasty League.</p>
@@ -64,7 +56,7 @@ export function MyTeamWindow() {
       </div>
     );
   }
-  return <TeamView leagueId={LEAGUE_ID} rosterId={roster.roster_id} />;
+  return <TeamView leagueId={LEAGUE_ID} rosterId={rosterId} />;
 }
 
 interface TeamViewProps {
@@ -82,7 +74,7 @@ function TeamView({ leagueId, rosterId }: TeamViewProps) {
   const roster = data.rosters.find((r) => r.roster_id === rosterId);
   if (!roster) return <p role="alert">{data.league.name} has no roster {rosterId}.</p>;
 
-  const isMine = leagueId === LEAGUE_ID && !!me && rosterOwnedBy(data.rosters, me) === roster;
+  const isMine = leagueId === LEAGUE_ID && !!me && rosterOf(data.rosters, me) === rosterId;
   return (
     <div className="flex flex-col gap-3">
       <TeamHead data={data} roster={roster} isMine={isMine} />
@@ -98,13 +90,12 @@ interface TeamHeadProps {
 }
 
 function TeamHead({ data: { league, users, rosters }, roster, isMine }: TeamHeadProps) {
-  const name = teamName(roster, users, roster.roster_id);
-  const owner = ownerOf(roster, users);
-  const avatar = avatarUrl(owner?.avatar);
+  const { name, avatarUrl: avatar } = teamOf(users, roster, roster.roster_id);
+  const owner = users.find((u) => u.user_id === roster.owner_id);
   const rank = rankOf(rosters, roster.roster_id);
-  const streak = streakOf(roster);
+  const streak = /^(\d+)([WLT])$/.exec(rank?.standing.streak ?? "");
   const { wins, losses, ties } = roster.settings;
-  const division = divisionName(league, roster.settings.division);
+  const division = rank?.division ? divisionName(league, rank.standing.division) : null;
 
   return (
     <section aria-label={name} className="team-head">
@@ -131,13 +122,13 @@ function TeamHead({ data: { league, users, rosters }, roster, isMine }: TeamHead
           <dd>
             {wins}-{losses}
             {ties > 0 && `-${ties}`}
-            {streak && <span className="team-streak" data-result={streak.result}>{`${streak.result}${streak.length}`}</span>}
+            {streak && <span className="team-streak" data-result={streak[2]}>{`${streak[2]}${streak[1]}`}</span>}
           </dd>
         </div>
         <div>
           <dt>PF / PA</dt>
           <dd>
-            {pointsFor(roster).toFixed(2)} / {pointsAgainst(roster).toFixed(2)}
+            {rank?.standing.pf.toFixed(2)} / {rank?.standing.pa.toFixed(2)}
           </dd>
         </div>
         {rank && (
@@ -164,9 +155,9 @@ function TeamHead({ data: { league, users, rosters }, roster, isMine }: TeamHead
 }
 
 function Roster({ league, roster }: { league: SleeperLeague; roster: SleeperRoster }) {
-  const state = playersResource.use();
+  const state = usePlayers();
   if (state.status === "loading") return <p role="status">Loading player names...</p>;
-  if (state.status === "error") return <LoadError what="player names" message={state.message} onRetry={() => playersResource.refresh()} />;
+  if (state.status === "error") return <LoadError what="player names" message={state.message} onRetry={refreshPlayers} />;
   if (!roster.players?.length) return <p className="team-empty">No players on this roster yet.</p>;
   const groups = rosterGroups(roster, league, state.players);
   const asRow = (id: string) => ({ key: id, label: state.players[id]?.position ?? "", id });
@@ -189,7 +180,7 @@ interface Row {
 
 interface RosterTableProps {
   title: string;
-  players: PlayerMap;
+  players: Record<string, Player>;
   rows: Row[];
   labelHeader?: string;
 }
