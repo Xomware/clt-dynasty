@@ -9,6 +9,7 @@ import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
 import { RulesWindow } from "@/components/windows/RulesWindow";
 import { ScoresWindow } from "@/components/windows/ScoresWindow";
+import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
 import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
@@ -22,6 +23,7 @@ import {
   ProfileIcon,
   RosterMoveIcon,
   ScoresIcon,
+  SearchIcon,
   StandingsIcon,
   StarIcon,
   TrophyIcon,
@@ -96,6 +98,18 @@ const SPECS = {
     component: ProfileWindow,
     defaultSize: { w: 520, h: 560 },
     link: readIdLink("userId"),
+  },
+  search: {
+    label: "Search",
+    title: "Search Sleeper",
+    Icon: SearchIcon,
+    component: SearchWindow,
+    defaultSize: { w: 460, h: 360 },
+    // `search:user:<name>` or `search:league:<id>`, the search Back returns to.
+    link: (v) => {
+      const [mode, ...q] = v.split(":");
+      return mode === "user" || mode === "league" ? { mode, q: q.join(":") } : null;
+    },
   },
   team: {
     label: "Team",
