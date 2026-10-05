@@ -985,10 +985,4 @@
     outline: 2px dotted var(--xp-text-inverse);
     outline-offset: -4px;
   }
-  .xp-start-menu-empty {
-    padding: 0.5rem 0.625rem;
-    color: var(--xp-text);
-    font-size: 0.8125rem;
-    font-style: italic;
-  }
 }

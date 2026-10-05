@@ -10,7 +10,6 @@ interface StartMenuProps {
 }
 
 export function StartMenu({ id, name, onOpen, onReset, onSignOut }: StartMenuProps) {
-  const programs = launchers();
   return (
     <nav id={id} className="xp-start-menu" aria-label="Start menu">
       <div className="xp-start-menu-header">
@@ -20,7 +19,7 @@ export function StartMenu({ id, name, onOpen, onReset, onSignOut }: StartMenuPro
         <span className="truncate">{name}</span>
       </div>
       <ul className="xp-start-menu-list">
-        {programs.map(({ kind, label, Icon }) => (
+        {launchers().map(({ kind, label, Icon }) => (
           <li key={kind}>
             <button type="button" className="xp-start-menu-link w-full" onClick={() => onOpen(kind)}>
               <Icon width={24} height={24} />
@@ -28,7 +27,6 @@ export function StartMenu({ id, name, onOpen, onReset, onSignOut }: StartMenuPro
             </button>
           </li>
         ))}
-        {programs.length === 0 && <li className="xp-start-menu-empty">League windows land here as they&rsquo;re built.</li>}
         <li>
           <button type="button" className="xp-start-menu-link w-full" onClick={onReset}>
             <DesktopIcon width={24} height={24} />
