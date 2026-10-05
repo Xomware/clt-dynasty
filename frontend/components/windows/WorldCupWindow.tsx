@@ -1,23 +1,30 @@
 "use client";
 
 import { LoadError } from "@/components/xp/LoadError";
+import { TeamLink } from "@/components/xp/TeamLink";
 import { TeamName } from "@/components/xp/TeamName";
 import { getWorldCup, type WorldCupDivision, type WorldCupTeam } from "@/lib/api/clt";
 import { useLeague } from "@/lib/league/use-league";
 import { useMember } from "@/lib/member/use-member";
+import { rosterOf } from "@/lib/sleeper/rosters";
 import { useLoad } from "@/lib/use-load";
 
 import "./league.css";
 
 const STATUS: Record<WorldCupTeam["status"], string> = { clinched: "Clinched", alive: "Alive", eliminated: "Out" };
 
+interface Current {
+  rosterId: number | null;
+  avatarUrl: string | null;
+}
+
 interface DivisionProps {
   division: WorldCupDivision;
-  avatarOf: (userId: string) => string | null;
+  current: (userId: string) => Current;
   mine: string;
 }
 
-function Division({ division, avatarOf, mine }: DivisionProps) {
+function Division({ division, current, mine }: DivisionProps) {
   const left = division.gamesRemaining;
   const headingId = `world-cup-${division.division}`;
   return (
@@ -26,7 +33,9 @@ function Division({ division, avatarOf, mine }: DivisionProps) {
         <h3 id={headingId} className="xp-group-title">
           {division.name}
         </h3>
-        <p className="text-xs">{left > 0 ? `${left} divisional ${left === 1 ? "game" : "games"} left` : "Divisional games done"}</p>
+        <p className="text-xs">
+          {left > 0 ? `${left} divisional ${left === 1 ? "game" : "games"} left` : "Divisional games done"}
+        </p>
       </div>
       <div className="xp-table-scroll">
         <table className="xp-table">
@@ -55,25 +64,29 @@ function Division({ division, avatarOf, mine }: DivisionProps) {
             </tr>
           </thead>
           <tbody>
-            {division.teams.map((t, i) => (
-              <tr key={t.userId} className={i < 2 ? "xp-in" : undefined}>
-                <td className="tabular-nums">{i + 1}</td>
-                <td className="max-w-0 [&_.xp-team]:max-w-full">
-                  <TeamName name={t.teamName || t.username} avatarUrl={avatarOf(t.userId)} isMine={t.userId === mine} />
-                </td>
-                <td className="tabular-nums">
-                  {t.wins}-{t.losses}
-                  {t.ties > 0 && `-${t.ties}`}
-                </td>
-                <td className="standings-extra text-right tabular-nums">{t.pointsFor.toFixed(2)}</td>
-                <td className="standings-extra text-right tabular-nums">{t.pointsAgainst.toFixed(2)}</td>
-                <td className="text-right">
-                  <span className="xp-tag world-cup-status" data-status={t.status}>
-                    {STATUS[t.status]}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {division.teams.map((t, i) => {
+              const { rosterId, avatarUrl } = current(t.userId);
+              const team = { name: t.teamName || t.username, avatarUrl, isMine: t.userId === mine };
+              return (
+                <tr key={t.userId} className={i < 2 ? "xp-in" : undefined}>
+                  <td className="tabular-nums">{i + 1}</td>
+                  <td className="max-w-0 [&_.xp-team]:max-w-full">
+                    {rosterId === null ? <TeamName {...team} /> : <TeamLink rosterId={rosterId} {...team} />}
+                  </td>
+                  <td className="tabular-nums">
+                    {t.wins}-{t.losses}
+                    {t.ties > 0 && `-${t.ties}`}
+                  </td>
+                  <td className="standings-extra text-right tabular-nums">{t.pointsFor.toFixed(2)}</td>
+                  <td className="standings-extra text-right tabular-nums">{t.pointsAgainst.toFixed(2)}</td>
+                  <td className="text-right">
+                    <span className="xp-tag world-cup-status" data-status={t.status}>
+                      {STATUS[t.status]}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -93,10 +106,13 @@ export function WorldCupWindow() {
   const { season, divisions } = load.value;
   if (divisions.length === 0) return <p>No divisional games have been played yet.</p>;
 
-  // The current league's users, for avatars; a manager who has left shows an initial.
-  const avatarOf = (userId: string) => {
+  // A manager still in the league links to their team; one who has left shows an initial.
+  const current = (userId: string): Current => {
     const avatar = data?.users.find((u) => u.user_id === userId)?.avatar;
-    return avatar ? `https://sleepercdn.com/avatars/thumbs/${avatar}` : null;
+    return {
+      rosterId: data ? rosterOf(data.rosters, userId) : null,
+      avatarUrl: avatar ? `https://sleepercdn.com/avatars/thumbs/${avatar}` : null,
+    };
   };
 
   return (
@@ -106,7 +122,7 @@ export function WorldCupWindow() {
         the World Cup.
       </p>
       {divisions.map((d) => (
-        <Division key={d.division} division={d} avatarOf={avatarOf} mine={mine} />
+        <Division key={d.division} division={d} current={current} mine={mine} />
       ))}
     </div>
   );

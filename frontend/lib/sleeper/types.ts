@@ -5,11 +5,13 @@ export interface SleeperLeague {
   status: string;
   total_rosters: number;
   previous_league_id: string | null;
+  avatar?: string | null;
   roster_positions: string[];
   scoring_settings: Record<string, number>;
   settings: {
     playoff_week_start: number;
     playoff_teams: number;
+    divisions?: number;
     [key: string]: unknown;
   };
   // Division names live here as division_1, division_2, ...
@@ -30,6 +32,8 @@ export interface SleeperRoster {
   starters: string[];
   players: string[] | null;
   taxi: string[] | null;
+  // Injured reserve.
+  reserve?: string[] | null;
   settings: {
     wins: number;
     losses: number;
@@ -106,10 +110,20 @@ export interface SleeperTradedPick {
   owner_id: number;
 }
 
+// /user/<name or id> also carries the account's handle.
+export interface SleeperAccount {
+  user_id: string;
+  username: string;
+  display_name: string;
+  avatar: string | null;
+}
+
 export interface SleeperNflState {
   week: number;
   display_week: number;
   season: string;
+  // The season leagues are in, which runs ahead of `season` in the offseason.
+  league_season?: string;
   season_type: string;
   leg: number;
 }
