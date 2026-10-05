@@ -139,6 +139,11 @@
   white-space: nowrap;
 }
 
+/* Where the playoff teams start at the back of the draft. */
+.xp-table .xp-group-start td {
+  border-top: 3px solid var(--xp-face-shadow);
+}
+
 .rules-body {
   display: grid;
   gap: 0.5rem;
