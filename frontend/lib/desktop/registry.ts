@@ -1,11 +1,12 @@
 import { type ComponentType, type SVGProps, useSyncExternalStore } from "react";
 
+import { AnalyzerWindow } from "@/components/windows/AnalyzerWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
 import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
-import { ControlPanelIcon, ProfileIcon, SearchIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
+import { ChartIcon, ControlPanelIcon, ProfileIcon, SearchIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
 import { LEAGUE_ID } from "@/lib/config";
 import { loadedAccount, loadedLeague, loadedRosters, loadedUsers, loadedVersion, subscribeLoaded } from "@/lib/sleeper/league";
 import { readIdLink, readTeamLink } from "@/lib/team/links";
@@ -55,6 +56,7 @@ const SPECS = {
     defaultSize: { w: 520, h: 560 },
     link: readIdLink("userId"),
   },
+  analyzer: { label: "Team Analyzer", title: "Team Analyzer", Icon: ChartIcon, component: AnalyzerWindow, defaultSize: { w: 760, h: 620 } },
   search: {
     label: "Search",
     title: "Search Sleeper",
