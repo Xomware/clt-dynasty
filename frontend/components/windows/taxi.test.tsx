@@ -66,10 +66,10 @@ describe("Taxi Squads", () => {
   it("offers no steal on the member's own squad and shows existing requests", async () => {
     open();
     const mine = await screen.findByRole("region", { name: "Team 4" });
-    expect(within(mine).queryByRole("button")).toBeNull();
+    expect(within(mine).queryByRole("button", { name: /^Steal / })).toBeNull();
     const nine = screen.getByRole("region", { name: "Team 9" });
     expect(within(nine).getByText(/Steal requested by Roster 2/)).toBeTruthy();
-    expect(within(nine).queryByRole("button")).toBeNull();
+    expect(within(nine).queryByRole("button", { name: /^Steal / })).toBeNull();
   });
 
   it("requests a steal after the confirmation", async () => {

@@ -8,7 +8,7 @@ import { SpeakerToggle } from "@/components/xp/SpeakerToggle";
 import { useAuth } from "@/lib/auth/use-auth";
 import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
-import { REGISTRY, useLaunchers, windowTitle } from "@/lib/desktop/registry";
+import { REGISTRY, useLaunchers, useWindowTitle } from "@/lib/desktop/registry";
 import { patchParams, windowId, type WindowParams } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { ViewParamsContext } from "@/lib/view-params";
@@ -143,7 +143,7 @@ interface PhoneWindowProps {
 
 function PhoneWindow({ view, onBack, onNavigate, onPatch }: PhoneWindowProps) {
   const { Icon, component: Body } = REGISTRY[view.kind];
-  const title = windowTitle(view);
+  const title = useWindowTitle()(view);
   return (
     <section className="xp-window m-window" aria-label={title}>
       <header className="xp-titlebar m-window-bar">

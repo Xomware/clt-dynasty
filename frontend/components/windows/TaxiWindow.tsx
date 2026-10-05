@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { pastDrafts } from "@/components/windows/DraftHistoryWindow";
 import { LoadError } from "@/components/xp/LoadError";
-import { TeamName } from "@/components/xp/TeamName";
+import { TeamLink } from "@/components/xp/TeamLink";
 import { useAlerts } from "@/lib/alerts/alerts";
 import { type Player, playerName } from "@/lib/api/players";
 import { listTaxiRequests, requestSteal, type TaxiRequest } from "@/lib/api/taxi";
@@ -90,7 +90,7 @@ export function TaxiWindow() {
         return (
           <section key={roster.roster_id} aria-label={team.name}>
             <h3 className="xp-round-title">
-              <TeamName name={team.name} avatarUrl={team.avatarUrl} isMine={mine} />
+              <TeamLink rosterId={roster.roster_id} name={team.name} avatarUrl={team.avatarUrl} isMine={mine} />
             </h3>
             <ul className="bg-(--xp-cream)">
               {(roster.taxi ?? []).map((id) => (

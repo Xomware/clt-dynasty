@@ -15,10 +15,13 @@ export type MemberState =
 interface MemberContextValue {
   state: MemberState;
   refresh: () => void;
+  // Refetches behind the current state, for a change the member just made
+  // (a Sleeper link), so the gate never drops back to its loading screen.
+  sync: () => void;
 }
 
 // Outside the provider (a component's own test) there is simply no member yet.
-const MemberContext = createContext<MemberContextValue>({ state: { status: "loading" }, refresh: () => {} });
+const MemberContext = createContext<MemberContextValue>({ state: { status: "loading" }, refresh: () => {}, sync: () => {} });
 
 const settle = (p: Promise<CltMe>): Promise<MemberState> =>
   p.then(
@@ -43,7 +46,11 @@ export function MemberProvider({ children }: { children: ReactNode }) {
     void settle(getCltMe()).then(setState);
   }, []);
 
-  return <MemberContext value={{ state, refresh }}>{children}</MemberContext>;
+  const sync = useCallback(() => {
+    void settle(getCltMe()).then((next) => next.status === "member" && setState(next));
+  }, []);
+
+  return <MemberContext value={{ state, refresh, sync }}>{children}</MemberContext>;
 }
 
 export const useMember = () => useContext(MemberContext);
