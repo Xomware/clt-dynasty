@@ -15,7 +15,7 @@ import { useAlerts } from "@/lib/alerts/alerts";
 import { type WindowLink, windowUrl } from "@/lib/desktop/deep-link";
 import { useDesktop } from "@/lib/desktop/desktop-context";
 import { NavigateContext } from "@/lib/desktop/navigation";
-import { REGISTRY, windowTitle } from "@/lib/desktop/registry";
+import { REGISTRY, useWindowTitle } from "@/lib/desktop/registry";
 import { historyOf, TASKBAR_HEIGHT, viewKey, type WindowState } from "@/lib/desktop/windows";
 import { ViewParamsContext } from "@/lib/view-params";
 
@@ -57,7 +57,7 @@ export function DesktopWindow({ win }: DesktopWindowProps) {
   const { active, dispatch } = useDesktop();
   const { notify } = useAlerts();
   const { Icon, component: Body } = REGISTRY[win.kind];
-  const title = windowTitle(win);
+  const title = useWindowTitle()(win);
   const { id } = win;
   const isActive = active?.id === id;
   const ref = useRef<HTMLElement>(null);

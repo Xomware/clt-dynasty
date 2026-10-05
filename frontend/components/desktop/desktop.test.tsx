@@ -61,7 +61,7 @@ describe("desktop", () => {
 
     expect(windowNamed("League Standings")).not.toBeNull();
     expect(tab("League Standings").getAttribute("aria-pressed")).toBe("true");
-    expect(window.location.search).toBe("?open=standings");
+    expect(window.location.search).toBe("?open=home,standings");
   });
 
   it("drags by the title bar and stays inside the viewport above the taskbar", async () => {
@@ -158,9 +158,10 @@ describe("taskbar", () => {
 
   it("resets the desktop from Start", async () => {
     await renderShell();
-    fireEvent.doubleClick(icon("Home"));
+    fireEvent.doubleClick(icon("Standings"));
     fireEvent.click(screen.getByRole("button", { name: /start/i }));
     fireEvent.click(screen.getByRole("button", { name: "Reset desktop" }));
-    expect(windowNamed("CLT Dynasty League")).toBeNull();
+    expect(windowNamed("League Standings")).toBeNull();
+    expect(windowNamed("CLT Dynasty League")).not.toBeNull();
   });
 });

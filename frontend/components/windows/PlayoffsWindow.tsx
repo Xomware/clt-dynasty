@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { TeamName } from "@/components/xp/TeamName";
+import { TeamLink } from "@/components/xp/TeamLink";
 import { type Bracket, finishOrder, fromSleeper, lastFinishedWeek, type Match, type Slot } from "@/lib/league/brackets";
 import { leagueMatchups, winnersBracket } from "@/lib/league/cache";
 import { playoffSeeds, sortStandings } from "@/lib/league/standings";
@@ -31,12 +31,13 @@ interface SlotRowProps {
 }
 
 function SlotRow({ slot, out, points, teamFor, myRosterId }: SlotRowProps) {
-  const team = slot.rosterId === null ? null : teamFor(slot.rosterId);
+  const id = slot.rosterId;
+  const team = id === null ? null : teamFor(id);
   return (
     <li className={`xp-slot${out ? " xp-slot-out" : ""}`}>
       <span className="xp-seed">{slot.seed ?? ""}</span>
-      {team ? (
-        <TeamName name={team.name} avatarUrl={team.avatarUrl} isMine={slot.rosterId === myRosterId} />
+      {team && id !== null ? (
+        <TeamLink rosterId={id} name={team.name} avatarUrl={team.avatarUrl} isMine={id === myRosterId} />
       ) : (
         <span className="min-w-0">TBD {slot.from && <span className="xp-slot-from">({slot.from})</span>}</span>
       )}
@@ -90,7 +91,8 @@ function BracketView({ bracket, startWeek, weeks, teamFor, myRosterId }: Bracket
                   <li key={s.rosterId} className="xp-slot">
                     <span className="xp-seed">{s.seed}</span>
                     {s.rosterId !== null && (
-                      <TeamName
+                      <TeamLink
+                        rosterId={s.rosterId}
                         name={teamFor(s.rosterId).name}
                         avatarUrl={teamFor(s.rosterId).avatarUrl}
                         isMine={s.rosterId === myRosterId}
@@ -167,7 +169,7 @@ export function PlayoffsWindow() {
             {view.finish.map((id, i) => (
               <li key={id} className="flex items-center gap-2">
                 <span className="w-20 flex-none font-bold">{PLACES[i] ?? `${i + 1}th`}</span>
-                <TeamName name={teamFor(id).name} avatarUrl={teamFor(id).avatarUrl} isMine={id === myRosterId} />
+                <TeamLink rosterId={id} name={teamFor(id).name} avatarUrl={teamFor(id).avatarUrl} isMine={id === myRosterId} />
               </li>
             ))}
           </ol>
