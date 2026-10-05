@@ -1,6 +1,7 @@
 import type { ComponentType, SVGProps } from "react";
 
 import { AdminAIWindow } from "@/components/windows/AdminAIWindow";
+import { AdminAnnouncementsWindow } from "@/components/windows/AdminAnnouncementsWindow";
 import { AIReportWindow, AIReviewWindow, readReportLink, reportTitle } from "@/components/windows/AIReviewWindow";
 import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
 import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
@@ -18,6 +19,7 @@ import { WorldCupWindow } from "@/components/windows/WorldCupWindow";
 import {
   AdminReportIcon,
   BallotIcon,
+  BellIcon,
   BracketIcon,
   CalendarIcon,
   ChartIcon,
@@ -104,6 +106,14 @@ const SPECS = {
     Icon: AdminReportIcon,
     component: AdminAIWindow,
     defaultSize: { w: 640, h: 660 },
+    adminOnly: true,
+  },
+  "admin-announcements": {
+    label: "Announcements",
+    title: "Admin: Announcements",
+    Icon: BellIcon,
+    component: AdminAnnouncementsWindow,
+    defaultSize: { w: 600, h: 640 },
     adminOnly: true,
   },
 } satisfies Record<string, WindowSpec>;

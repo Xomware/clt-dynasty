@@ -37,3 +37,7 @@
   border-color: var(--xp-face-shadow);
   background: var(--xp-face);
 }
+
+.proposal[data-inactive] {
+  background: var(--xp-face);
+}
