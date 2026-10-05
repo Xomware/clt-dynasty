@@ -10,10 +10,10 @@ import { analyze, AXES, type AxisValues, leagueShape, standing, type TeamAnalysi
 import { values as valuesResource } from "@/lib/analyzer/values";
 import { LEAGUE_ID } from "@/lib/config";
 import type { WindowParams } from "@/lib/desktop/windows";
-import { players as playersResource } from "@/lib/players";
+import { refreshPlayers, usePlayers } from "@/lib/league/players";
+import { rosterOf } from "@/lib/sleeper/rosters";
 import { loadLeagueData, useMySleeperId } from "@/lib/team/data";
 import { teamLink } from "@/lib/team/links";
-import { rosterOwnedBy } from "@/lib/team/team";
 import { useLoad } from "@/lib/use-load";
 
 import "./analyzer.css";
@@ -22,13 +22,13 @@ const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
 export function AnalyzerWindow({ params }: { params: WindowParams }) {
   const [league, retryLeague] = useLoad(() => loadLeagueData(LEAGUE_ID), LEAGUE_ID);
-  const players = playersResource.use();
+  const players = usePlayers();
   const values = valuesResource.use();
   const me = useMySleeperId();
 
   if (league.status === "error") return <LoadError what="the league from Sleeper" message={league.message} onRetry={retryLeague} />;
   if (values.status === "error") return <LoadError what="FantasyCalc values" message={values.message} onRetry={() => valuesResource.refresh()} />;
-  if (players.status === "error") return <LoadError what="player names" message={players.message} onRetry={() => playersResource.refresh()} />;
+  if (players.status === "error") return <LoadError what="player names" message={players.message} onRetry={refreshPlayers} />;
   if (league.status === "loading" || values.status === "loading" || players.status === "loading") {
     return <p role="status">Fetching player values...</p>;
   }
@@ -36,7 +36,7 @@ export function AnalyzerWindow({ params }: { params: WindowParams }) {
   const { rosters, users } = league.value;
   if (rosters.length === 0) return <p>The league has no teams yet.</p>;
   const teams = rosters.map((r) => analyze(r, users, players.players, values.values));
-  const mine = (me && rosterOwnedBy(rosters, me)?.roster_id) || null;
+  const mine = me ? rosterOf(rosters, me) : null;
 
   const tabs: Tab[] = [
     { id: "compare", label: "Compare", panel: () => <Compare teams={teams} mine={mine} /> },

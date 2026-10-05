@@ -1,6 +1,6 @@
-import type { PlayerMap } from "@/lib/players";
-import type { SleeperRoster, SleeperUser } from "@/lib/sleeper/league";
-import { teamName } from "@/lib/team/team";
+import type { Player } from "@/lib/api/players";
+import { teamOf } from "@/lib/league/use-league";
+import type { SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
 import { valueOf, type Values } from "./values";
 
 export const AXES = ["QB", "RB", "WR", "TE", "Bench", "Taxi"] as const;
@@ -24,7 +24,7 @@ const zero = (): AxisValues => ({ QB: 0, RB: 0, WR: 0, TE: 0, Bench: 0, Taxi: 0 
 // - IR players count toward nothing;
 // - a starter counts toward his position, and a starting K or DEF toward Bench;
 // - everyone else is Bench.
-export function analyze(roster: SleeperRoster, users: SleeperUser[], players: PlayerMap, values: Values): TeamAnalysis {
+export function analyze(roster: SleeperRoster, users: SleeperUser[], players: Record<string, Player>, values: Values): TeamAnalysis {
   const starters = new Set(roster.starters ?? []);
   const taxi = new Set(roster.taxi ?? []);
   const reserve = new Set(roster.reserve ?? []);
@@ -44,7 +44,7 @@ export function analyze(roster: SleeperRoster, users: SleeperUser[], players: Pl
 
   return {
     rosterId: roster.roster_id,
-    name: teamName(roster, users, roster.roster_id),
+    name: teamOf(users, roster, roster.roster_id).name,
     ownerId: roster.owner_id,
     axes,
     total: AXES.reduce((sum, a) => sum + axes[a], 0),

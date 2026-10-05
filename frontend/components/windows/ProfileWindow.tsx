@@ -9,10 +9,12 @@ import { TeamName } from "@/components/xp/TeamName";
 import { LEAGUE_ID } from "@/lib/config";
 import { DrillContext } from "@/lib/desktop/navigation";
 import type { WindowParams } from "@/lib/desktop/windows";
-import { avatarUrl, getAccount, getNflState, getUserLeagues } from "@/lib/sleeper/league";
+import { account as getAccount, nflState, userLeagues } from "@/lib/league/cache";
+import { teamOf } from "@/lib/league/use-league";
+import { rosterOf } from "@/lib/sleeper/rosters";
 import { loadLeagueData, useMySleeperId } from "@/lib/team/data";
 import { leagueLink, teamLink } from "@/lib/team/links";
-import { ordinal, rankOf, rosterOwnedBy, teamName } from "@/lib/team/team";
+import { avatarUrl, ordinal, rankOf } from "@/lib/team/team";
 import { useLoad } from "@/lib/use-load";
 
 import "./team.css";
@@ -20,9 +22,9 @@ import "./team.css";
 async function loadProfile(userId: string) {
   const account = await getAccount(userId);
   if (!account) return null;
-  const nfl = await getNflState();
+  const nfl = await nflState();
   const season = nfl.league_season ?? nfl.season;
-  const [leagues, clt] = await Promise.all([getUserLeagues(account.user_id, season), loadLeagueData(LEAGUE_ID)]);
+  const [leagues, clt] = await Promise.all([userLeagues(account.user_id, season), loadLeagueData(LEAGUE_ID)]);
   return { account, season, leagues, clt };
 }
 
@@ -53,7 +55,8 @@ function Profile({ userId }: { userId: string }) {
 
   const { account, season, leagues, clt } = load.value;
   const avatar = avatarUrl(account.avatar);
-  const roster = rosterOwnedBy(clt.rosters, account.user_id);
+  const rosterId = rosterOf(clt.rosters, account.user_id);
+  const roster = clt.rosters.find((r) => r.roster_id === rosterId);
   const others = leagues.filter((l) => l.league_id !== LEAGUE_ID);
   const rank = roster && rankOf(clt.rosters, roster.roster_id);
 
@@ -82,7 +85,7 @@ function Profile({ userId }: { userId: string }) {
         {roster ? (
           <div className="team-list-row">
             <DrillLink to={teamLink(LEAGUE_ID, roster.roster_id)}>
-              <TeamName name={teamName(roster, clt.users, roster.roster_id)} avatarUrl={avatarUrl(account.avatar)} />
+              <TeamName name={teamOf(clt.users, roster, roster.roster_id).name} avatarUrl={avatarUrl(account.avatar)} />
             </DrillLink>
             <span className="ml-auto flex-none text-xs tabular-nums">
               {roster.settings.wins}-{roster.settings.losses}

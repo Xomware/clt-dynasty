@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY } from "@/lib/desktop/registry";
-import { clearSleeperCache } from "@/lib/sleeper/league";
 import { ViewParamsContext } from "@/lib/view-params";
 import { SearchWindow } from "./SearchWindow";
 
@@ -28,7 +27,6 @@ afterEach(() => {
   vi.restoreAllMocks();
   navigate.mockReset();
   setParams.mockReset();
-  clearSleeperCache();
 });
 
 const renderSearch = (params = {}) =>

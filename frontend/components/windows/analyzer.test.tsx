@@ -7,7 +7,6 @@ vi.mock("aws-amplify/auth", () => ({
 
 import { LEAGUE_ID } from "@/lib/config";
 import { MemberProvider } from "@/lib/member/use-member";
-import { clearSleeperCache } from "@/lib/sleeper/league";
 import { AnalyzerWindow } from "./AnalyzerWindow";
 
 const roster = (roster_id: number, players: string[], starters: string[]) => ({
@@ -47,7 +46,6 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.restoreAllMocks();
-  clearSleeperCache();
 });
 
 const renderAnalyzer = () =>

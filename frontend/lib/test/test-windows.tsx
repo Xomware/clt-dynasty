@@ -19,7 +19,7 @@ function Broken(): never {
   throw new Error("bad row");
 }
 
-// Stand-in windows: the real registry is empty until the league windows land.
+// Stand-in windows, so the shell's tests don't change as real windows land.
 const TEST_SPECS: Record<string, WindowSpec> = {
   home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: () => <p>home body</p>, defaultSize: { w: 600, h: 400 } },
   standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsBody, defaultSize: { w: 500, h: 500 } },
@@ -37,11 +37,15 @@ const TEST_SPECS: Record<string, WindowSpec> = {
 
 export const kind = (k: string) => k as WindowKind;
 
+// Swaps the real windows out for the stand-ins, and back afterwards.
 export function registerTestWindows() {
+  const real = { ...REGISTRY };
   beforeAll(() => {
+    for (const k of Object.keys(real)) delete REGISTRY[k];
     Object.assign(REGISTRY, TEST_SPECS);
   });
   afterAll(() => {
     for (const k of Object.keys(TEST_SPECS)) delete REGISTRY[k];
+    Object.assign(REGISTRY, real);
   });
 }
