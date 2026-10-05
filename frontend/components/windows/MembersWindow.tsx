@@ -163,12 +163,12 @@ function EditMember({ member, onCancel, onSaved }: EditProps) {
       <p id={`${id}-email-note`} className="text-xs">
         A new email is a new Google account: they sign in again with it.
       </p>
-      <label className="members-check">
+      <label className="settings-check">
         <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
         Active: can sign in and vote
       </label>
       {member.boundToAccount && (
-        <label className="members-check">
+        <label className="settings-check">
           <input type="checkbox" checked={clearSub} onChange={(e) => setClearSub(e.target.checked)} />
           Unlink their Google account, so the next one to sign in with this email takes the seat
         </label>

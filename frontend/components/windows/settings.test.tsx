@@ -48,7 +48,7 @@ afterEach(() => {
 const renderSettings = () =>
   render(
     <AlertsProvider>
-      <SettingsWindow />
+      <SettingsWindow params={{}} />
     </AlertsProvider>,
   );
 const calls = (path: string) => vi.mocked(fetch).mock.calls.filter(([u]) => String(u).endsWith(path));
