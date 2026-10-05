@@ -3,10 +3,12 @@ import { type ComponentType, type SVGProps, useSyncExternalStore } from "react";
 import { AnalyzerWindow } from "@/components/windows/AnalyzerWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
+import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
+import { StandingsWindow } from "@/components/windows/StandingsWindow";
 import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
-import { ChartIcon, ControlPanelIcon, ProfileIcon, SearchIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
+import { ChartIcon, ControlPanelIcon, ProfileIcon, ScoresIcon, SearchIcon, StandingsIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
 import { LEAGUE_ID } from "@/lib/config";
 import { loadedAccount, loadedLeague, loadedRosters, loadedUsers, loadedVersion, subscribeLoaded } from "@/lib/sleeper/league";
 import { readIdLink, readTeamLink } from "@/lib/team/links";
@@ -46,6 +48,8 @@ function profileTitle(p: WindowParams): string {
 
 // One entry per window kind, in launcher order. Each league window adds itself here.
 const SPECS = {
+  standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
+  scores: { label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
   "my-team": { label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
   profile: {
