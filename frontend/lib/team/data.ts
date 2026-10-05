@@ -1,14 +1,8 @@
 "use client";
 
+import { league, rosters, users } from "@/lib/league/cache";
 import { useMember } from "@/lib/member/use-member";
-import {
-  getLeague,
-  getLeagueRosters,
-  getLeagueUsers,
-  type SleeperLeague,
-  type SleeperRoster,
-  type SleeperUser,
-} from "@/lib/sleeper/league";
+import type { SleeperLeague, SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
 
 export interface LeagueData {
   league: SleeperLeague;
@@ -17,8 +11,8 @@ export interface LeagueData {
 }
 
 export const loadLeagueData = async (leagueId: string): Promise<LeagueData> => {
-  const [league, users, rosters] = await Promise.all([getLeague(leagueId), getLeagueUsers(leagueId), getLeagueRosters(leagueId)]);
-  return { league, users, rosters };
+  const [l, u, r] = await Promise.all([league(leagueId), users(leagueId), rosters(leagueId)]);
+  return { league: l, users: u, rosters: r };
 };
 
 // The account they linked in Settings, else the one the roster lists for
