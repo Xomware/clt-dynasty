@@ -63,12 +63,6 @@
   background: var(--xp-title-dark);
 }
 
-.m-empty {
-  padding: 1rem 0.875rem;
-  font-size: 1rem;
-  font-style: italic;
-}
-
 .m-account {
   display: flex;
   align-items: center;

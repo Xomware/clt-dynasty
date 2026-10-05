@@ -117,24 +117,19 @@ export function PhoneShell() {
 }
 
 function Programs({ onOpen }: { onOpen: (kind: WindowLink["kind"]) => void }) {
-  const programs = launchers();
   return (
     <nav className="m-programs" aria-label="Programs">
       <h2 className="m-programs-title">Programs</h2>
-      {programs.length === 0 ? (
-        <p className="m-empty">League windows land here as they&rsquo;re built.</p>
-      ) : (
-        <ul>
-          {programs.map(({ kind, label, Icon }) => (
-            <li key={kind}>
-              <button type="button" className="m-program" onClick={() => onOpen(kind)}>
-                <Icon width={32} height={32} />
-                {label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul>
+        {launchers().map(({ kind, label, Icon }) => (
+          <li key={kind}>
+            <button type="button" className="m-program" onClick={() => onOpen(kind)}>
+              <Icon width={32} height={32} />
+              {label}
+            </button>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }

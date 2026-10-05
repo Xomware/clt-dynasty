@@ -1,5 +1,8 @@
 import type { ComponentType, SVGProps } from "react";
 
+import { SettingsWindow } from "@/components/windows/SettingsWindow";
+import { ControlPanelIcon } from "@/components/xp/icons";
+
 import type { WindowParams, WindowView } from "./windows";
 
 export interface WindowSpec {
@@ -18,7 +21,9 @@ export interface WindowSpec {
 }
 
 // One entry per window kind, in launcher order. Each league window adds itself here.
-const SPECS = {} satisfies Record<string, WindowSpec>;
+const SPECS = {
+  settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
+} satisfies Record<string, WindowSpec>;
 
 export type WindowKind = keyof typeof SPECS;
 export const REGISTRY: Record<string, WindowSpec> = SPECS;
