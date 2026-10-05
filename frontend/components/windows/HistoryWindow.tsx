@@ -22,7 +22,7 @@ function finalOf(s: Season): PastGame | undefined {
 
 function Champions({ seasons, myRosterId }: { seasons: Season[]; myRosterId: number | null }) {
   return (
-    <ol className="grid gap-2" aria-label="Champions by season">
+    <ol className="grid grid-cols-1 gap-2" aria-label="Champions by season">
       {seasons.map((s) => {
         const final = finalOf(s);
         const score = (id: number) => final?.sides.find((x) => x.rosterId === id)?.points.toFixed(2);
@@ -62,7 +62,7 @@ function Standings({ seasons, myRosterId }: { seasons: Season[]; myRosterId: num
     return i >= 0 ? PLACES[i] : "";
   };
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       <div className="flex items-center gap-2">
         <label htmlFor={picker} className="font-bold">
           Season
@@ -137,7 +137,7 @@ function Rivals({ games, rosterIds, teamFor, myRosterId }: RivalsProps) {
     { wins: 0, losses: 0, ties: 0 },
   );
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       <div className="flex flex-wrap items-center gap-2">
         <label htmlFor={picker} className="font-bold">
           Team

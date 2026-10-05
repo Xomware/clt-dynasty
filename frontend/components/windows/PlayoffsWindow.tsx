@@ -144,7 +144,7 @@ export function PlayoffsWindow() {
 
   const projected = inSeason && finished < start - 1;
   return (
-    <div className="grid gap-3">
+    <div className="grid grid-cols-1 gap-3">
       {projected && (
         <p className="flex flex-wrap items-center gap-2">
           <span className="xp-tag">Projected</span>

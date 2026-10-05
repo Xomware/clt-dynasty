@@ -91,7 +91,7 @@ export function StandingsWindow({ params }: { params: WindowParams }) {
   const table = { seedOf, playoffTeams, teamFor, myRosterId };
 
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       <Tabs
         label="Standings view"
         selected={params.tab}

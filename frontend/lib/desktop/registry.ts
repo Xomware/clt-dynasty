@@ -1,12 +1,13 @@
 import type { ComponentType, SVGProps } from "react";
 
+import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
 import { HistoryWindow } from "@/components/windows/HistoryWindow";
 import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
 import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
-import { BracketIcon, CalendarIcon, ChartIcon, ControlPanelIcon, ScoresIcon, StandingsIcon } from "@/components/xp/icons";
+import { BracketIcon, CalendarIcon, ChartIcon, ControlPanelIcon, FolderIcon, ScoresIcon, StandingsIcon } from "@/components/xp/icons";
 
 import type { WindowParams, WindowView } from "./windows";
 
@@ -38,6 +39,7 @@ const SPECS = {
     component: MatchupHistoryWindow,
     defaultSize: { w: 560, h: 620 },
   },
+  drafts: { label: "Draft History", title: "Draft History", Icon: FolderIcon, component: DraftHistoryWindow, defaultSize: { w: 640, h: 620 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
 } satisfies Record<string, WindowSpec>;
 

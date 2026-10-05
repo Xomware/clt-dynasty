@@ -4,13 +4,17 @@ import { API_BASE } from "@/lib/config";
 import { SLEEPER_BASE } from "@/lib/sleeper/client";
 import type {
   SleeperBracketMatch,
+  SleeperDraft,
+  SleeperDraftPick,
   SleeperLeague,
   SleeperMatchup,
   SleeperNflState,
   SleeperRoster,
+  SleeperTradedPick,
   SleeperUser,
 } from "@/lib/sleeper/types";
 import season from "./fixtures/league-2026.json";
+import drafts from "./fixtures/drafts.json";
 import past from "./fixtures/league-past.json";
 import players from "./fixtures/players.json";
 
@@ -31,6 +35,23 @@ export const fixture = season as unknown as Season;
 // only roster, game and points.
 export const pastFixture = past as unknown as Record<string, Omit<Season, "state">>;
 
+// Each season's drafts with their picks (none for the 30-round 2024 startup)
+// and traded picks, by league id. Pickers are "u<roster_id>" too.
+export const draftFixture = drafts as unknown as Record<
+  string,
+  { drafts: { draft: SleeperDraft; picks: SleeperDraftPick[] }[]; traded_picks: SleeperTradedPick[] }
+>;
+
+const draftRoutes = Object.entries(draftFixture).reduce(
+  (all, [id, d]) => ({
+    ...all,
+    [`/league/${id}/drafts`]: d.drafts.map((x) => x.draft),
+    [`/league/${id}/traded_picks`]: d.traded_picks,
+    ...Object.fromEntries(d.drafts.map((x) => [`/draft/${x.draft.draft_id}/picks`, x.picks])),
+  }),
+  {},
+);
+
 const seasonRoutes = (s: Omit<Season, "state">) => {
   const league = `/league/${s.league.league_id}`;
   return {
@@ -46,6 +67,7 @@ const seasonRoutes = (s: Omit<Season, "state">) => {
 const RESPONSES: Record<string, unknown> = {
   ...seasonRoutes(fixture),
   ...Object.values(pastFixture).reduce((all, s) => ({ ...all, ...seasonRoutes(s) }), {}),
+  ...draftRoutes,
   "/state/nfl": fixture.state,
   [`${API_BASE}/players/list`]: { count: Object.keys(players).length, players },
 };
