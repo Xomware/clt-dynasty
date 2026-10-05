@@ -128,5 +128,6 @@ export function desktopReducer(state: WindowState[], action: WindowAction): Wind
   }
 }
 
-// An empty desktop until the league windows land; Home opens here first.
-export const defaultLayout = (): WindowState[] => [];
+// A first visit, or Start's reset, opens on Home.
+export const defaultLayout = (): WindowState[] =>
+  desktopReducer([], { type: "open", kind: "home", params: {}, size: { w: 640, h: 640 } });

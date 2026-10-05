@@ -4,6 +4,7 @@ import { AnalyzerWindow } from "@/components/windows/AnalyzerWindow";
 import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
 import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
 import { HistoryWindow } from "@/components/windows/HistoryWindow";
+import { HomeWindow } from "@/components/windows/HomeWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
@@ -20,6 +21,7 @@ import {
   ChartIcon,
   ControlPanelIcon,
   FolderIcon,
+  HomeIcon,
   NewspaperIcon,
   ProfileIcon,
   RosterMoveIcon,
@@ -71,6 +73,7 @@ function profileTitle(p: WindowParams): string {
 
 // One entry per window kind, in launcher order. Each league window adds itself here.
 const SPECS = {
+  home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: HomeWindow, defaultSize: { w: 640, h: 640 } },
   standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
   scores: { label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
   playoffs: { label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 720, h: 560 } },
