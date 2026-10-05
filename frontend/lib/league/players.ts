@@ -5,3 +5,4 @@ import { sharedResource } from "@/lib/shared-resource";
 const resource = sharedResource(async () => ({ status: "ok" as const, players: await getPlayers() }));
 
 export const usePlayers = resource.use;
+export const refreshPlayers = resource.refresh;
