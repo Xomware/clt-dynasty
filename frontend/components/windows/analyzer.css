@@ -1,0 +1,257 @@
+.analyzer-pickers {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.375rem 0.75rem;
+}
+
+.analyzer-pickers .xp-select {
+  min-width: 0;
+  max-width: min(100%, 28rem);
+}
+
+.analyzer-compare {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 40rem) {
+  .analyzer-compare {
+    grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.analyzer-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-cream);
+  box-shadow: inset 1px 1px 0 var(--xp-face-shadow);
+}
+
+.hex-chart {
+  width: 100%;
+  max-width: 18rem;
+  aspect-ratio: 1;
+}
+
+.hex-ring,
+.hex-spoke {
+  fill: none;
+  stroke: var(--xp-face-shadow);
+  stroke-width: 1;
+}
+
+.hex-average {
+  fill: color-mix(in srgb, var(--xp-face-shadow) 18%, transparent);
+  stroke: var(--xp-text);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.hex-primary polygon {
+  fill: color-mix(in srgb, var(--clt-crown) 35%, transparent);
+  stroke: var(--clt-crown-dark);
+  stroke-width: 2.5;
+}
+
+.hex-primary circle {
+  fill: var(--clt-crown-dark);
+}
+
+.hex-comparison polygon {
+  fill: color-mix(in srgb, var(--clt-teal) 22%, transparent);
+  stroke: var(--clt-teal);
+  stroke-width: 2.5;
+}
+
+.hex-comparison rect {
+  fill: var(--clt-teal);
+}
+
+.hex-label {
+  font: bold 15px var(--xp-font);
+  fill: var(--xp-text);
+}
+
+.analyzer-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.analyzer-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analyzer-legend span::before {
+  content: "";
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.analyzer-legend [data-series="primary"]::before {
+  border: 2px solid var(--clt-crown-dark);
+  border-radius: 50%;
+  background: var(--clt-crown);
+}
+
+.analyzer-legend [data-series="comparison"]::before {
+  border: 2px solid var(--clt-teal);
+  background: color-mix(in srgb, var(--clt-teal) 40%, transparent);
+}
+
+.analyzer-legend [data-series="average"]::before {
+  height: 0;
+  border-top: 2px dashed var(--xp-text);
+}
+
+.analyzer-breakdown tbody th,
+.analyzer-breakdown tfoot th {
+  padding: 0.375rem;
+  text-align: left;
+}
+
+.analyzer-breakdown tfoot th,
+.analyzer-breakdown tfoot td {
+  border-top: 2px solid var(--xp-face-shadow);
+  font-weight: bold;
+}
+
+.analyzer-bar {
+  display: block;
+  height: 0.625rem;
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-face);
+}
+
+.analyzer-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(var(--clt-crown), var(--clt-crown-dark));
+}
+
+.analyzer-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* An up or down triangle beside the number, so the marking isn't color alone. */
+.analyzer-value[data-standing="above"],
+.analyzer-key [data-standing="above"] {
+  font-weight: bold;
+  color: var(--xp-start-dark);
+}
+
+.analyzer-value[data-standing="below"],
+.analyzer-key [data-standing="below"] {
+  color: var(--xp-red);
+}
+
+.analyzer-value[data-standing]:not([data-standing="even"])::before,
+.analyzer-key span::before {
+  content: "";
+  border-inline: 0.25rem solid transparent;
+}
+
+.analyzer-value[data-standing="above"]::before,
+.analyzer-key [data-standing="above"]::before {
+  border-bottom: 0.375rem solid currentColor;
+}
+
+.analyzer-value[data-standing="below"]::before,
+.analyzer-key [data-standing="below"]::before {
+  border-top: 0.375rem solid currentColor;
+}
+
+.analyzer-key {
+  display: flex;
+  gap: 1rem;
+}
+
+.analyzer-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.analyzer-averages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: linear-gradient(var(--xp-cream), var(--xp-face));
+}
+
+.analyzer-averages dt {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.analyzer-averages dd {
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.analyzer-ranks {
+  min-width: 44rem;
+}
+
+.analyzer-ranks th,
+.analyzer-ranks td {
+  white-space: nowrap;
+}
+
+.analyzer-team-col {
+  width: 12rem;
+  max-width: 12rem;
+  overflow: hidden;
+}
+
+.analyzer-ranks tr[data-mine] td {
+  background: var(--clt-sky);
+}
+
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  .analyzer-pickers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .analyzer-averages dt,
+  .analyzer-legend {
+    font-size: 0.8125rem;
+  }
+
+  /* Keep the team in view while the value columns scroll. */
+  .analyzer-ranks .analyzer-team-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    width: 9rem;
+    max-width: 9rem;
+    background: var(--xp-cream);
+  }
+
+  .analyzer-ranks thead .analyzer-team-col {
+    background: var(--xp-face);
+  }
+}

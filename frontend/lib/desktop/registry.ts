@@ -1,5 +1,6 @@
 import { type ComponentType, type SVGProps, useSyncExternalStore } from "react";
 
+import { AnalyzerWindow } from "@/components/windows/AnalyzerWindow";
 import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
 import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
 import { HistoryWindow } from "@/components/windows/HistoryWindow";
@@ -26,6 +27,7 @@ import {
   SearchIcon,
   StandingsIcon,
   StarIcon,
+  TradeIcon,
   TrophyIcon,
 } from "@/components/xp/icons";
 import { LEAGUE_ID } from "@/lib/config";
@@ -99,6 +101,7 @@ const SPECS = {
     defaultSize: { w: 520, h: 560 },
     link: readIdLink("userId"),
   },
+  analyzer: { label: "Team Analyzer", title: "Team Analyzer", Icon: TradeIcon, component: AnalyzerWindow, defaultSize: { w: 760, h: 620 } },
   search: {
     label: "Search",
     title: "Search Sleeper",
