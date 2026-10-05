@@ -1,4 +1,11 @@
-import type { SleeperLeague, SleeperMatchup, SleeperNflState, SleeperRoster, SleeperUser } from "./types";
+import type {
+  SleeperBracketMatch,
+  SleeperLeague,
+  SleeperMatchup,
+  SleeperNflState,
+  SleeperRoster,
+  SleeperUser,
+} from "./types";
 
 export const SLEEPER_BASE = "https://api.sleeper.app/v1";
 
@@ -13,4 +20,5 @@ export const getLeague = (id: string) => get<SleeperLeague>(`/league/${id}`);
 export const getUsers = (id: string) => get<SleeperUser[]>(`/league/${id}/users`);
 export const getRosters = (id: string) => get<SleeperRoster[]>(`/league/${id}/rosters`);
 export const getMatchups = (id: string, week: number) => get<SleeperMatchup[]>(`/league/${id}/matchups/${week}`);
+export const getWinnersBracket = (id: string) => get<SleeperBracketMatch[]>(`/league/${id}/winners_bracket`);
 export const getNflState = () => get<SleeperNflState>("/state/nfl");

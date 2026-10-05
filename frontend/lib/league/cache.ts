@@ -1,5 +1,5 @@
 import { LEAGUE_ID } from "@/lib/config";
-import { getLeague, getMatchups, getNflState, getRosters, getUsers } from "@/lib/sleeper/client";
+import { getLeague, getMatchups, getNflState, getRosters, getUsers, getWinnersBracket } from "@/lib/sleeper/client";
 import type { SleeperMatchup } from "@/lib/sleeper/types";
 
 // Every window reads the same league, so one promise per endpoint serves the
@@ -30,6 +30,9 @@ function cached<T>(key: string, load: () => Promise<T>, ttl = Infinity): Promise
 export const league = (id = LEAGUE_ID) => cached(`league/${id}`, () => getLeague(id));
 export const users = (id = LEAGUE_ID) => cached(`users/${id}`, () => getUsers(id));
 export const rosters = (id = LEAGUE_ID) => cached(`rosters/${id}`, () => getRosters(id));
+// Sleeper redraws the bracket from the standings each week until the playoffs start.
+export const winnersBracket = (live: boolean, id = LEAGUE_ID) =>
+  cached(`winners/${id}`, () => getWinnersBracket(id), live ? LIVE_TTL : Infinity);
 
 export function nflState(fresh = false) {
   if (fresh) entries.delete("nfl");
