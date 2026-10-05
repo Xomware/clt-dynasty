@@ -1,0 +1,49 @@
+"use client";
+
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
+
+import { ApiError } from "@/lib/api/client";
+import { type CltMe, getCltMe } from "@/lib/api/clt";
+
+export type MemberState =
+  | { status: "loading" }
+  | { status: "member"; me: CltMe }
+  // Signed in with Google, but /clt/me answered 403: not on the roster.
+  | { status: "not-member" }
+  | { status: "error"; message: string };
+
+interface MemberContextValue {
+  state: MemberState;
+  refresh: () => void;
+}
+
+// Outside the provider (a component's own test) there is simply no member yet.
+const MemberContext = createContext<MemberContextValue>({ state: { status: "loading" }, refresh: () => {} });
+
+const settle = (p: Promise<CltMe>): Promise<MemberState> =>
+  p.then(
+    (me): MemberState => ({ status: "member", me }),
+    (e: Error): MemberState =>
+      e instanceof ApiError && e.status === 403 ? { status: "not-member" } : { status: "error", message: e.message },
+  );
+
+export function MemberProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<MemberState>({ status: "loading" });
+
+  useEffect(() => {
+    let live = true;
+    void settle(getCltMe()).then((next) => live && setState(next));
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const refresh = useCallback(() => {
+    setState({ status: "loading" });
+    void settle(getCltMe()).then(setState);
+  }, []);
+
+  return <MemberContext value={{ state, refresh }}>{children}</MemberContext>;
+}
+
+export const useMember = () => useContext(MemberContext);

@@ -1,0 +1,143 @@
+.xp-logon {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
+  color: var(--xp-text-inverse);
+  background: var(--xp-logon);
+}
+
+.xp-logon-band {
+  min-height: 4.5rem;
+  padding: 0.75rem 1rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  background: var(--xp-logon-top);
+  /* XP's orange-white rule along the band's inner edge. */
+  box-shadow: inset 0 -2px 0 var(--xp-logon-rule);
+}
+
+.xp-logon-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  font-size: 0.8125rem;
+  box-shadow: inset 0 2px 0 var(--xp-logon-rule);
+}
+
+.xp-logon-body {
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 24rem);
+  gap: 0 2.5rem;
+  padding: 2rem 1.5rem;
+  background: radial-gradient(ellipse 60% 70% at 20% 30%, var(--xp-title-light), transparent 70%), var(--xp-logon);
+}
+
+.xp-logon-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-right: 2.5rem;
+  border-right: 1px solid rgb(255 255 255 / 0.6);
+  text-align: right;
+}
+
+.xp-logon-name {
+  font: italic bold 2.25rem/1.1 var(--xp-title-font);
+  text-shadow: 1px 2px 3px var(--xp-logon-top);
+}
+
+.xp-logon-tagline {
+  font-size: 0.9375rem;
+}
+
+.xp-logon-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.xp-logon-panel h1 {
+  font: bold 1.25rem/1.2 var(--xp-title-font);
+}
+
+/* An XP user tile: picture frame plus name, lit gold on hover. */
+.xp-user-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-height: 4.5rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: var(--xp-text-inverse);
+  font: bold 1.125rem var(--xp-title-font);
+  text-align: left;
+  background: rgb(255 255 255 / 0.08);
+  cursor: pointer;
+}
+
+.xp-user-tile-picture {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 2px solid var(--xp-text-inverse);
+  border-radius: 6px;
+  background: var(--xp-cream);
+}
+
+.xp-user-tile:hover:enabled {
+  border-color: var(--xp-gold);
+  background: rgb(255 255 255 / 0.18);
+}
+
+.xp-user-tile:active:enabled {
+  background: var(--xp-logon-top);
+}
+
+.xp-user-tile:focus-visible {
+  outline: 2px dotted var(--xp-text-inverse);
+  outline-offset: 3px;
+}
+
+.xp-user-tile:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.xp-logon-link {
+  color: var(--xp-text-inverse);
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.xp-logon-link:focus-visible {
+  outline: 2px dotted var(--xp-text-inverse);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+  .xp-logon-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    align-content: start;
+    padding-top: 2.5rem;
+  }
+
+  .xp-logon-brand {
+    align-items: center;
+    padding: 0 0 1.5rem;
+    border-right: 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.6);
+    text-align: center;
+  }
+}
