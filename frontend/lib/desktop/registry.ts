@@ -5,12 +5,14 @@ import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
 import { HistoryWindow } from "@/components/windows/HistoryWindow";
 import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
+import { ProposalsWindow } from "@/components/windows/ProposalsWindow";
 import { RulesWindow } from "@/components/windows/RulesWindow";
 import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
 import { WorldCupWindow } from "@/components/windows/WorldCupWindow";
 import {
+  BallotIcon,
   BracketIcon,
   CalendarIcon,
   ChartIcon,
@@ -62,6 +64,7 @@ const SPECS = {
     defaultSize: { w: 600, h: 620 },
   },
   "world-cup": { label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
+  proposals: { label: "Proposals", title: "Rule Proposals", Icon: BallotIcon, component: ProposalsWindow, defaultSize: { w: 600, h: 640 } },
   rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
 } satisfies Record<string, WindowSpec>;

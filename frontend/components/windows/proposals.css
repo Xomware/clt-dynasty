@@ -1,0 +1,39 @@
+.proposal {
+  display: grid;
+  gap: 0.5rem;
+  background: var(--xp-cream);
+}
+
+.proposal-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.proposal-textarea {
+  min-height: 6rem;
+  padding-block: 0.375rem;
+  resize: vertical;
+}
+
+.proposal-votes {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.proposal-votes dt {
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.proposal-status[data-status="approved"] {
+  background: var(--xp-gold);
+}
+
+.proposal-status[data-status="rejected"],
+.proposal-status[data-status="closed"] {
+  border-color: var(--xp-face-shadow);
+  background: var(--xp-face);
+}

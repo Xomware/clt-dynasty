@@ -11,6 +11,8 @@ export interface CltMe {
     sleeperUserId: string;
   };
   linkedSleeperUserId: string;
+  // Xomper's admin gate: the cognito admin group plus an admin whitelisted_users row.
+  isAdmin: boolean;
 }
 
 export const getCltMe = () => request<CltMe>("/clt/me");
