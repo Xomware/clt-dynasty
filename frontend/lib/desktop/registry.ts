@@ -1,7 +1,9 @@
 import type { ComponentType, SVGProps } from "react";
 
+import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
-import { ControlPanelIcon } from "@/components/xp/icons";
+import { StandingsWindow } from "@/components/windows/StandingsWindow";
+import { ControlPanelIcon, ScoresIcon, StandingsIcon } from "@/components/xp/icons";
 
 import type { WindowParams, WindowView } from "./windows";
 
@@ -22,6 +24,8 @@ export interface WindowSpec {
 
 // One entry per window kind, in launcher order. Each league window adds itself here.
 const SPECS = {
+  standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
+  scores: { label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
 } satisfies Record<string, WindowSpec>;
 

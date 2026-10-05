@@ -11,6 +11,12 @@ configure({ asyncUtilTimeout: 5000 });
 // vitest does not unless `globals: true`.
 afterEach(cleanup);
 afterEach(clearSharedResources);
+// Imported late: a module the setup imports up front loads before a test's
+// vi.mock and env stubs, which then never reach it.
+afterEach(async () => {
+  (await import("@/lib/league/cache")).clearLeagueCache();
+  (await import("@/lib/league/nfl-state")).clearNflState();
+});
 
 // jsdom has no matchMedia. The default is "no preference"; tests that care stub their own.
 vi.stubGlobal(
