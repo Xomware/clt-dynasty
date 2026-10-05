@@ -1,5 +1,15 @@
 import { LEAGUE_ID } from "@/lib/config";
-import { getLeague, getMatchups, getNflState, getRosters, getUsers, getWinnersBracket } from "@/lib/sleeper/client";
+import {
+  getDraftPicks,
+  getDrafts,
+  getLeague,
+  getMatchups,
+  getNflState,
+  getRosters,
+  getTradedPicks,
+  getUsers,
+  getWinnersBracket,
+} from "@/lib/sleeper/client";
 import type { SleeperMatchup } from "@/lib/sleeper/types";
 
 // Every window reads the same league, so one promise per endpoint serves the
@@ -33,6 +43,15 @@ export const rosters = (id = LEAGUE_ID) => cached(`rosters/${id}`, () => getRost
 // Sleeper redraws the bracket from the standings each week until the playoffs start.
 export const winnersBracket = (live: boolean, id = LEAGUE_ID) =>
   cached(`winners/${id}`, () => getWinnersBracket(id), live ? LIVE_TTL : Infinity);
+
+export const drafts = (id = LEAGUE_ID) => cached(`drafts/${id}`, () => getDrafts(id));
+export const tradedPicks = (id = LEAGUE_ID) => cached(`traded/${id}`, () => getTradedPicks(id));
+// A finished draft's picks never change; one under way gains a pick every few minutes.
+export function draftPicks(draftId: string, live: boolean, fresh = false) {
+  const key = `picks/${draftId}`;
+  if (fresh) entries.delete(key);
+  return cached(key, () => getDraftPicks(draftId), live ? LIVE_TTL : Infinity);
+}
 
 export function nflState(fresh = false) {
   if (fresh) entries.delete("nfl");

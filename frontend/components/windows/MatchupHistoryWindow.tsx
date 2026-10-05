@@ -79,7 +79,7 @@ function SeasonWeeks({ season, myRosterId }: { season: Season; myRosterId: numbe
   const [open, setOpen] = useState(() => new Set(weeks.slice(0, 1)));
   if (weeks.length === 0) return <p>No finished games in {season.league.season} yet.</p>;
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       {weeks.map((w) => (
         <Week
           key={w}
@@ -117,7 +117,7 @@ export function MatchupHistoryWindow() {
   const season = seasons.find((s) => s.league.league_id === pick) ?? seasons[0];
 
   return (
-    <div className="grid gap-3">
+    <div className="grid grid-cols-1 gap-3">
       <div className="flex items-center gap-2">
         <label htmlFor={picker} className="font-bold">
           Season

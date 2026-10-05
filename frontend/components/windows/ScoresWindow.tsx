@@ -32,7 +32,7 @@ export function ScoresWindow() {
   if (!data || current === undefined || week === undefined) return <p role="status">Loading the league...</p>;
 
   return (
-    <div className="grid gap-3">
+    <div className="grid grid-cols-1 gap-3">
       <div className="flex items-stretch gap-2">
         <label htmlFor={picker} className="self-center font-bold">
           Week
@@ -63,7 +63,7 @@ export function ScoresWindow() {
           <StepIcon d="M6 3l5 5-5 5z" />
         </button>
       </div>
-      <div aria-live="polite" className="grid gap-3">
+      <div aria-live="polite" className="grid grid-cols-1 gap-3">
         {!games ? (
           <p role="status">Loading week {week}...</p>
         ) : games.length === 0 ? (

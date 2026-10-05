@@ -139,6 +139,52 @@
   white-space: nowrap;
 }
 
+.xp-toggle {
+  border-radius: 0;
+}
+
+.xp-toggle:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.xp-toggle:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.xp-toggle[aria-pressed="true"] {
+  background: var(--xp-face-shadow);
+  box-shadow: inset 1px 1px 2px rgb(0 0 0 / 0.3);
+}
+
+.xp-pick-owner {
+  flex: none;
+  max-width: 40%;
+  font-size: 0.75rem;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* The member's own picks: gold, with a star or "(yours)" saying so in words. */
+[data-mine] {
+  background: var(--xp-balloon);
+  box-shadow: inset 4px 0 var(--xp-gold);
+}
+
+.xp-board {
+  table-layout: auto;
+  min-width: 48rem;
+}
+
+.xp-board td {
+  min-width: 4rem;
+  border-left: 1px solid var(--xp-face-shadow);
+  vertical-align: top;
+}
+
+.xp-board [data-dim] {
+  opacity: 0.4;
+}
+
 @media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
   /* A phone has room for rank, team, record, points and seed. */
   .standings-extra {
