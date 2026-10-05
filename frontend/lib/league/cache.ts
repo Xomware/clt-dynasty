@@ -1,5 +1,6 @@
 import { LEAGUE_ID } from "@/lib/config";
 import {
+  getAccount,
   getDraftPicks,
   getDrafts,
   getLeague,
@@ -7,6 +8,7 @@ import {
   getNflState,
   getRosters,
   getTradedPicks,
+  getUserLeagues,
   getUsers,
   getWinnersBracket,
 } from "@/lib/sleeper/client";
@@ -24,6 +26,10 @@ interface Entry {
 }
 
 const entries = new Map<string, Entry>();
+// The last value each key resolved to, for window titles, which read synchronously.
+const values = new Map<string, unknown>();
+const listeners = new Set<() => void>();
+let version = 0;
 
 function cached<T>(key: string, load: () => Promise<T>, ttl = Infinity): Promise<T> {
   const hit = entries.get(key);
@@ -31,9 +37,23 @@ function cached<T>(key: string, load: () => Promise<T>, ttl = Infinity): Promise
   const promise = load();
   const entry = { promise, expires: Date.now() + ttl };
   entries.set(key, entry);
-  // A failure is dropped so the next caller retries instead of reusing the rejection.
-  promise.catch(() => entries.get(key) === entry && entries.delete(key));
+  promise.then(
+    (value) => {
+      values.set(key, value);
+      version++;
+      listeners.forEach((fn) => fn());
+    },
+    // A failure is dropped so the next caller retries instead of reusing the rejection.
+    () => entries.get(key) === entry && entries.delete(key),
+  );
   return promise;
+}
+
+export const settled = <T>(key: string) => values.get(key) as T | undefined;
+export const settledVersion = () => version;
+export function subscribeSettled(fn: () => void) {
+  listeners.add(fn);
+  return () => void listeners.delete(fn);
 }
 
 // Past seasons pass their own league id; everything else reads the current one.
@@ -53,6 +73,10 @@ export function draftPicks(draftId: string, live: boolean, fresh = false) {
   return cached(key, () => getDraftPicks(draftId), live ? LIVE_TTL : Infinity);
 }
 
+// Search and profiles look up any Sleeper user, not only CLT's managers.
+export const account = (nameOrId: string) => cached(`account/${nameOrId.toLowerCase()}`, () => getAccount(nameOrId.toLowerCase()));
+export const userLeagues = (userId: string, season: string) => cached(`leagues/${userId}/${season}`, () => getUserLeagues(userId, season));
+
 export function nflState(fresh = false) {
   if (fresh) entries.delete("nfl");
   return cached("nfl", getNflState, NFL_TTL);
@@ -66,4 +90,5 @@ export function leagueMatchups(week: number, live: boolean, fresh = false, id = 
 
 export function clearLeagueCache() {
   entries.clear();
+  values.clear();
 }

@@ -5,7 +5,14 @@ import { useEffect, useId, useState } from "react";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
 import { Markdown } from "@/components/xp/Markdown";
-import { type AIReport, findReport, listReports, periodLabel, REPORT_LABEL, type ReportType } from "@/lib/api/ai-reports";
+import {
+  type AIReport,
+  findReport,
+  listReports,
+  periodLabel,
+  REPORT_LABEL,
+  type ReportType,
+} from "@/lib/api/ai-reports";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { useLoad } from "@/lib/use-load";
@@ -17,9 +24,15 @@ const TYPES = Object.keys(REPORT_LABEL) as ReportType[];
 
 export const isRedacted = (r: AIReport) => String(r.metadata.is_redacted) === "true";
 
-export const reportLink = (r: AIReport): WindowLink => ({ kind: "ai-report", params: { type: r.report_type, period: r.period } });
+export const reportLink = (r: AIReport): WindowLink => ({
+  kind: "ai-report",
+  params: { type: r.report_type, period: r.period },
+});
 
-type List = { status: "loading" } | { status: "error"; message: string } | { status: "ok"; rows: AIReport[]; next: string | null };
+type List =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "ok"; rows: AIReport[]; next: string | null };
 
 export function AIReviewWindow() {
   const filterId = useId();
@@ -116,7 +129,10 @@ export function AIReviewWindow() {
 
 export function ReportView({ report }: { report: AIReport }) {
   return (
-    <article className="grid grid-cols-1 gap-3" aria-label={`${REPORT_LABEL[report.report_type]}, ${periodLabel(report.period)}`}>
+    <article
+      className="grid grid-cols-1 gap-3"
+      aria-label={`${REPORT_LABEL[report.report_type]}, ${periodLabel(report.period)}`}
+    >
       <header className="flex flex-wrap items-center gap-2">
         <span className="xp-tag">{REPORT_LABEL[report.report_type]}</span>
         <h3 className="font-bold">{periodLabel(report.period)}</h3>
@@ -137,7 +153,8 @@ export function AIReportWindow({ params }: { params: WindowParams }) {
 
   if (load.status === "loading") return <p role="status">Loading the report...</p>;
   if (load.status === "error") return <LoadError what="the report" message={load.message} onRetry={retry} />;
-  if (!load.value) return <p>This report isn&rsquo;t available. It may have been removed or hidden by the commissioner.</p>;
+  if (!load.value)
+    return <p>This report isn&rsquo;t available. It may have been removed or hidden by the commissioner.</p>;
   return <ReportView report={load.value} />;
 }
 
@@ -151,3 +168,62 @@ export const reportTitle = (p: WindowParams) => {
   const type = String(p.type) as ReportType;
   return `${REPORT_LABEL[type] ?? "AI Review"} - ${periodLabel(String(p.period))}`;
 };
+
+// The report's own first heading and paragraph, without markdown marks.
+function headline(r: AIReport): { title: string; excerpt: string } {
+  const blocks = r.body_markdown
+    .split(/\n{2,}/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+  const heading = blocks.find((b) => /^#{1,6}\s/.test(b));
+  const paragraph = blocks.find((b) => !/^#{1,6}\s/.test(b) && !/^\s*([-*•]|\d+[.)])\s/.test(b)) ?? "";
+  const plain = (s: string) =>
+    s
+      .replace(/^#{1,6}\s+/, "")
+      .replace(/\*\*|[*_]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  const excerpt = plain(paragraph);
+  return {
+    title: heading ? plain(heading.split("\n")[0]) : `${REPORT_LABEL[r.report_type]}, ${periodLabel(r.period)}`,
+    excerpt: excerpt.length > 240 ? `${excerpt.slice(0, 240).replace(/\s+\S*$/, "")}...` : excerpt,
+  };
+}
+
+// Home's card: the newest review that isn't a mock draft. Nothing shows until there is one.
+export function AIHeadline() {
+  const [load, retry] = useLoad(
+    () => listReports().then((p) => p.rows.find((r) => r.report_type !== "mock") ?? null),
+    "headline",
+  );
+  if (load.status === "loading" || (load.status === "ok" && !load.value)) return null;
+  return (
+    <section className="xp-group" aria-labelledby="home-ai">
+      <h3 id="home-ai" className="xp-group-title">
+        AI Review
+      </h3>
+      {load.status === "error" ? (
+        <LoadError what="the latest AI review" message={load.message} onRetry={retry} />
+      ) : (
+        load.value && <HeadlineCard report={load.value} />
+      )}
+    </section>
+  );
+}
+
+function HeadlineCard({ report }: { report: AIReport }) {
+  const { title, excerpt } = headline(report);
+  return (
+    <div className="ai-headline">
+      <p className="flex flex-wrap items-center gap-2">
+        <span className="xp-tag">{REPORT_LABEL[report.report_type]}</span>
+        <span className="text-xs">{periodLabel(report.period)}</span>
+      </p>
+      <p className="ai-headline-title">{title}</p>
+      {excerpt && <p className="ai-headline-excerpt">{excerpt}</p>}
+      <DrillLink to={reportLink(report)} className="home-more">
+        Read the full review
+      </DrillLink>
+    </div>
+  );
+}
