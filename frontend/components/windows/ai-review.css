@@ -31,3 +31,25 @@
   border: 1px solid var(--xp-face-shadow);
   background: var(--xp-cream);
 }
+
+.ai-preview {
+  padding: 0 0.5rem;
+}
+
+.ai-preview-text {
+  max-height: 20rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  overflow: auto;
+  border: 1px solid var(--xp-face-shadow);
+  font: inherit;
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+  background: var(--xp-face);
+}
+
+.ai-flags {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
