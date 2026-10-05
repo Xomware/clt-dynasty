@@ -55,6 +55,15 @@ export interface SleeperRoster {
   metadata: { streak?: string; record?: string; [key: string]: unknown } | null;
 }
 
+// start_time is epoch ms, null until the commissioner sets it.
+export interface SleeperDraft {
+  draft_id: string;
+  season: string;
+  status: "pre_draft" | "drafting" | "paused" | "complete";
+  type: string;
+  start_time: number | null;
+}
+
 export interface SleeperNflState {
   season: string;
   league_season?: string;
@@ -108,6 +117,7 @@ export const getLeagueRosters = (id: string) => cached<SleeperRoster[]>(`/league
 export const getAccount = (nameOrId: string) => cached<SleeperAccount | null>(`/user/${encodeURIComponent(nameOrId.toLowerCase())}`);
 export const getUserLeagues = (userId: string, season: string) => cached<SleeperLeague[]>(`/user/${userId}/leagues/nfl/${season}`);
 export const getNflState = () => cached<SleeperNflState>("/state/nfl");
+export const getLeagueDrafts = (id: string) => cached<SleeperDraft[]>(`/league/${id}/drafts`);
 
 export const loadedLeague = (id: string) => settled.get(`/league/${id}`) as SleeperLeague | undefined;
 export const loadedUsers = (id: string) => settled.get(`/league/${id}/users`) as SleeperUser[] | undefined;
