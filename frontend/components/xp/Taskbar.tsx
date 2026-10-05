@@ -1,0 +1,113 @@
+"use client";
+
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+
+import { useAuth } from "@/lib/auth/use-auth";
+import { useDesktop } from "@/lib/desktop/desktop-context";
+import { REGISTRY, windowTitle } from "@/lib/desktop/registry";
+import { defaultLayout } from "@/lib/desktop/windows";
+import { useMember } from "@/lib/member/use-member";
+import { CrownIcon } from "./icons";
+import { SpeakerToggle } from "./SpeakerToggle";
+import { StartMenu } from "./StartMenu";
+
+function subscribeToClock(onTick: () => void) {
+  const id = setInterval(onTick, 1000);
+  return () => clearInterval(id);
+}
+
+function readClock() {
+  return new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+// The static export prerenders with no clock, so the server snapshot is empty
+// and the time appears on hydration instead of mismatching.
+function readServerClock() {
+  return "";
+}
+
+export function Taskbar() {
+  const [open, setOpen] = useState(false);
+  const { signOut } = useAuth();
+  const { state } = useMember();
+  const { windows, active, dispatch, open: openWindow } = useDesktop();
+  const menuId = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const start = useRef<HTMLButtonElement>(null);
+  const time = useSyncExternalStore(subscribeToClock, readClock, readServerClock);
+  const name = (state.status === "member" && state.me.member.displayName) || "CLT Dynasty League";
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      start.current?.focus();
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (!root.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [open]);
+
+  return (
+    <div ref={root}>
+      {open && (
+        <StartMenu
+          id={menuId}
+          name={name}
+          onOpen={(kind) => {
+            setOpen(false);
+            openWindow(kind);
+          }}
+          onReset={() => {
+            setOpen(false);
+            dispatch({ type: "restore", windows: defaultLayout() });
+          }}
+          onSignOut={() => void signOut()}
+        />
+      )}
+      <div className="xp-taskbar">
+        <button
+          ref={start}
+          type="button"
+          className="xp-start"
+          aria-expanded={open}
+          aria-controls={open ? menuId : undefined}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <CrownIcon width={22} height={22} />
+          start
+        </button>
+        <ul className="xp-tasks" aria-label="Open windows">
+          {windows.map((w) => {
+            const { Icon } = REGISTRY[w.kind];
+            const pressed = active?.id === w.id;
+            return (
+              <li key={w.id}>
+                <button
+                  type="button"
+                  className="xp-task"
+                  aria-pressed={pressed}
+                  onClick={() => dispatch({ type: pressed ? "minimize" : "focus", id: w.id })}
+                >
+                  <Icon className="shrink-0" />
+                  <span className="truncate">{windowTitle(w)}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="xp-tray">
+          <SpeakerToggle />
+          <time>{time}</time>
+        </div>
+      </div>
+    </div>
+  );
+}
