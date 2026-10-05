@@ -1,0 +1,163 @@
+/* The phone: Luna colours and chrome on one scrolling column. The page itself
+   scrolls (not a fixed box) so Safari's toolbars collapse as on any site. */
+.m-home,
+.m-window {
+  min-height: 100dvh;
+  padding-bottom: calc(var(--taskbar-top) + 1rem);
+}
+
+.m-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 3.5rem;
+  padding: env(safe-area-inset-top) 1rem 0;
+  color: var(--xp-text-inverse);
+  background: linear-gradient(var(--xp-title-light), var(--xp-title) 20%, var(--xp-title) 80%, var(--xp-title-dark));
+}
+
+.m-bar-title {
+  font: bold 1.125rem var(--xp-title-font);
+  text-shadow: 1px 1px var(--xp-frame);
+}
+
+.m-programs {
+  margin: 1rem 0.75rem;
+  border: 2px solid var(--xp-taskbar-dark);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--xp-cream);
+}
+
+.m-programs-title {
+  padding: 0.5rem 0.75rem;
+  color: var(--xp-text-inverse);
+  font: bold 1rem var(--xp-title-font);
+  background: linear-gradient(var(--xp-title-light), var(--xp-title-dark));
+}
+
+.m-program {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0 0.875rem;
+  border-bottom: 1px solid var(--xp-face);
+  font-size: 1.0625rem;
+  font-weight: bold;
+  text-align: left;
+}
+
+.m-program:hover,
+.m-program:focus-visible {
+  color: var(--xp-text-inverse);
+  background: var(--xp-select);
+  outline: none;
+}
+
+.m-program:active {
+  background: var(--xp-title-dark);
+}
+
+.m-empty {
+  padding: 1rem 0.875rem;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.m-account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 6px;
+  font-size: 1rem;
+  background: var(--xp-face);
+}
+
+/* A window opened on the phone fills the screen, title bar pinned under the notch. */
+.m-window {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.m-window-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-height: 3.5rem;
+  padding-top: calc(0.25rem + env(safe-area-inset-top));
+  border-radius: 0;
+}
+
+.m-window-bar .xp-titlebar-text {
+  font-size: 1.0625rem;
+}
+
+.m-back {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 4px;
+}
+
+.m-back:hover {
+  background: rgb(255 255 255 / 0.15);
+}
+
+.m-back:active {
+  background: var(--xp-title-dark);
+}
+
+.m-back:focus-visible {
+  outline: 2px dotted var(--xp-text-inverse);
+  outline-offset: -3px;
+}
+
+.m-window-body {
+  font-size: 1rem;
+}
+
+.m-taskbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  height: var(--taskbar-top);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: linear-gradient(var(--xp-taskbar-light), var(--xp-taskbar) 15%, var(--xp-taskbar) 85%, var(--xp-taskbar-dark));
+}
+
+/* No tray to point at: the balloon hangs under the title bar instead. */
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  .xp-balloon {
+    top: calc(3.5rem + env(safe-area-inset-top) + 0.5rem);
+    right: 0.75rem;
+    bottom: auto;
+    left: 0.75rem;
+    width: auto;
+    font-size: 1rem;
+  }
+
+  .xp-balloon::after {
+    display: none;
+  }
+
+  .xp-balloon-close {
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: -0.75rem -0.625rem -0.75rem auto;
+  }
+}
