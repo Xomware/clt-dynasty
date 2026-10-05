@@ -1,0 +1,57 @@
+.brand-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--xp-text-inverse);
+}
+
+.brand-loader-name {
+  font: italic bold 1.75rem var(--xp-title-font);
+  text-shadow: 1px 2px 2px var(--xp-frame);
+}
+
+.brand-loader-track {
+  display: flex;
+  gap: 2px;
+  width: 10rem;
+  height: 1rem;
+  padding: 2px;
+  overflow: hidden;
+  border: 2px solid var(--xp-face-shadow);
+  border-radius: 4px;
+  background: var(--xp-screen);
+}
+
+.brand-loader-track span {
+  flex: none;
+  width: 0.625rem;
+  border-radius: 1px;
+  background: linear-gradient(var(--xp-title-light), var(--xp-title) 50%, var(--xp-title-dark));
+}
+
+.brand-loader-run span {
+  animation: brand-loader-march 2s steps(24, end) infinite;
+}
+
+.brand-loader-still {
+  justify-content: center;
+}
+
+@keyframes brand-loader-march {
+  from {
+    transform: translateX(-2.5rem);
+  }
+  to {
+    transform: translateX(10rem);
+  }
+}
+
+.brand-loader-label {
+  font-size: 0.875rem;
+}
+
+/* A full screen behind the loader, in the logon screen's blue. */
+.brand-loader-page {
+  background: linear-gradient(var(--xp-logon-top), var(--xp-logon) 30%, var(--xp-logon) 70%, var(--xp-logon-bottom));
+}

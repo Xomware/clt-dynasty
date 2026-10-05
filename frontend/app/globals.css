@@ -1,0 +1,591 @@
+@import "tailwindcss";
+
+:root {
+  --xp-font: Tahoma, Verdana, "Segoe UI", sans-serif;
+  --xp-title-font: "Trebuchet MS", Tahoma, sans-serif;
+
+  --xp-text: #1b1b17;
+  --xp-text-inverse: #fbfbf6;
+  --xp-face: #ece9d8;
+  --xp-face-shadow: #aca899;
+  --xp-cream: #fbf8ec;
+  --xp-select: #316ac5;
+
+  --xp-sky-top: #2b64c9;
+  --xp-sky-bottom: #8ec1f2;
+  --xp-hill: #4f9a2f;
+  --xp-hill-dark: #3a7a1f;
+  --xp-title-inactive: #7a96df;
+  --xp-title-inactive-light: #9db9eb;
+
+  --xp-title-light: #3d95ff;
+  --xp-title: #0a5ce6;
+  --xp-title-dark: #0544c4;
+  --xp-frame: #0831d9;
+  --xp-close: #e0533a;
+  --xp-close-dark: #b4321b;
+
+  --xp-taskbar-light: #3f8cf3;
+  --xp-taskbar: #245edb;
+  --xp-taskbar-dark: #1941a5;
+  --xp-tray: #0b67c2;
+  --xp-tray-dark: #094f9e;
+
+  --xp-start-light: #5fbf55;
+  --xp-start: #3a9a36;
+  --xp-start-dark: #2b7a28;
+
+  /* The Welcome screen XP shows before the desktop. */
+  --xp-logon-top: #00309c;
+  --xp-logon: #5a7edc;
+  --xp-logon-bottom: #00309c;
+  --xp-logon-rule: #f89b3d;
+
+  --xp-menu-side: #d3e5fa;
+  --xp-red: #c8311e;
+  --xp-wood: #9b5a24;
+  --xp-screen: #1e2c3a;
+  --xp-lime: #7cf05a;
+  --xp-gold: #e8b92c;
+  --xp-silver: #c9ccd1;
+  --xp-bronze: #c07a3e;
+
+  /* Charlotte: Queen City navy and crown gold, with a Carolina teal accent. */
+  --clt-navy: #142a52;
+  --clt-navy-dark: #0b1a36;
+  --clt-crown: #e3b23c;
+  --clt-crown-dark: #9a6f12;
+  --clt-teal: #1590a8;
+  --clt-sky: #d6ebf7;
+
+  --xp-folder: #f6d774;
+  --xp-folder-back: #e2b84e;
+  --xp-folder-light: #fff3c4;
+  --xp-folder-edge: #a97c22;
+
+  --xp-button-border: #003c74;
+  --xp-balloon: #ffffe1;
+
+  --taskbar-height: 44px;
+  /* The taskbar sits above the iPhone home bar; everything that stacks on it uses this. */
+  --taskbar-top: calc(var(--taskbar-height) + env(safe-area-inset-bottom));
+}
+
+@layer base {
+  body {
+    font-family: var(--xp-font);
+    color: var(--xp-text);
+    background:
+      radial-gradient(ellipse 120% 40% at 30% 100%, var(--xp-hill) 60%, transparent 61%),
+      radial-gradient(ellipse 90% 30% at 90% 100%, var(--xp-hill-dark) 60%, transparent 61%),
+      linear-gradient(var(--xp-sky-top), var(--xp-sky-bottom));
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .xp-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0 calc(var(--taskbar-height) + 1rem);
+  }
+
+  @media (min-width: 40rem) {
+    .xp-page {
+      padding-inline: 1rem;
+      padding-top: 2rem;
+    }
+  }
+
+  .xp-note {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--xp-text);
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    background: var(--xp-balloon);
+  }
+
+  .xp-button,
+  .xp-select,
+  .xp-log-off {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--xp-button-border);
+    border-radius: 3px;
+    font-weight: bold;
+    color: var(--xp-text);
+    background: linear-gradient(var(--xp-cream), var(--xp-face) 85%, var(--xp-face-shadow));
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-button:hover,
+  .xp-select:hover,
+  .xp-log-off:hover {
+    box-shadow: inset 0 0 0 2px var(--xp-gold);
+  }
+
+  .xp-button:active,
+  .xp-log-off:active {
+    background: var(--xp-face-shadow);
+  }
+
+  .xp-button:focus-visible,
+  .xp-select:focus-visible,
+  .xp-log-off:focus-visible {
+    outline: 2px dotted var(--xp-text);
+    outline-offset: 2px;
+  }
+
+  .xp-log-off:focus-visible {
+    outline-color: var(--xp-text-inverse);
+  }
+
+
+  /* Desktop: as tall as the select beside it, which WebKit draws natively short. */
+  .xp-step {
+    justify-content: center;
+    min-width: 1.75rem;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .xp-step:disabled {
+    color: var(--xp-face-shadow);
+    background: var(--xp-face);
+    box-shadow: none;
+    cursor: var(--cursor-default, default);
+  }
+
+  .xp-drill {
+    display: inline-flex;
+    max-width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: none;
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-drill:hover,
+  .xp-drill:hover .xp-team-name {
+    text-decoration: underline;
+  }
+
+  .xp-drill:active {
+    color: var(--xp-select);
+  }
+
+  .xp-drill:focus-visible {
+    outline: 2px dotted var(--xp-text);
+    outline-offset: 1px;
+  }
+
+  .xp-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    background: var(--xp-cream);
+  }
+
+  .xp-table th {
+    padding: 0.25rem 0.375rem;
+    border: 1px solid var(--xp-face-shadow);
+    text-align: left;
+    background: linear-gradient(var(--xp-cream), var(--xp-face));
+  }
+
+  .xp-table td {
+    padding: 0.375rem;
+    border-bottom: 1px solid var(--xp-face-shadow);
+  }
+
+
+  .xp-tag {
+    flex: none;
+    padding: 0 0.375rem;
+    border: 1px solid var(--xp-text);
+    border-radius: 3px;
+    font-size: 0.6875rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: var(--xp-balloon);
+  }
+
+  .xp-window {
+    width: min(100%, 40rem);
+    border: 3px solid var(--xp-frame);
+    border-top-width: 0;
+    border-radius: 8px 8px 0 0;
+    background: var(--xp-face);
+    box-shadow: 2px 3px 8px rgb(10 30 80 / 0.4);
+  }
+
+  .xp-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+    border-radius: 7px 7px 0 0;
+    color: var(--xp-text-inverse);
+    background: linear-gradient(var(--xp-title-light), var(--xp-title) 20%, var(--xp-title) 80%, var(--xp-title-dark));
+  }
+
+  .xp-titlebar-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: bold 0.875rem var(--xp-title-font);
+    text-shadow: 1px 1px var(--xp-frame);
+  }
+
+  .xp-titlebar-controls {
+    display: flex;
+    gap: 2px;
+  }
+
+  .xp-control {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--xp-text-inverse);
+    border-radius: 3px;
+    color: var(--xp-text-inverse);
+    background: linear-gradient(135deg, var(--xp-title-light), var(--xp-title-dark));
+  }
+
+  .xp-control-close {
+    background: linear-gradient(135deg, var(--xp-close), var(--xp-close-dark));
+  }
+
+  button.xp-control {
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  button.xp-control:hover {
+    filter: brightness(1.15);
+  }
+
+  button.xp-control:active {
+    filter: brightness(0.85);
+  }
+
+  button.xp-control:focus-visible {
+    outline: 2px dotted var(--xp-text-inverse);
+    outline-offset: 1px;
+  }
+
+  .xp-window-body {
+    padding: 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .xp-tray-button {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 3px;
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-tray-button:hover {
+    background: rgb(255 255 255 / 0.15);
+  }
+
+  .xp-tray-button:active {
+    background: var(--xp-tray-dark);
+  }
+
+  .xp-tray-button:focus-visible {
+    outline: 2px dotted var(--xp-text-inverse);
+    outline-offset: -4px;
+  }
+
+  .xp-balloon {
+    position: fixed;
+    right: 0.5rem;
+    bottom: calc(var(--taskbar-top) + 14px);
+    z-index: 60;
+    width: min(20rem, calc(100vw - 1rem));
+    padding: 0.5rem 0.625rem 0.625rem;
+    border: 1px solid var(--xp-text);
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    background: var(--xp-balloon);
+    box-shadow: 2px 3px 6px rgb(10 30 80 / 0.35);
+    animation: xp-balloon-in 200ms ease-out;
+  }
+
+  /* The tail points down at the tray icons. */
+  .xp-balloon::after {
+    content: "";
+    position: absolute;
+    right: 2.5rem;
+    bottom: -13px;
+    border: 12px solid transparent;
+    border-top-color: var(--xp-balloon);
+    border-bottom: 0;
+    border-right: 0;
+    filter: drop-shadow(0 1px 0 var(--xp-text));
+  }
+
+  .xp-balloon-head {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .xp-balloon-close {
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: auto;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-balloon-close:hover {
+    border-color: var(--xp-face-shadow);
+    background: var(--xp-cream);
+  }
+
+  .xp-balloon-close:active {
+    background: var(--xp-face);
+  }
+
+  .xp-balloon-close:focus-visible {
+    outline: 2px dotted var(--xp-text);
+    outline-offset: 1px;
+  }
+
+  @keyframes xp-balloon-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .xp-balloon {
+      animation: none;
+    }
+  }
+
+
+  .xp-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgb(10 30 80 / 0.3);
+  }
+
+  .xp-message-box {
+    width: min(26rem, 100%);
+    box-shadow: 3px 4px 12px rgb(10 30 80 / 0.5);
+  }
+
+  .xp-message-body {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .xp-message-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0 1rem 1rem;
+  }
+
+
+  .xp-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  @media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+    /* Names wrap to nothing in a fixed layout at this width; size the columns
+       to their content and let .xp-table-scroll take the overflow. */
+    .xp-table {
+      table-layout: auto;
+    }
+
+    /* A 44px hit area without growing the rows or the sentences drill links sit in. */
+    .xp-drill {
+      position: relative;
+    }
+
+    .xp-drill::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      min-width: 2.75rem;
+      height: 2.75rem;
+      translate: 0 -50%;
+    }
+
+    .xp-tag {
+      font-size: 0.75rem;
+    }
+
+    .xp-step {
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+    }
+
+    /* Native iOS selects ignore min-height, so draw the chevron ourselves. */
+    .xp-select {
+      appearance: none;
+      padding-right: 2rem;
+      background:
+        linear-gradient(45deg, transparent 50%, var(--xp-text) 50%) right 0.875rem center / 0.375rem 0.375rem no-repeat,
+        linear-gradient(135deg, var(--xp-text) 50%, transparent 50%) right 0.5rem center / 0.375rem 0.375rem no-repeat,
+        linear-gradient(var(--xp-cream), var(--xp-face) 85%, var(--xp-face-shadow));
+    }
+
+    /* iOS zooms the page into any field under 16px and leaves it zoomed. */
+    input,
+    select,
+    textarea {
+      font-size: 1rem;
+    }
+  }
+
+
+  .xp-group {
+    padding: 0.5rem;
+    border: 1px solid var(--xp-face-shadow);
+    border-radius: 3px;
+  }
+
+  .xp-group-title {
+    margin-bottom: 0.375rem;
+    font-weight: bold;
+    color: var(--xp-title-dark);
+  }
+
+  .xp-inset {
+    border: 1px solid var(--xp-face-shadow);
+    background: var(--xp-cream);
+    box-shadow: inset 1px 1px 0 var(--xp-face-shadow);
+  }
+
+  .xp-summary {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 1.5rem;
+  }
+
+  .xp-summary dd {
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .xp-dialog {
+    min-width: 0;
+    border: 1px solid var(--xp-frame);
+    border-radius: 6px 6px 0 0;
+    background: var(--xp-cream);
+    box-shadow: 1px 2px 4px rgb(10 30 80 / 0.25);
+  }
+
+  .xp-dialog-title {
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px 5px 0 0;
+    color: var(--xp-text-inverse);
+    font: bold 0.8125rem var(--xp-title-font);
+    text-shadow: 1px 1px var(--xp-frame);
+    background: linear-gradient(var(--xp-title-light), var(--xp-title) 30%, var(--xp-title-dark));
+  }
+
+  .xp-tab-strip {
+    --fade-start: 0px;
+    --fade-end: 0px;
+    display: flex;
+    gap: 2px;
+    padding: 2px 4px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, transparent, black var(--fade-start), black calc(100% - var(--fade-end)), transparent);
+  }
+
+  .xp-tab-strip[data-more-start] {
+    --fade-start: 2rem;
+  }
+
+  .xp-tab-strip[data-more-end] {
+    --fade-end: 2rem;
+  }
+
+  .xp-tab {
+    flex-shrink: 0;
+    min-height: 2rem;
+    padding: 0.25rem 0.75rem;
+    margin-top: 2px;
+    border: 1px solid var(--xp-face-shadow);
+    border-bottom: 0;
+    border-radius: 3px 3px 0 0;
+    color: var(--xp-text);
+    font: inherit;
+    white-space: nowrap;
+    background: linear-gradient(var(--xp-cream), var(--xp-face));
+    cursor: var(--cursor-pointer, pointer);
+  }
+
+  .xp-tab:hover {
+    box-shadow: inset 0 2px 0 var(--xp-gold);
+  }
+
+  .xp-tab:active {
+    background: var(--xp-face);
+  }
+
+  .xp-tab[aria-selected="true"] {
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+    margin-bottom: -1px;
+    padding-bottom: calc(0.25rem + 3px);
+    font-weight: bold;
+    background: var(--xp-cream);
+    box-shadow: inset 0 3px 0 var(--xp-gold);
+  }
+
+  .xp-tab:focus-visible {
+    outline: 2px dotted var(--xp-text);
+    outline-offset: -4px;
+  }
+
+  .xp-tab-panel {
+    padding: 0.5rem;
+    border: 1px solid var(--xp-face-shadow);
+    background: var(--xp-cream);
+    container-type: inline-size;
+  }
+
+  .xp-tab-panel:focus-visible {
+    outline: 2px dotted var(--xp-text);
+    outline-offset: -3px;
+  }
+}
