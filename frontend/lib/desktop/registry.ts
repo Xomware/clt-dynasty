@@ -10,6 +10,7 @@ import { RulesWindow } from "@/components/windows/RulesWindow";
 import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
+import { TaxiWindow } from "@/components/windows/TaxiWindow";
 import { WorldCupWindow } from "@/components/windows/WorldCupWindow";
 import {
   BallotIcon,
@@ -22,6 +23,7 @@ import {
   RosterMoveIcon,
   ScoresIcon,
   StandingsIcon,
+  TaxiIcon,
   TrophyIcon,
 } from "@/components/xp/icons";
 
@@ -65,6 +67,7 @@ const SPECS = {
   },
   "world-cup": { label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
   proposals: { label: "Proposals", title: "Rule Proposals", Icon: BallotIcon, component: ProposalsWindow, defaultSize: { w: 600, h: 640 } },
+  taxi: { label: "Taxi Squads", title: "Taxi Squads", Icon: TaxiIcon, component: TaxiWindow, defaultSize: { w: 600, h: 640 } },
   rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
 } satisfies Record<string, WindowSpec>;

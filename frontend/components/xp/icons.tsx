@@ -225,6 +225,19 @@ export function BallotIcon(props: IconProps) {
   );
 }
 
+// Taxi squads: a yellow cab with its roof sign.
+export function TaxiIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M6.5 2.5h3v2h-3z" className="fill-(--xp-cream) stroke-(--xp-text)" />
+      <path d="M3.5 4.5h9l1.5 4h1v4h-14v-4h1z" className="fill-(--xp-gold) stroke-(--xp-text)" />
+      <path d="M4.5 5.5h7l1 3h-9z" className="fill-(--xp-sky-bottom)" />
+      <circle cx="4.5" cy="12.5" r="1.5" className="fill-(--xp-text)" />
+      <circle cx="11.5" cy="12.5" r="1.5" className="fill-(--xp-text)" />
+    </Icon>
+  );
+}
+
 export function TradeIcon(props: IconProps) {
   return (
     <Icon {...props}>
