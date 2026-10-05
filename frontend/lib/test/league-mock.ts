@@ -1,16 +1,21 @@
 import { vi } from "vitest";
 
-import { API_BASE, LEAGUE_ID } from "@/lib/config";
+import { API_BASE } from "@/lib/config";
 import { SLEEPER_BASE } from "@/lib/sleeper/client";
 import type {
   SleeperBracketMatch,
+  SleeperDraft,
+  SleeperDraftPick,
   SleeperLeague,
   SleeperMatchup,
   SleeperNflState,
   SleeperRoster,
+  SleeperTradedPick,
   SleeperUser,
 } from "@/lib/sleeper/types";
 import season from "./fixtures/league-2026.json";
+import drafts from "./fixtures/drafts.json";
+import past from "./fixtures/league-past.json";
 import players from "./fixtures/players.json";
 
 interface Season {
@@ -26,18 +31,44 @@ interface Season {
 // Real 2026 Sleeper data from the evening of week 4's Monday game, with
 // managers replaced by their roster ids: user "u<id>", team "Team <id>".
 export const fixture = season as unknown as Season;
-const current = fixture;
+// The two seasons before it, 2025 and 2024, by league id; their matchups keep
+// only roster, game and points.
+export const pastFixture = past as unknown as Record<string, Omit<Season, "state">>;
 
-const league = `/league/${LEAGUE_ID}`;
+// Each season's drafts with their picks (none for the 30-round 2024 startup)
+// and traded picks, by league id. Pickers are "u<roster_id>" too.
+export const draftFixture = drafts as unknown as Record<
+  string,
+  { drafts: { draft: SleeperDraft; picks: SleeperDraftPick[] }[]; traded_picks: SleeperTradedPick[] }
+>;
+
+const draftRoutes = Object.entries(draftFixture).reduce(
+  (all, [id, d]) => ({
+    ...all,
+    [`/league/${id}/drafts`]: d.drafts.map((x) => x.draft),
+    [`/league/${id}/traded_picks`]: d.traded_picks,
+    ...Object.fromEntries(d.drafts.map((x) => [`/draft/${x.draft.draft_id}/picks`, x.picks])),
+  }),
+  {},
+);
+
+const seasonRoutes = (s: Omit<Season, "state">) => {
+  const league = `/league/${s.league.league_id}`;
+  return {
+    [league]: s.league,
+    [`${league}/users`]: s.users,
+    [`${league}/rosters`]: s.rosters,
+    [`${league}/winners_bracket`]: s.winners_bracket,
+    [`${league}/losers_bracket`]: s.losers_bracket,
+    ...Object.fromEntries(Object.entries(s.matchups).map(([w, rows]) => [`${league}/matchups/${w}`, rows])),
+  };
+};
 
 const RESPONSES: Record<string, unknown> = {
-  [league]: current.league,
-  [`${league}/users`]: current.users,
-  [`${league}/rosters`]: current.rosters,
-  [`${league}/winners_bracket`]: current.winners_bracket,
-  [`${league}/losers_bracket`]: current.losers_bracket,
-  "/state/nfl": current.state,
-  ...Object.fromEntries(Object.entries(current.matchups).map(([w, rows]) => [`${league}/matchups/${w}`, rows])),
+  ...seasonRoutes(fixture),
+  ...Object.values(pastFixture).reduce((all, s) => ({ ...all, ...seasonRoutes(s) }), {}),
+  ...draftRoutes,
+  "/state/nfl": fixture.state,
   [`${API_BASE}/players/list`]: { count: Object.keys(players).length, players },
 };
 

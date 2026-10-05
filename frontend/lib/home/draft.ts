@@ -1,4 +1,4 @@
-import type { SleeperDraft } from "@/lib/sleeper/league";
+import type { SleeperDraft } from "@/lib/sleeper/types";
 
 // The next draft Sleeper has for the league, if one is waiting or under way.
 export const upcomingDraft = (drafts: SleeperDraft[]) => drafts.find((d) => d.status === "pre_draft" || d.status === "drafting" || d.status === "paused");

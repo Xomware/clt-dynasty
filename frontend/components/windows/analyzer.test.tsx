@@ -7,7 +7,6 @@ vi.mock("aws-amplify/auth", () => ({
 
 import { LEAGUE_ID } from "@/lib/config";
 import { MemberProvider } from "@/lib/member/use-member";
-import { clearSleeperCache } from "@/lib/sleeper/league";
 import { AnalyzerWindow } from "./AnalyzerWindow";
 
 const roster = (roster_id: number, players: string[], starters: string[]) => ({
@@ -47,7 +46,6 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.restoreAllMocks();
-  clearSleeperCache();
 });
 
 const renderAnalyzer = () =>
@@ -100,12 +98,16 @@ describe("Team Analyzer", () => {
         { player: { sleeperId: "5", position: "QB", name: "D" }, value: 3000 },
       ],
     ];
+    routes["/players/list"] = [
+      200,
+      { count: 2, players: { "2": { player_id: "2", first_name: "Wide", last_name: "Out", position: "WR" }, "3": { player_id: "3", first_name: "Run", last_name: "Back", position: "RB" } } },
+    ];
     renderAnalyzer();
     fireEvent.click(await screen.findByRole("tab", { name: "Trades" }));
     const trade = within(screen.getByRole("listitem"));
     expect(trade.getByRole("button", { name: "Team Name 6" })).toBeTruthy();
-    expect(trade.getByText("Give").nextSibling?.textContent).toBe("Player 3RB · 8,000");
-    expect(trade.getByText("Get").nextSibling?.textContent).toBe("Player 2WR · 7,800");
+    expect(trade.getByText("Give").nextSibling?.textContent).toBe("Run BackRB · 8,000");
+    expect(trade.getByText("Get").nextSibling?.textContent).toBe("Wide OutWR · 7,800");
     expect(trade.getByText("Adds 3,900 at WR. Values 3% apart.")).toBeTruthy();
   });
 

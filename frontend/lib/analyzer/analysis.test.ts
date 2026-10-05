@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { SleeperRoster } from "@/lib/sleeper/league";
+import type { SleeperRoster } from "@/lib/sleeper/types";
 import { analyze, leagueShape, standing } from "./analysis";
 import { parseValues } from "./values";
 
@@ -22,7 +22,7 @@ const roster = (extra: Partial<SleeperRoster> = {}): SleeperRoster => ({
   players: ["qb1", "wr1", "wr2", "k1", "tx1", "ir1", "unvalued"],
   taxi: ["tx1"],
   reserve: ["ir1"],
-  settings: { wins: 0, losses: 0, ties: 0 },
+  settings: { wins: 0, losses: 0, ties: 0, fpts: 0 },
   metadata: null,
   ...extra,
 });

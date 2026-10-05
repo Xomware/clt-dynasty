@@ -35,7 +35,6 @@
 }
 
 .xp-matchup-hint {
-  align-self: flex-end;
   font-size: 0.6875rem;
   color: var(--xp-title-dark);
   text-decoration: underline;
@@ -97,8 +96,109 @@
   box-shadow: inset 4px 0 var(--xp-gold);
 }
 
+.xp-round-title {
+  margin-bottom: 0.375rem;
+  font-weight: bold;
+}
+
+.xp-bracket-match {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: var(--xp-cream);
+}
+
+.xp-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  min-height: 2rem;
+}
+
+.xp-slot-out .xp-team-name {
+  text-decoration: line-through;
+  font-weight: normal;
+}
+
+.xp-slot-from {
+  font-size: 0.6875rem;
+}
+
+.xp-seed {
+  flex: none;
+  width: 1.25rem;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
 .xp-table th {
   white-space: nowrap;
+}
+
+/* Where the playoff teams start at the back of the draft. */
+.xp-table .xp-group-start td {
+  border-top: 3px solid var(--xp-face-shadow);
+}
+
+.rules-body {
+  display: grid;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+  line-height: 1.5;
+}
+
+.rules-table {
+  max-width: 28rem;
+}
+
+.xp-toggle {
+  border-radius: 0;
+}
+
+.xp-toggle:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.xp-toggle:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.xp-toggle[aria-pressed="true"] {
+  background: var(--xp-face-shadow);
+  box-shadow: inset 1px 1px 2px rgb(0 0 0 / 0.3);
+}
+
+.xp-pick-owner {
+  flex: none;
+  max-width: 40%;
+  font-size: 0.75rem;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* The member's own picks: gold, with a star or "(yours)" saying so in words. */
+[data-mine] {
+  background: var(--xp-balloon);
+  box-shadow: inset 4px 0 var(--xp-gold);
+}
+
+.xp-board {
+  table-layout: auto;
+  min-width: 48rem;
+}
+
+.xp-board td {
+  min-width: 4rem;
+  border-left: 1px solid var(--xp-face-shadow);
+  vertical-align: top;
+}
+
+.xp-board [data-dim] {
+  opacity: 0.4;
 }
 
 @media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
@@ -114,6 +214,7 @@
 
   .xp-player-pos,
   .xp-player-team,
+  .xp-slot-from,
   .xp-matchup-hint {
     font-size: 0.75rem;
   }

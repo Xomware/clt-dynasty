@@ -8,12 +8,12 @@ import { LoadError } from "@/components/xp/LoadError";
 import { TeamName } from "@/components/xp/TeamName";
 import { announcements as announcementsResource } from "@/lib/announcements";
 import { LEAGUE_ID } from "@/lib/config";
+import { drafts as leagueDrafts } from "@/lib/league/cache";
 import { leagueWeek } from "@/lib/league/default-week";
 import { sortStandings } from "@/lib/league/standings";
 import type { LeagueData, Team } from "@/lib/league/use-league";
 import { useWeekGames } from "@/lib/league/use-week-games";
 import { countdown, upcomingDraft } from "@/lib/home/draft";
-import { getLeagueDrafts } from "@/lib/sleeper/league";
 import { teamLink } from "@/lib/team/links";
 import { useLoad } from "@/lib/use-load";
 
@@ -110,7 +110,7 @@ const START = new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short
 
 // No draft waiting is the usual in-season case, so the section stays out of the way then.
 function DraftCountdown() {
-  const [load, retry] = useLoad(() => getLeagueDrafts(LEAGUE_ID), LEAGUE_ID);
+  const [load, retry] = useLoad(() => leagueDrafts(LEAGUE_ID), LEAGUE_ID);
   const draft = load.status === "ok" ? upcomingDraft(load.value) : undefined;
   const start = draft?.start_time ?? null;
   const now = useNow(start !== null && draft?.status === "pre_draft");

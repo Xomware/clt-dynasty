@@ -12,10 +12,12 @@ interface MatchupCardProps {
   game: Game;
   teamFor: (rosterId: number) => Team;
   myRosterId: number | null;
+  // A tag beside the game, like "Consolation".
+  note?: string;
 }
 
 // Two teams and their scores; opening it shows both lineups.
-export function MatchupCard({ game, teamFor, myRosterId }: MatchupCardProps) {
+export function MatchupCard({ game, teamFor, myRosterId, note }: MatchupCardProps) {
   const [open, setOpen] = useState(false);
   const lineups = useId();
   const top = Math.max(...game.sides.map((s) => s.points));
@@ -39,7 +41,10 @@ export function MatchupCard({ game, teamFor, myRosterId }: MatchupCardProps) {
             </span>
           );
         })}
-        <span className="xp-matchup-hint">{open ? "Hide lineups" : "Show lineups"}</span>
+        <span className="flex items-center justify-between gap-2">
+          {note ? <span className="xp-tag">{note}</span> : <span />}
+          <span className="xp-matchup-hint">{open ? "Hide lineups" : "Show lineups"}</span>
+        </span>
       </button>
       {open && (
         <div id={lineups} className="@container mt-2">

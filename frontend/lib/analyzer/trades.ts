@@ -1,5 +1,5 @@
-import { type PlayerMap, playerName } from "@/lib/players";
-import type { SleeperRoster } from "@/lib/sleeper/league";
+import { type Player, playerName } from "@/lib/api/players";
+import type { SleeperRoster } from "@/lib/sleeper/types";
 import { type Axis, leagueShape, standing, type TeamAnalysis } from "./analysis";
 import { valueOf, type Values } from "./values";
 
@@ -32,7 +32,7 @@ export function recommendTrades(
   me: TeamAnalysis,
   teams: TeamAnalysis[],
   rosters: SleeperRoster[],
-  players: PlayerMap,
+  players: Record<string, Player>,
   values: Values,
   limit = 5,
 ) {

@@ -1,19 +1,42 @@
 import { type ComponentType, type SVGProps, useSyncExternalStore } from "react";
 
 import { AnalyzerWindow } from "@/components/windows/AnalyzerWindow";
+import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
+import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
+import { HistoryWindow } from "@/components/windows/HistoryWindow";
 import { HomeWindow } from "@/components/windows/HomeWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
+import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
+import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
+import { RulesWindow } from "@/components/windows/RulesWindow";
 import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
 import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
-import { ChartIcon, ControlPanelIcon, HomeIcon, ProfileIcon, ScoresIcon, SearchIcon, StandingsIcon, StarIcon, TrophyIcon } from "@/components/xp/icons";
+import {
+  BracketIcon,
+  CalendarIcon,
+  ChartIcon,
+  ControlPanelIcon,
+  FolderIcon,
+  HomeIcon,
+  NewspaperIcon,
+  ProfileIcon,
+  RosterMoveIcon,
+  ScoresIcon,
+  SearchIcon,
+  StandingsIcon,
+  StarIcon,
+  TradeIcon,
+  TrophyIcon,
+} from "@/components/xp/icons";
 import { LEAGUE_ID } from "@/lib/config";
-import { loadedAccount, loadedLeague, loadedRosters, loadedUsers, loadedVersion, subscribeLoaded } from "@/lib/sleeper/league";
+import { settled, settledVersion, subscribeSettled } from "@/lib/league/cache";
+import { teamOf } from "@/lib/league/use-league";
+import type { SleeperAccount, SleeperLeague, SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
 import { readIdLink, readTeamLink } from "@/lib/team/links";
-import { teamName } from "@/lib/team/team";
 
 import type { WindowParams, WindowView } from "./windows";
 
@@ -36,14 +59,15 @@ export interface WindowSpec {
 function teamTitle(p: WindowParams): string {
   const leagueId = String(p.leagueId ?? LEAGUE_ID);
   const rosterId = Number(p.rosterId);
-  const [users, rosters] = [loadedUsers(leagueId), loadedRosters(leagueId)];
+  const users = settled<SleeperUser[]>(`users/${leagueId}`);
+  const rosters = settled<SleeperRoster[]>(`rosters/${leagueId}`);
   if (!users || !rosters) return "Team Profile";
-  return `Team Profile - ${teamName(rosters.find((r) => r.roster_id === rosterId), users, rosterId)}`;
+  return `Team Profile - ${teamOf(users, rosters.find((r) => r.roster_id === rosterId), rosterId).name}`;
 }
 
 function profileTitle(p: WindowParams): string {
   if (!p.userId) return "My Profile";
-  const name = loadedAccount(String(p.userId))?.display_name;
+  const name = settled<SleeperAccount | null>(`account/${p.userId}`)?.display_name;
   return name ? `Profile - ${name}` : "Profile";
 }
 
@@ -52,6 +76,24 @@ const SPECS = {
   home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: HomeWindow, defaultSize: { w: 640, h: 640 } },
   standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
   scores: { label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
+  playoffs: { label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 720, h: 560 } },
+  history: { label: "History", title: "League History", Icon: CalendarIcon, component: HistoryWindow, defaultSize: { w: 640, h: 600 } },
+  "matchup-history": {
+    label: "Matchup History",
+    title: "Matchup History",
+    Icon: ChartIcon,
+    component: MatchupHistoryWindow,
+    defaultSize: { w: 560, h: 620 },
+  },
+  drafts: { label: "Draft History", title: "Draft History", Icon: FolderIcon, component: DraftHistoryWindow, defaultSize: { w: 640, h: 620 } },
+  "draft-order": {
+    label: "Draft Order",
+    title: "Draft Order",
+    Icon: RosterMoveIcon,
+    component: DraftOrderWindow,
+    defaultSize: { w: 600, h: 620 },
+  },
+  rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
   "my-team": { label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
   profile: {
@@ -62,7 +104,7 @@ const SPECS = {
     defaultSize: { w: 520, h: 560 },
     link: readIdLink("userId"),
   },
-  analyzer: { label: "Team Analyzer", title: "Team Analyzer", Icon: ChartIcon, component: AnalyzerWindow, defaultSize: { w: 760, h: 620 } },
+  analyzer: { label: "Team Analyzer", title: "Team Analyzer", Icon: TradeIcon, component: AnalyzerWindow, defaultSize: { w: 760, h: 620 } },
   search: {
     label: "Search",
     title: "Search Sleeper",
@@ -86,7 +128,7 @@ const SPECS = {
   },
   league: {
     label: "League",
-    title: (p) => loadedLeague(String(p.leagueId))?.name ?? "League",
+    title: (p) => settled<SleeperLeague>(`league/${p.leagueId}`)?.name ?? "League",
     Icon: TrophyIcon,
     component: LeagueWindow,
     defaultSize: { w: 600, h: 600 },
@@ -113,6 +155,6 @@ export function windowTitle({ kind, params }: WindowView): string {
 
 // Re-renders the caller when Sleeper data lands, so a title that names a team or league catches up.
 export function useWindowTitle(): (view: WindowView) => string {
-  useSyncExternalStore(subscribeLoaded, loadedVersion, loadedVersion);
+  useSyncExternalStore(subscribeSettled, settledVersion, settledVersion);
   return windowTitle;
 }

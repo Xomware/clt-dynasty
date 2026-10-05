@@ -5,11 +5,13 @@ export interface SleeperLeague {
   status: string;
   total_rosters: number;
   previous_league_id: string | null;
+  avatar?: string | null;
   roster_positions: string[];
   scoring_settings: Record<string, number>;
   settings: {
     playoff_week_start: number;
     playoff_teams: number;
+    divisions?: number;
     [key: string]: unknown;
   };
   // Division names live here as division_1, division_2, ...
@@ -30,6 +32,8 @@ export interface SleeperRoster {
   starters: string[];
   players: string[] | null;
   taxi: string[] | null;
+  // Injured reserve.
+  reserve?: string[] | null;
   settings: {
     wins: number;
     losses: number;
@@ -71,10 +75,55 @@ export interface SleeperBracketMatch {
   p?: number;
 }
 
+export interface SleeperDraft {
+  draft_id: string;
+  league_id: string;
+  season: string;
+  status: "pre_draft" | "drafting" | "paused" | "complete";
+  type: "linear" | "snake" | "auction";
+  // ms since epoch; null until the commissioner schedules it.
+  start_time: number | null;
+  settings: { rounds: number; teams: number; [key: string]: unknown };
+  // user_id -> draft slot; null until the order is set.
+  draft_order: Record<string, number> | null;
+  metadata: { name?: string } | null;
+}
+
+// `roster_id` is the roster that made the pick, after any trade.
+export interface SleeperDraftPick {
+  round: number;
+  pick_no: number;
+  draft_slot: number;
+  player_id: string;
+  picked_by: string;
+  roster_id: number;
+  is_keeper: boolean | null;
+  metadata: { first_name?: string; last_name?: string; position?: string; team?: string };
+}
+
+// `roster_id` is the pick's original owner; `owner_id` holds it now.
+export interface SleeperTradedPick {
+  season: string;
+  round: number;
+  roster_id: number;
+  previous_owner_id: number;
+  owner_id: number;
+}
+
+// /user/<name or id> also carries the account's handle.
+export interface SleeperAccount {
+  user_id: string;
+  username: string;
+  display_name: string;
+  avatar: string | null;
+}
+
 export interface SleeperNflState {
   week: number;
   display_week: number;
   season: string;
+  // The season leagues are in, which runs ahead of `season` in the offseason.
+  league_season?: string;
   season_type: string;
   leg: number;
 }

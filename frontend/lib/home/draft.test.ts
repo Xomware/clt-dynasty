@@ -2,7 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import { countdown, upcomingDraft } from "./draft";
 
-const draft = (status: "pre_draft" | "drafting" | "paused" | "complete", season = "2027") => ({ draft_id: season, season, status, type: "linear", start_time: null });
+const draft = (status: "pre_draft" | "drafting" | "paused" | "complete", season = "2027") => ({
+  draft_id: season,
+  league_id: "1",
+  season,
+  status,
+  type: "linear" as const,
+  start_time: null,
+  settings: { rounds: 4, teams: 12 },
+  draft_order: null,
+  metadata: null,
+});
 
 describe("draft countdown", () => {
   it("formats days, hours and minutes down to seconds", () => {

@@ -14,7 +14,7 @@ vi.mock("@/lib/api/clt", () => ({
 import { API_BASE, LEAGUE_ID } from "@/lib/config";
 import { NavigateContext } from "@/lib/desktop/navigation";
 import { MemberProvider } from "@/lib/member/use-member";
-import { clearSleeperCache } from "@/lib/sleeper/league";
+import { clearLeagueCache } from "@/lib/league/cache";
 import { fixture, stubSleeper } from "@/lib/test/league-mock";
 import { HomeWindow } from "./HomeWindow";
 
@@ -40,7 +40,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
-  clearSleeperCache();
 });
 
 const navigate = vi.fn();
@@ -98,7 +97,7 @@ describe("Home", () => {
     expect(within(draft).getByText("2027 Rookie Draft")).toBeTruthy();
     expect(within(draft).getByText(/^Starts in 1h 30m 0[45]s$/)).toBeTruthy();
     unmount();
-    clearSleeperCache();
+    clearLeagueCache();
     stubSleeper({ [NEWS]: list([]), [DRAFTS]: [{ draft_id: "8", season: "2026", status: "complete", type: "linear", start_time: 1 }] });
     renderHome();
     await screen.findByRole("region", { name: "Standings" });
