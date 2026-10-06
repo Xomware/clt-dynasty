@@ -1,4 +1,4 @@
-import { launchers, type WindowKind } from "@/lib/desktop/registry";
+import { useLaunchers, type WindowKind } from "@/lib/desktop/registry";
 import { CrownIcon, DesktopIcon } from "./icons";
 
 interface StartMenuProps {
@@ -19,7 +19,7 @@ export function StartMenu({ id, name, onOpen, onReset, onSignOut }: StartMenuPro
         <span className="truncate">{name}</span>
       </div>
       <ul className="xp-start-menu-list">
-        {launchers().map(({ kind, label, Icon }) => (
+        {useLaunchers().map(({ kind, label, Icon }) => (
           <li key={kind}>
             <button type="button" className="xp-start-menu-link w-full" onClick={() => onOpen(kind)}>
               <Icon width={24} height={24} />

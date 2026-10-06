@@ -7,6 +7,7 @@ import { HistoryWindow } from "@/components/windows/HistoryWindow";
 import { HomeWindow } from "@/components/windows/HomeWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
+import { MembersWindow } from "@/components/windows/MembersWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
 import { ProposalsWindow } from "@/components/windows/ProposalsWindow";
@@ -26,6 +27,7 @@ import {
   ControlPanelIcon,
   FolderIcon,
   HomeIcon,
+  MembersIcon,
   NewspaperIcon,
   ProfileIcon,
   RosterMoveIcon,
@@ -43,6 +45,8 @@ import { teamOf } from "@/lib/league/use-league";
 import type { SleeperAccount, SleeperLeague, SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
 import { readIdLink, readTeamLink } from "@/lib/team/links";
 
+import { useMember } from "@/lib/member/use-member";
+
 import type { WindowParams, WindowView } from "./windows";
 
 export interface WindowSpec {
@@ -58,6 +62,8 @@ export interface WindowSpec {
   // Opened only by a drill from another window (a team, a player), never
   // from the desktop, Start or the phone's list.
   drillOnly?: boolean;
+  // Offered only when /clt/me says isAdmin. The window still checks, for links and saved layouts.
+  adminOnly?: boolean;
 }
 
 // Titles name what the window shows once Sleeper has answered for it.
@@ -143,6 +149,14 @@ const SPECS = {
     link: readIdLink("leagueId"),
     drillOnly: true,
   },
+  members: {
+    label: "Members",
+    title: "Admin: Members",
+    Icon: MembersIcon,
+    component: MembersWindow,
+    defaultSize: { w: 600, h: 620 },
+    adminOnly: true,
+  },
 } satisfies Record<string, WindowSpec>;
 
 export type WindowKind = keyof typeof SPECS;
@@ -151,10 +165,13 @@ export const REGISTRY: Record<string, WindowSpec> = SPECS;
 export const isKind = (kind: string): kind is WindowKind => Object.hasOwn(REGISTRY, kind);
 
 // What the desktop, Start and the phone list offer.
-export const launchers = () =>
-  Object.entries(REGISTRY)
-    .filter(([, spec]) => !spec.drillOnly)
+export function useLaunchers() {
+  const { state } = useMember();
+  const isAdmin = state.status === "member" && state.me.isAdmin;
+  return Object.entries(REGISTRY)
+    .filter(([, spec]) => !spec.drillOnly && (!spec.adminOnly || isAdmin))
     .map(([kind, spec]) => ({ kind: kind as WindowKind, ...spec }));
+}
 
 export function windowTitle({ kind, params }: WindowView): string {
   const { title } = REGISTRY[kind];

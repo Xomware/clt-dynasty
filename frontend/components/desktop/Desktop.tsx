@@ -6,7 +6,7 @@ import { openLinks, parseOpen, syncUrl } from "@/lib/desktop/deep-link";
 import { useDesktop } from "@/lib/desktop/desktop-context";
 import { DrillContext } from "@/lib/desktop/navigation";
 import { loadLayout, saveLayout } from "@/lib/desktop/persist";
-import { launchers } from "@/lib/desktop/registry";
+import { useLaunchers } from "@/lib/desktop/registry";
 import { defaultLayout, type WindowState } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { DesktopWindow } from "./DesktopWindow";
@@ -56,7 +56,7 @@ export function Desktop() {
       <main className="xp-desktop">
         <h1 className="sr-only">CLT Dynasty League</h1>
         <ul className="xp-desktop-icons" aria-label="Desktop">
-          {launchers().map(({ kind, label, Icon }) => (
+          {useLaunchers().map(({ kind, label, Icon }) => (
             <li key={kind}>
               <IconButton Icon={Icon} label={label} onOpen={() => open(kind)} />
             </li>
