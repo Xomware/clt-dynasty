@@ -567,6 +567,15 @@
   color: var(--u-muted);
 }
 
+/* A phone's text runs over the backdrop, so the city sits lower and dimmer. */
+@media (max-width: 767.98px) {
+  .u-backdrop-city {
+    --u: max(calc(100vw / 2400), calc(16dvh / 500));
+
+    opacity: 0.4;
+  }
+}
+
 @media (max-width: 1279.98px) {
   .u-header {
     padding-inline: 1.25rem;
