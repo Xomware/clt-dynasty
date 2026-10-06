@@ -1,0 +1,478 @@
+/* The playoff bracket. Rounds are columns of one grid sharing equal rows, so a
+   game spanning its feeders' rows sits exactly between them and the connector
+   lines can be placed by percentage. Row gaps would break that: spacing lives
+   in each cell's padding. */
+
+.pb-scroll {
+  container-type: inline-size;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.25rem;
+}
+
+.pb-grid {
+  --gap: 2rem;
+  --line: 2px;
+  --pb-off: var(--xp-face-shadow);
+  --pb-on: var(--xp-title-dark);
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(13.5rem, 1fr));
+  grid-template-rows: auto repeat(var(--rows), minmax(2.5rem, 1fr));
+  column-gap: var(--gap);
+  width: max-content;
+  min-width: 100%;
+}
+
+/* A phone shows one round at a time with the next peeking in, so the lines
+   into it stay in view, and each swipe snaps to a round. */
+@container (max-width: 40rem) {
+  .pb-grid {
+    --gap: 1.5rem;
+    grid-template-columns: repeat(var(--cols), calc(100cqw - 4.25rem));
+  }
+}
+
+.pb-round {
+  display: grid;
+  grid-row: 1 / -1;
+  grid-template-rows: subgrid;
+  scroll-snap-align: start;
+}
+
+.pb-round-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--xp-face-shadow);
+  font-weight: bold;
+  color: var(--xp-title-dark);
+}
+
+.pb-week {
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: var(--xp-text);
+}
+
+.pb-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding-block: 0.375rem;
+}
+
+/* The final's cell: the trophy above, the game dead centre, so the
+   semifinal lines still meet it in the middle. */
+.pb-final {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.pb-crown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.pb-match {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: var(--xp-cream);
+  box-shadow: 1px 1px 0 var(--xp-face-shadow);
+}
+
+.pb-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 0;
+  min-height: 2.25rem;
+  padding-left: 0.375rem;
+  box-shadow: inset 3px 0 transparent;
+}
+
+.pb-slot + .pb-slot {
+  border-top: 1px solid var(--xp-face-shadow);
+}
+
+.pb-slot .xp-drill {
+  flex: 1;
+  min-width: 0;
+}
+
+.pb-slot .xp-avatar {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.pb-slot[data-result="won"] {
+  box-shadow: inset 3px 0 var(--pb-on);
+}
+
+.pb-slot[data-result="won"] :is(.pb-score, .pb-seed) {
+  font-weight: bold;
+  color: var(--pb-on);
+}
+
+.pb-slot[data-result="lost"] > :not(.pb-score) {
+  opacity: 0.5;
+}
+
+.pb-slot[data-result="lost"] .xp-team-name {
+  font-weight: normal;
+}
+
+.pb-slot[data-result="lost"] .pb-score {
+  opacity: 0.7;
+}
+
+.pb-seed {
+  flex: none;
+  width: 1rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--xp-title-dark);
+}
+
+.pb-tbd {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.75rem;
+  font-style: italic;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pb-end {
+  flex: none;
+  margin-left: auto;
+  margin-right: 0.375rem;
+}
+
+.pb-record {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.pb-score {
+  align-self: stretch;
+  min-width: 3.75rem;
+  margin-right: 0;
+  padding: 0 0.5rem;
+  border: 0;
+  border-left: 1px solid var(--xp-face-shadow);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: inherit;
+  background: none;
+  cursor: var(--cursor-pointer, pointer);
+}
+
+.pb-score:hover {
+  text-decoration: underline;
+  background: var(--xp-balloon);
+}
+
+.pb-score:active {
+  background: var(--xp-face);
+}
+
+.pb-score:focus-visible {
+  outline: 2px dotted var(--xp-text);
+  outline-offset: -3px;
+}
+
+.pb-bye .pb-slot {
+  min-height: 2.25rem;
+}
+
+/* Champion */
+
+.pb-champ {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid var(--xp-gold);
+  border-radius: 3px;
+  background: linear-gradient(var(--xp-balloon), var(--xp-cream));
+  box-shadow: 1px 1px 0 var(--xp-face-shadow);
+}
+
+.pb-champ:not([data-crowned]) {
+  border-style: dashed;
+  border-color: var(--xp-face-shadow);
+  background: var(--xp-cream);
+}
+
+.pb-champ:not([data-crowned]) .pb-trophy {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.pb-trophy {
+  flex: none;
+}
+
+.pb-champ-label {
+  font-size: 0.6875rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pb-champ .xp-team-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Connector lines */
+
+.pb-line {
+  position: absolute;
+  background: var(--pb-off);
+}
+
+.pb-line[data-on] {
+  background: var(--pb-on);
+  z-index: 1;
+}
+
+.pb-out,
+.pb-in {
+  top: calc(50% - var(--line) / 2);
+  width: calc(var(--gap) / 2);
+  height: var(--line);
+}
+
+.pb-out {
+  left: 100%;
+  transform-origin: left;
+}
+
+.pb-in {
+  right: 100%;
+  transform-origin: left;
+}
+
+.pb-in-top,
+.pb-in-bottom {
+  left: calc(var(--gap) / -2 - var(--line) / 2);
+  width: var(--line);
+}
+
+.pb-in-top {
+  top: calc(var(--jt) - var(--line) / 2);
+  bottom: calc(50% - var(--line) / 2);
+  transform-origin: top;
+}
+
+.pb-in-bottom {
+  top: calc(50% - var(--line) / 2);
+  bottom: calc(100% - var(--jb) - var(--line) / 2);
+  transform-origin: bottom;
+}
+
+.pb-up {
+  position: relative;
+  width: var(--line);
+  height: 0.75rem;
+  transform-origin: bottom;
+}
+
+/* The lines draw in round by round on load: out of a game, along the elbow,
+   into the next one. */
+@keyframes pb-draw-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes pb-draw-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes pb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem);
+  }
+}
+
+.pb-out {
+  animation: pb-draw-x 220ms ease-out calc(var(--col) * 600ms + 150ms) both;
+}
+
+.pb-in-top,
+.pb-in-bottom {
+  animation: pb-draw-y 220ms ease-out calc(var(--col) * 600ms - 230ms) both;
+}
+
+.pb-in {
+  animation: pb-draw-x 160ms ease-out calc(var(--col) * 600ms - 10ms) both;
+}
+
+.pb-up {
+  animation: pb-draw-y 200ms ease-out calc(var(--col) * 600ms + 220ms) both;
+}
+
+.pb-champ {
+  animation: pb-rise 320ms ease-out calc(var(--col) * 600ms + 380ms) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-line,
+  .pb-champ {
+    animation: none;
+  }
+}
+
+.pb-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--xp-gold);
+  border-radius: 3px;
+  background: var(--xp-balloon);
+}
+
+.pb-lineups:focus {
+  outline: none;
+}
+
+.pb-lineups:focus-visible {
+  outline: 2px dotted var(--xp-text);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  .pb-slot {
+    min-height: 2.75rem;
+  }
+
+  .pb-score {
+    min-width: 4rem;
+  }
+}
+
+/* Uptown: navy cards, gold for the path the winners took, teal seeds. */
+
+[data-theme="uptown"] .pb-grid {
+  --pb-off: var(--u-edge);
+  --pb-on: var(--u-gold);
+}
+
+[data-theme="uptown"] .pb-round-title {
+  border-bottom-color: var(--u-line);
+  color: var(--u-label);
+  font: 800 0.75rem/1.25 var(--u-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme="uptown"] .pb-week {
+  color: var(--u-muted);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+[data-theme="uptown"] :is(.pb-match, .pb-champ) {
+  border-color: var(--u-line);
+  border-radius: 12px;
+  background: var(--u-card);
+  box-shadow: 0 6px 18px rgb(2 8 20 / 0.35);
+}
+
+[data-theme="uptown"] .pb-match {
+  overflow: hidden;
+}
+
+[data-theme="uptown"] .pb-slot + .pb-slot {
+  border-top-color: var(--u-line);
+}
+
+[data-theme="uptown"] .pb-seed {
+  color: var(--u-link);
+}
+
+[data-theme="uptown"] :is(.pb-tbd, .pb-record) {
+  color: var(--u-muted);
+}
+
+[data-theme="uptown"] .pb-score {
+  border-left-color: var(--u-line);
+  color: var(--u-text-strong);
+  font-family: var(--u-display);
+  font-weight: 600;
+}
+
+[data-theme="uptown"] .pb-score:hover {
+  text-decoration: none;
+  background: var(--u-hover);
+}
+
+[data-theme="uptown"] .pb-score:active {
+  background: var(--u-press);
+}
+
+[data-theme="uptown"] .pb-score:focus-visible {
+  outline: 2px solid var(--u-focus);
+  outline-offset: -2px;
+}
+
+[data-theme="uptown"] .pb-slot[data-result="won"] {
+  background: linear-gradient(90deg, rgb(227 178 60 / 0.12), transparent 70%);
+}
+
+[data-theme="uptown"] .pb-slot[data-result="won"] .xp-team-name {
+  color: var(--u-text-strong);
+}
+
+[data-theme="uptown"] .pb-champ[data-crowned] {
+  border: 1px solid rgb(227 178 60 / 0.7);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgb(227 178 60 / 0.28), transparent 60%),
+    var(--u-card);
+  box-shadow:
+    inset 0 1px 0 rgb(255 231 161 / 0.25),
+    0 8px 24px rgb(227 178 60 / 0.16);
+}
+
+[data-theme="uptown"] .pb-champ:not([data-crowned]) {
+  border-style: dashed;
+  border-color: var(--u-edge);
+}
+
+[data-theme="uptown"] .pb-champ-label {
+  color: var(--u-gold-light);
+}
+
+[data-theme="uptown"] .pb-banner {
+  border-color: rgb(227 178 60 / 0.45);
+  border-radius: 12px;
+  color: var(--u-text);
+  background: rgb(227 178 60 / 0.08);
+}
+
+[data-theme="uptown"] .pb-lineups:focus-visible {
+  outline: 2px solid var(--u-focus);
+}
