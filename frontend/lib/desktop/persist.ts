@@ -3,7 +3,7 @@ import type { WindowState } from "./windows";
 
 // Bump the version when the default layout changes, so every saved layout
 // resets to it once.
-const key = (sub: string) => `clt.desktop.v1:${sub}`;
+const key = (sub: string) => `clt.desktop.v2:${sub}`;
 
 // Storage can be missing, full, or blocked (private mode, disabled cookies),
 // and a saved layout can be corrupt or name a window kind that no longer

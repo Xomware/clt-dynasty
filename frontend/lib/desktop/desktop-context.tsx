@@ -2,6 +2,7 @@
 
 import { createContext, type Dispatch, type ReactNode, useCallback, useContext, useReducer } from "react";
 
+import { recordRecent } from "./recent";
 import { REGISTRY, type WindowKind } from "./registry";
 import {
   activeWindow,
@@ -26,7 +27,9 @@ export function DesktopProvider({ children }: { children: ReactNode }) {
   const [windows, dispatch] = useReducer(desktopReducer, undefined, defaultLayout);
 
   const open = useCallback((kind: WindowKind, params: WindowParams = {}) => {
-    const { w, h } = REGISTRY[kind].defaultSize;
+    const { defaultSize, drillOnly } = REGISTRY[kind];
+    if (!drillOnly) recordRecent(kind);
+    const { w, h } = defaultSize;
     const size = { w: Math.min(w, window.innerWidth), h: Math.min(h, window.innerHeight - TASKBAR_HEIGHT) };
     dispatch({ type: "open", kind, params, size });
   }, []);
