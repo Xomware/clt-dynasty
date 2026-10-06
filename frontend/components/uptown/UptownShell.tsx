@@ -1,6 +1,6 @@
 "use client";
 
-import { type ComponentType, type MouseEvent, useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { CrownIcon } from "@/components/xp/icons";
@@ -12,18 +12,15 @@ import { patchParams, viewKey, windowId, type WindowParams } from "@/lib/desktop
 import { ViewParamsContext } from "@/lib/view-params";
 import { AccountMenu } from "./AccountMenu";
 import { Backdrop } from "./Backdrop";
-import { GroupPage } from "./GroupPage";
+import { OVERRIDES } from "./bodies";
 import { LINE, LineIcon } from "./icons";
 import { groupOf, HOME, urlOf } from "./pages";
 import { Spotlight } from "./Spotlight";
+import { UptownHome } from "./UptownHome";
 
 import "./uptown.css";
 import "./uptown-skin.css";
 
-type Body = ComponentType<{ params: WindowParams }>;
-
-// Kinds whose XP body is shell chrome rather than content.
-export const OVERRIDES: Partial<Record<string, Body>> = { folder: GroupPage };
 
 // The XP desktop's link names several windows; the last is the one it had in front.
 const fromUrl = (): WindowLink => parseOpen(window.location.search).at(-1) ?? HOME;
@@ -42,9 +39,19 @@ export function UptownShell() {
   const windowTitle = useWindowTitle();
   const heading = useRef<HTMLHeadingElement>(null);
   const id = windowId(view.kind, view.params);
-  const title = view.kind === "home" ? "CLT Dynasty League" : windowTitle(view);
+  const title = windowTitle(view);
   const Page = OVERRIDES[view.kind] ?? REGISTRY[view.kind].component;
   const pages = groups.find((g) => g.id === group)?.items ?? [];
+
+  // The clicked link went with the old page, so the new title takes focus. A
+  // tab switch stays on the page, so it is keyed without the tab.
+  const page = viewKey(view.kind, view.params);
+  const shown = useRef(page);
+  useEffect(() => {
+    if (shown.current === page) return;
+    shown.current = page;
+    heading.current?.focus({ preventScroll: true });
+  }, [page]);
 
   useEffect(() => {
     const onPop = () =>
@@ -70,8 +77,6 @@ export function UptownShell() {
     setNav({ view: to, group: groupOf(to, group) });
     window.history.pushState(null, "", urlOf(to));
     window.scrollTo(0, 0);
-    // The clicked link may unmount with the old page, so focus lands on the new title.
-    heading.current?.focus({ preventScroll: true });
   };
   // A tab or filter switch stays on the page, so it replaces the history entry.
   const patch = (params: WindowParams) => {
@@ -135,16 +140,24 @@ export function UptownShell() {
       <DrillContext value={go}>
         <NavigateContext value={go}>
           <main className="u-page">
-            <h1 ref={heading} tabIndex={-1} className="u-title">
-              {title}
-            </h1>
-            <section className="u-panel" aria-label={title}>
-              <WindowBoundary key={viewKey(view.kind, view.params)}>
-                <ViewParamsContext value={patch}>
-                  <Page params={view.params} />
-                </ViewParamsContext>
+            {view.kind === "home" ? (
+              <WindowBoundary key={id}>
+                <UptownHome ref={heading} />
               </WindowBoundary>
-            </section>
+            ) : (
+              <>
+                <h1 ref={heading} tabIndex={-1} className="u-title">
+                  {title}
+                </h1>
+                <section className="u-panel" aria-label={title}>
+                  <WindowBoundary key={page}>
+                    <ViewParamsContext value={patch}>
+                      <Page params={view.params} />
+                    </ViewParamsContext>
+                  </WindowBoundary>
+                </section>
+              </>
+            )}
           </main>
         </NavigateContext>
       </DrillContext>

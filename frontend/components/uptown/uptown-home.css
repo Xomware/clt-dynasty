@@ -1,0 +1,171 @@
+/* Uptown Home: a hero over HomeWindow's own cards. With no page panel around
+   them, each card is a glass card of its own rather than a card in a card. */
+
+.u-home {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.u-hero {
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+  padding: 0.5rem 0 0.5rem;
+}
+
+.u-hero-copy {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.u-hero-kicker {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgb(227 178 60 / 0.45);
+  border-radius: 999px;
+  color: var(--u-gold-light);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgb(227 178 60 / 0.1);
+}
+
+.u-hero-title {
+  color: var(--u-text-strong);
+  font: 800 3.25rem/1.05 var(--u-display);
+  letter-spacing: -0.025em;
+}
+
+.u-hero-title span {
+  color: var(--u-gold);
+}
+
+.u-hero-title:focus {
+  outline: none;
+}
+
+.u-hero-lede {
+  max-width: 40rem;
+  color: var(--u-muted);
+  font-size: 1.0625rem;
+}
+
+.u-hero-ctas {
+  display: flex;
+  flex: none;
+  gap: 0.75rem;
+}
+
+.u-cta {
+  min-height: 3rem;
+  padding: 0 1.375rem;
+  border: 1px solid var(--u-edge);
+  border-radius: 999px;
+  color: var(--u-text-strong);
+  font: 800 1rem var(--u-body);
+  background: rgb(255 255 255 / 0.06);
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+}
+
+.u-cta:hover {
+  border-color: rgb(227 178 60 / 0.6);
+  background: var(--u-hover);
+}
+
+.u-cta:active {
+  transform: translateY(2px);
+}
+
+.u-cta-go {
+  border-color: var(--u-gold);
+  color: var(--u-night);
+  background: linear-gradient(var(--u-gold-light), var(--u-gold) 70%);
+  box-shadow: 0 4px 0 var(--u-gold-deep), 0 12px 24px rgb(227 178 60 / 0.25);
+}
+
+.u-cta-go:hover {
+  background: var(--u-gold-light);
+}
+
+.u-cta-go:active {
+  box-shadow: 0 2px 0 var(--u-gold-deep), 0 6px 12px rgb(227 178 60 / 0.25);
+}
+
+/* HomeWindow's cards. One class above the skin's [data-theme] rules, which also match them. */
+
+.uptown .u-home .home {
+  gap: 1.25rem;
+}
+
+.uptown .u-home :is(.home-pulse, .home-cols, .home-col) {
+  gap: 1.25rem;
+}
+
+.uptown .u-home .home-card {
+  position: relative;
+  padding: 1.25rem 1.375rem;
+  border: 1px solid var(--u-edge);
+  border-radius: 20px;
+  background: var(--u-card);
+  box-shadow: var(--u-card-shadow);
+}
+
+.uptown .u-home .home-card-head {
+  margin-bottom: 0.75rem;
+}
+
+.uptown .u-home .home-card-head .xp-group-title {
+  font-size: 1.125rem;
+}
+
+.uptown .u-home :is(.home-card-more, .home-more) {
+  color: var(--u-link);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.uptown .u-home :is(.home-card-more, .home-more):hover {
+  color: var(--u-link-hover);
+  text-decoration: underline;
+}
+
+.uptown .u-home .home-tile {
+  background: var(--u-card);
+}
+
+.uptown .u-home .home-big {
+  font: 800 2rem/1.1 var(--u-display);
+}
+
+.uptown .u-home .home-mine {
+  border-color: rgb(227 178 60 / 0.5);
+  background: linear-gradient(rgb(227 178 60 / 0.1), transparent 60%), var(--u-card);
+}
+
+.uptown .u-home :is(.home-row, .home-list-item) {
+  border-bottom-color: var(--u-line);
+}
+
+.uptown .u-home :is(.home-game, .home-stats div, .home-mine-game, .home-mine-next) {
+  background: var(--u-row);
+}
+
+@media (max-width: 1023.98px) {
+  .u-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u-cta {
+    transition: none;
+  }
+}

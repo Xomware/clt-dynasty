@@ -12,6 +12,11 @@ vi.mock("@/lib/api/clt", () => ({
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
+// The Home hero reads the league; these tests are about the shell.
+vi.mock("@/lib/league/use-league", async (orig) => ({
+  ...(await orig<typeof import("@/lib/league/use-league")>()),
+  useLeague: () => ({ data: null }),
+}));
 
 import { AppShell } from "@/components/AppShell";
 import { TIMING } from "@/components/theme/ThemeTransition";
@@ -64,7 +69,7 @@ describe("UptownShell", () => {
   it("files the header nav by group and starts on Home", async () => {
     await renderShell();
     expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["League"]);
-    expect(title().textContent).toBe("CLT Dynasty League");
+    expect(title().textContent).toBe("The Queen City\u2019s dynasty league");
     expect(screen.getByText("home body")).toBeTruthy();
     expect(screen.queryByRole("navigation", { name: "League pages" })).toBeNull();
   });
