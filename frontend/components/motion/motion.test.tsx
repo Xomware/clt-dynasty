@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CountUp } from "./CountUp";
 
 afterEach(() => {
+  vi.useRealTimers();
   delete document.documentElement.dataset.theme;
 });
 
@@ -19,17 +20,24 @@ describe("CountUp", () => {
     expect(screen.getByText("-")).toBeTruthy();
   });
 
-  it("rolls up from zero under Uptown, then follows a live change to its new value", async () => {
+  it("rolls up from zero under Uptown, then follows a live change to its new value", () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
     document.documentElement.dataset.theme = "uptown";
     const { container, rerender } = render(<CountUp value={100} />);
     const span = container.querySelector("span")!;
+    expect(span.textContent).toBe("0");
+    act(() => vi.advanceTimersByTime(300));
+    expect(Number(span.textContent)).toBeGreaterThan(0);
     expect(Number(span.textContent)).toBeLessThan(100);
-    await waitFor(() => expect(span.textContent).toBe("100"));
+    act(() => vi.advanceTimersByTime(1000));
+    expect(span.textContent).toBe("100");
 
     rerender(<CountUp value={140} />);
-    await waitFor(() => expect(span.textContent).toBe("140"));
+    act(() => vi.advanceTimersByTime(1000));
+    expect(span.textContent).toBe("140");
     // Still React's own text node, so later renders keep landing.
     rerender(<CountUp value={7} />);
-    await waitFor(() => expect(span.textContent).toBe("7"));
+    act(() => vi.advanceTimersByTime(1000));
+    expect(span.textContent).toBe("7");
   });
 });
