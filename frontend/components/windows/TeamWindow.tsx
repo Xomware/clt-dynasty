@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useContext } from "react";
 
 import { DrillLink } from "@/components/xp/DrillLink";
