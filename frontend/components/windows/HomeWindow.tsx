@@ -13,6 +13,7 @@ import { AIHeadline } from "@/components/windows/AIReviewWindow";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { WarningIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
+import { CountUp } from "@/components/motion/CountUp";
 import { TeamName } from "@/components/xp/TeamName";
 import { announcements as announcementsResource } from "@/lib/announcements";
 import { LEAGUE_ID } from "@/lib/config";
@@ -167,7 +168,7 @@ function ThisWeek({ games, live, teamFor, myRosterId }: LeagueProps & { games: G
                   <DrillLink to={teamLink(LEAGUE_ID, s.rosterId)}>
                     <TeamName name={team.name} avatarUrl={team.avatarUrl} isMine={s.rosterId === myRosterId} />
                   </DrillLink>
-                  <span className="home-game-points">{s.points > 0 ? s.points.toFixed(2) : "-"}</span>
+                  <CountUp value={s.points} decimals={2} empty="-" className="home-game-points" />
                 </span>
               );
             })}

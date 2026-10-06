@@ -1063,3 +1063,120 @@
     display: none;
   }
 }
+
+/* The living backdrop: stars that breathe, office lights going on and off,
+   two searchlights sweeping from uptown, the city sinking as the page scrolls. */
+
+.u-stars-twinkle {
+  opacity: 0;
+  background:
+    radial-gradient(1.5px 1.5px at 18% 12%, var(--intro-text), transparent),
+    radial-gradient(1px 1px at 33% 31%, var(--intro-text), transparent),
+    radial-gradient(1.5px 1.5px at 51% 6%, var(--intro-text), transparent),
+    radial-gradient(1px 1px at 61% 21%, var(--intro-text), transparent),
+    radial-gradient(1.5px 1.5px at 73% 37%, var(--intro-text), transparent),
+    radial-gradient(1px 1px at 84% 14%, var(--intro-text), transparent),
+    radial-gradient(1.5px 1.5px at 9% 27%, var(--intro-text), transparent),
+    radial-gradient(1px 1px at 42% 17%, var(--intro-text), transparent);
+}
+
+.u-twinkles {
+  position: absolute;
+  inset: 0;
+}
+
+.u-twinkles rect {
+  opacity: 0;
+}
+
+.u-beams {
+  position: absolute;
+  bottom: 72%;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+
+.u-beams::before,
+.u-beams::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -3vw;
+  width: 6vw;
+  height: 120vh;
+  background: linear-gradient(to top, rgb(255 231 161 / 0.22), rgb(255 231 161 / 0.06) 45%, transparent 85%);
+  clip-path: polygon(46% 100%, 54% 100%, 100% 0, 0 0);
+  transform-origin: 50% 100%;
+  opacity: 0.55;
+}
+
+.u-beams::before {
+  transform: rotate(-24deg);
+}
+
+.u-beams::after {
+  transform: rotate(18deg);
+}
+
+.u-backdrop-city {
+  translate: 0 calc(var(--scroll, 0) * 0.06px);
+}
+
+.u-backdrop .intro-stars {
+  translate: 0 calc(var(--scroll, 0) * -0.02px);
+}
+
+@keyframes u-stars-breathe {
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Mostly on, with a clean cut off and back: steps, so a window changes on
+   only two frames per cycle and the skyline barely repaints. */
+@keyframes u-office-light {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.95;
+  }
+  74% {
+    opacity: 0.95;
+  }
+  76% {
+    opacity: 0;
+  }
+}
+
+@keyframes u-sweep-a {
+  50% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes u-sweep-b {
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .u-stars-twinkle {
+    animation: u-stars-breathe 7s ease-in-out infinite;
+  }
+
+  .u-twinkles rect {
+    animation: u-office-light var(--dur, 7s) steps(1, end) var(--delay, 0s) infinite;
+  }
+
+  .u-beams::before {
+    animation: u-sweep-a 16s ease-in-out infinite;
+  }
+
+  .u-beams::after {
+    animation: u-sweep-b 21s ease-in-out infinite;
+  }
+}
