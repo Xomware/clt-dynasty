@@ -4,7 +4,7 @@ import { type Ref, useContext } from "react";
 
 import { DrillContext } from "@/lib/desktop/navigation";
 import { REGISTRY } from "@/lib/desktop/registry";
-import { lastLeagueWeek, leagueWeek } from "@/lib/league/default-week";
+import { leagueWeek, weekOf } from "@/lib/league/default-week";
 import { type LeagueData, useLeague } from "@/lib/league/use-league";
 
 import "./uptown-home.css";
@@ -13,7 +13,8 @@ function kicker(data: LeagueData | null): string {
   if (!data) return "Charlotte, NC";
   const { league } = data;
   if (league.status !== "in_season") return `${league.season} season`;
-  return `Week ${leagueWeek(league, data.nfl)} of ${lastLeagueWeek(league)} · ${league.season}`;
+  const week = leagueWeek(league, data.nfl);
+  return `Week ${week} of ${weekOf(league, week)} · ${league.season}`;
 }
 
 function lede(data: LeagueData | null): string {

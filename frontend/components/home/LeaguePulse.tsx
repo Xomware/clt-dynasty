@@ -10,7 +10,7 @@ import { LEAGUE_ID } from "@/lib/config";
 import { reigningChampion } from "@/lib/home/champion";
 import { countdown, upcomingDraft } from "@/lib/home/draft";
 import { drafts as leagueDrafts } from "@/lib/league/cache";
-import { lastLeagueWeek } from "@/lib/league/default-week";
+import { weekOf } from "@/lib/league/default-week";
 import type { LeagueData } from "@/lib/league/use-league";
 import { teamLink } from "@/lib/team/links";
 import { useLoad } from "@/lib/use-load";
@@ -55,7 +55,7 @@ function SeasonTile({ data, week, error }: LeaguePulseProps) {
           <p className="home-big">
             {data.league.status === "in_season" && week ? `Week ${week}` : data.league.season}
             {data.league.status === "in_season" && week && (
-              <span className="home-big-label"> of {lastLeagueWeek(data.league)}</span>
+              <span className="home-big-label"> of {weekOf(data.league, week)}</span>
             )}
           </p>
           <p className="text-xs">

@@ -10,6 +10,11 @@ import type { LeagueData } from "./use-league";
 export const lastLeagueWeek = (league: SleeperLeague) =>
   league.settings.playoff_week_start + Math.ceil(Math.log2(Math.max(2, league.settings.playoff_teams))) - 1;
 
+// What "Week N of M" counts to: the regular season until the playoffs start,
+// then the final, matching the landing page.
+export const weekOf = (league: SleeperLeague, week: number) =>
+  week < league.settings.playoff_week_start ? league.settings.playoff_week_start - 1 : lastLeagueWeek(league);
+
 // The latest week the league has: Sleeper's NFL week in season, the final
 // playoff week once the league is complete.
 export function leagueWeek(league: SleeperLeague, nfl: SleeperNflState): number {
