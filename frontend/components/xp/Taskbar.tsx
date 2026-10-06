@@ -70,7 +70,7 @@ export function Taskbar() {
           }}
           onReset={() => {
             setOpen(false);
-            dispatch({ type: "restore", windows: defaultLayout() });
+            dispatch({ type: "restore", windows: defaultLayout(window.innerWidth, window.innerHeight) });
           }}
           onSignOut={() => void signOut()}
         />

@@ -129,6 +129,30 @@ export function desktopReducer(state: WindowState[], action: WindowAction): Wind
   }
 }
 
-// A first visit, or Start's reset, opens on Home.
-export const defaultLayout = (): WindowState[] =>
-  desktopReducer([], { type: "open", kind: "home", params: {}, size: { w: 640, h: 640 } });
+const HOME_SIZE = { w: 760, h: 700 };
+// Where the first arrival tiles three windows; smaller screens get Home alone.
+export const TILE_MIN = { w: 1280, h: 800 };
+
+// A first visit, or Start's reset: Home on the left with Standings over this
+// week's Scores beside it, none overlapping. Before the viewport is known
+// (the first render), Home alone.
+export function defaultLayout(vw = 0, vh = 0): WindowState[] {
+  if (vw < TILE_MIN.w || vh < TILE_MIN.h) {
+    const size = { w: Math.min(HOME_SIZE.w, vw || HOME_SIZE.w), h: Math.min(HOME_SIZE.h, (vh || Infinity) - TASKBAR_HEIGHT) };
+    return desktopReducer([], { type: "open", kind: "home", params: {}, size });
+  }
+  const gap = 8;
+  const left = ICON_COLUMN + gap;
+  const width = vw - left - gap;
+  const height = vh - TASKBAR_HEIGHT - 2 * gap;
+  const homeW = Math.min(900, Math.round(width * 0.56));
+  const sideW = Math.min(760, width - homeW - gap);
+  const sideX = left + homeW + gap;
+  const top = Math.floor((height - gap) / 2);
+  const tiles = [
+    { kind: "standings", x: sideX, y: gap, w: sideW, h: top },
+    { kind: "scores", x: sideX, y: gap * 2 + top, w: sideW, h: height - top - gap },
+    { kind: "home", x: left, y: gap, w: homeW, h: height },
+  ];
+  return tiles.map((t, i) => ({ ...t, id: t.kind, params: {}, z: i + 1, minimized: false, maximized: false }));
+}

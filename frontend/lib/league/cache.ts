@@ -8,6 +8,7 @@ import {
   getNflState,
   getRosters,
   getTradedPicks,
+  getTransactions,
   getUserLeagues,
   getUsers,
   getWinnersBracket,
@@ -87,6 +88,10 @@ export function leagueMatchups(week: number, live: boolean, fresh = false, id = 
   if (fresh) entries.delete(key);
   return cached(key, () => getMatchups(id, week), live ? LIVE_TTL : Infinity);
 }
+
+// A finished week's moves are settled; the live week's waivers and adds keep landing.
+export const transactions = (week: number, live: boolean) =>
+  cached(`transactions/${LEAGUE_ID}/${week}`, () => getTransactions(LEAGUE_ID, week), live ? LIVE_TTL : Infinity);
 
 export function clearLeagueCache() {
   entries.clear();
