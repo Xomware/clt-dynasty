@@ -64,9 +64,12 @@ describe("AuthGate", () => {
 
   it("shows the sign-in screen when signed out, and signs in with Google only", async () => {
     vi.mocked(getCurrentUser).mockRejectedValue(new Error("not signed in"));
+    // The landing's public Sleeper reads; this test only cares about sign-in.
+    vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}));
     render(<AuthGate>league content</AuthGate>);
 
-    fireEvent.click(await screen.findByRole("button", { name: "Sign in with Google" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "CLT Dynasty" })).toBeTruthy();
+    fireEvent.click(screen.getAllByRole("button", { name: "Sign in with Google" })[0]);
     expect(signInWithRedirect).toHaveBeenCalledWith({ provider: "Google" });
     expect(screen.queryByText("league content")).toBeNull();
   });

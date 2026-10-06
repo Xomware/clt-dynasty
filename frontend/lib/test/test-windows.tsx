@@ -22,8 +22,8 @@ function Broken(): never {
 // Stand-in windows, so the shell's tests don't change as real windows land.
 const TEST_SPECS: Record<string, WindowSpec> = {
   home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: () => <p>home body</p>, defaultSize: { w: 600, h: 400 } },
-  standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsBody, defaultSize: { w: 500, h: 500 } },
-  broken: { label: "Broken", title: "Broken", Icon: HomeIcon, component: Broken, defaultSize: { w: 400, h: 300 } },
+  standings: { group: "league", label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsBody, defaultSize: { w: 500, h: 500 } },
+  broken: { group: "league", label: "Broken", title: "Broken", Icon: HomeIcon, component: Broken, defaultSize: { w: 400, h: 300 } },
   team: {
     label: "Team",
     title: (p: WindowParams) => `Team ${p.rosterId}`,
@@ -37,15 +37,16 @@ const TEST_SPECS: Record<string, WindowSpec> = {
 
 export const kind = (k: string) => k as WindowKind;
 
-// Swaps the real windows out for the stand-ins, and back afterwards.
+// Swaps the real windows out for the stand-ins, and back afterwards. The real
+// folder window stays, since it only lists whatever the registry holds.
 export function registerTestWindows() {
   const real = { ...REGISTRY };
   beforeAll(() => {
     for (const k of Object.keys(real)) delete REGISTRY[k];
-    Object.assign(REGISTRY, TEST_SPECS);
+    Object.assign(REGISTRY, TEST_SPECS, { folder: real.folder });
   });
   afterAll(() => {
-    for (const k of Object.keys(TEST_SPECS)) delete REGISTRY[k];
+    for (const k of [...Object.keys(TEST_SPECS), "folder"]) delete REGISTRY[k];
     Object.assign(REGISTRY, real);
   });
 }

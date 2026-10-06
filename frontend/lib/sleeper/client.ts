@@ -8,6 +8,7 @@ import type {
   SleeperNflState,
   SleeperRoster,
   SleeperTradedPick,
+  SleeperTransaction,
   SleeperUser,
 } from "./types";
 
@@ -38,6 +39,8 @@ export const getWinnersBracket = (id: string) => get<SleeperBracketMatch[]>(`/le
 export const getDrafts = (id: string) => get<SleeperDraft[]>(`/league/${id}/drafts`);
 export const getDraftPicks = (draftId: string) => get<SleeperDraftPick[]>(`/draft/${draftId}/picks`);
 export const getTradedPicks = (id: string) => get<SleeperTradedPick[]>(`/league/${id}/traded_picks`);
+export const getTransactions = (id: string, week: number) =>
+  get<SleeperTransaction[]>(`/league/${id}/transactions/${week}`);
 export const getNflState = () => get<SleeperNflState>("/state/nfl");
 // Sleeper answers an unknown name or id with a 200 and `null`.
 export const getAccount = (nameOrId: string) => get<SleeperAccount | null>(`/user/${encodeURIComponent(nameOrId)}`);

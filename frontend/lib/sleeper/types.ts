@@ -110,6 +110,25 @@ export interface SleeperTradedPick {
   owner_id: number;
 }
 
+// One row of /league/<id>/transactions/<week>. `leg` is the week. Failed
+// waiver claims come back mixed in with complete ones; `adds`/`drops` map a
+// player id to the roster that made the move and are null when empty.
+export interface SleeperTransaction {
+  transaction_id: string;
+  type: "trade" | "waiver" | "free_agent" | "commissioner";
+  status: "complete" | "failed" | "pending";
+  roster_ids: number[];
+  adds: Record<string, number> | null;
+  drops: Record<string, number> | null;
+  // `owner_id` receives the pick; `roster_id` is its original owner.
+  draft_picks: { season: string; round: number; roster_id: number; owner_id: number; previous_owner_id: number }[];
+  waiver_budget: { sender: number; receiver: number; amount: number }[];
+  // Rolling-waiver leagues send only `seq`; FAAB leagues add `waiver_bid`.
+  settings: { waiver_bid?: number; seq?: number } | null;
+  status_updated: number;
+  leg: number;
+}
+
 // /user/<name or id> also carries the account's handle.
 export interface SleeperAccount {
   user_id: string;

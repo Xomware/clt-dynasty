@@ -21,24 +21,24 @@ afterEach(() => {
 });
 
 describe("saved layout", () => {
-  it("round-trips per member under clt.desktop.v1", () => {
+  it("round-trips per member under clt.desktop.v2", () => {
     saveLayout("a@example.com", layout());
 
     expect(loadLayout("a@example.com")).toEqual(layout());
     expect(loadLayout("b@example.com")).toBeNull();
-    expect(realStorage.getItem("clt.desktop.v1:a@example.com")).not.toBeNull();
+    expect(realStorage.getItem("clt.desktop.v2:a@example.com")).not.toBeNull();
   });
 
   it("returns null for corrupt JSON or a non-array", () => {
-    realStorage.setItem("clt.desktop.v1:u", "{not json");
+    realStorage.setItem("clt.desktop.v2:u", "{not json");
     expect(loadLayout("u")).toBeNull();
-    realStorage.setItem("clt.desktop.v1:u", JSON.stringify({ kind: "home" }));
+    realStorage.setItem("clt.desktop.v2:u", JSON.stringify({ kind: "home" }));
     expect(loadLayout("u")).toBeNull();
   });
 
   it("drops windows whose kind no longer exists", () => {
     const [home] = layout();
-    realStorage.setItem("clt.desktop.v1:u", JSON.stringify([home, { ...home, id: "gone", kind: "gone" }]));
+    realStorage.setItem("clt.desktop.v2:u", JSON.stringify([home, { ...home, id: "gone", kind: "gone" }]));
     expect(loadLayout("u")).toEqual([home]);
   });
 

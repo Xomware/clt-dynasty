@@ -211,6 +211,13 @@
   background: var(--xp-face);
 }
 
+/* A narrow window, such as Standings tiled beside Home, drops the same columns a phone does. */
+@container (max-width: 34rem) {
+  .standings-extra {
+    display: none;
+  }
+}
+
 @media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
   /* A phone has room for rank, team, record, points and seed. */
   .standings-extra {

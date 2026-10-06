@@ -3,12 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
-import { BackArrowIcon, CrownIcon } from "@/components/xp/icons";
+import { BackArrowIcon, CrownIcon, FolderIcon } from "@/components/xp/icons";
 import { SpeakerToggle } from "@/components/xp/SpeakerToggle";
 import { useAuth } from "@/lib/auth/use-auth";
 import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
-import { REGISTRY, useLaunchers, useWindowTitle } from "@/lib/desktop/registry";
+import { REGISTRY, useLauncherGroups, useWindowTitle } from "@/lib/desktop/registry";
 import { patchParams, windowId, type WindowParams } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { ViewParamsContext } from "@/lib/view-params";
@@ -89,7 +89,7 @@ export function PhoneShell() {
             <CrownIcon width={28} height={28} />
             <h1 className="m-bar-title">CLT Dynasty League</h1>
           </header>
-          <Programs onOpen={(kind) => open({ kind, params: {} })} />
+          <Programs onOpen={open} />
           <section className="m-account" aria-label="Account">
             <span className="truncate">{name ? `Signed in as ${name}` : "Signed in"}</span>
             <button type="button" className="xp-log-off" onClick={() => void signOut()}>
@@ -116,16 +116,30 @@ export function PhoneShell() {
   );
 }
 
-function Programs({ onOpen }: { onOpen: (kind: WindowLink["kind"]) => void }) {
+// Two levels: Home and a row per group; a group opens as a folder screen.
+function Programs({ onOpen }: { onOpen: (link: WindowLink) => void }) {
+  const { pinned, groups } = useLauncherGroups();
   return (
     <nav className="m-programs" aria-label="Programs">
       <h2 className="m-programs-title">Programs</h2>
       <ul>
-        {useLaunchers().map(({ kind, label, Icon }) => (
+        {pinned.map(({ kind, label, Icon }) => (
           <li key={kind}>
-            <button type="button" className="m-program" onClick={() => onOpen(kind)}>
+            <button type="button" className="m-program" onClick={() => onOpen({ kind, params: {} })}>
               <Icon width={32} height={32} />
               {label}
+            </button>
+          </li>
+        ))}
+        {groups.map((g) => (
+          <li key={g.id}>
+            <button type="button" className="m-program" onClick={() => onOpen({ kind: "folder", params: { id: g.id } })}>
+              <FolderIcon width={32} height={32} />
+              <span className="m-program-label">
+                {g.label}
+                <span className="m-program-detail">{g.items.map((l) => l.label).join(", ")}</span>
+              </span>
+              <ChevronGlyph />
             </button>
           </li>
         ))}
@@ -133,6 +147,12 @@ function Programs({ onOpen }: { onOpen: (kind: WindowLink["kind"]) => void }) {
     </nav>
   );
 }
+
+const ChevronGlyph = () => (
+  <svg viewBox="0 0 8 12" width={8} height={12} aria-hidden focusable="false" className="ml-auto flex-none">
+    <path d="M1.5 1.5 6 6l-4.5 4.5" className="fill-none stroke-current stroke-2" />
+  </svg>
+);
 
 interface PhoneWindowProps {
   view: WindowLink;

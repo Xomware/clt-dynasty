@@ -6,6 +6,7 @@ import { AIReportWindow, AIReviewWindow, readReportLink, reportTitle } from "@/c
 import { AnalyzerWindow } from "@/components/windows/AnalyzerWindow";
 import { DraftHistoryWindow } from "@/components/windows/DraftHistoryWindow";
 import { DraftOrderWindow } from "@/components/windows/DraftOrderWindow";
+import { FolderWindow } from "@/components/windows/FolderWindow";
 import { HistoryWindow } from "@/components/windows/HistoryWindow";
 import { HomeWindow } from "@/components/windows/HomeWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
@@ -30,6 +31,7 @@ import {
   CalendarIcon,
   ChartIcon,
   ControlPanelIcon,
+  DraftBoardIcon,
   FolderIcon,
   HomeIcon,
   MembersIcon,
@@ -53,6 +55,7 @@ import { readIdLink, readTeamLink } from "@/lib/team/links";
 
 import { useMember } from "@/lib/member/use-member";
 
+import { GROUPS, type GroupId, groupLabel, isGroup } from "./groups";
 import type { WindowParams, WindowView } from "./windows";
 
 export interface WindowSpec {
@@ -70,6 +73,8 @@ export interface WindowSpec {
   drillOnly?: boolean;
   // Offered only when /clt/me says isAdmin. The window still checks, for links and saved layouts.
   adminOnly?: boolean;
+  // Where the launchers file it; none keeps it at the top level, like Home.
+  group?: GroupId;
 }
 
 // Titles name what the window shows once Sleeper has answered for it.
@@ -90,30 +95,32 @@ function profileTitle(p: WindowParams): string {
 
 // One entry per window kind, in launcher order. Each league window adds itself here.
 const SPECS = {
-  home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: HomeWindow, defaultSize: { w: 640, h: 640 } },
-  standings: { label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
-  scores: { label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
-  playoffs: { label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 720, h: 560 } },
-  history: { label: "History", title: "League History", Icon: CalendarIcon, component: HistoryWindow, defaultSize: { w: 640, h: 600 } },
+  home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: HomeWindow, defaultSize: { w: 760, h: 700 } },
+  standings: { group: "league", label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
+  scores: { group: "league", label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
+  playoffs: { group: "league", label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 720, h: 560 } },
+  history: { group: "history", label: "History", title: "League History", Icon: CalendarIcon, component: HistoryWindow, defaultSize: { w: 640, h: 600 } },
   "matchup-history": {
+    group: "history",
     label: "Matchup History",
     title: "Matchup History",
     Icon: ChartIcon,
     component: MatchupHistoryWindow,
     defaultSize: { w: 560, h: 620 },
   },
-  drafts: { label: "Draft History", title: "Draft History", Icon: FolderIcon, component: DraftHistoryWindow, defaultSize: { w: 640, h: 620 } },
+  drafts: { group: "draft", label: "Draft History", title: "Draft History", Icon: DraftBoardIcon, component: DraftHistoryWindow, defaultSize: { w: 640, h: 620 } },
   "draft-order": {
+    group: "draft",
     label: "Draft Order",
     title: "Draft Order",
     Icon: RosterMoveIcon,
     component: DraftOrderWindow,
     defaultSize: { w: 600, h: 620 },
   },
-  "world-cup": { label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
-  proposals: { label: "Proposals", title: "Rule Proposals", Icon: BallotIcon, component: ProposalsWindow, defaultSize: { w: 600, h: 640 } },
-  taxi: { label: "Taxi Squads", title: "Taxi Squads", Icon: TaxiIcon, component: TaxiWindow, defaultSize: { w: 600, h: 640 } },
-  "ai-review": { label: "AI Review", title: "AI Review", Icon: NewsFeedIcon, component: AIReviewWindow, defaultSize: { w: 640, h: 640 } },
+  "world-cup": { group: "league", label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
+  proposals: { group: "community", label: "Proposals", title: "Rule Proposals", Icon: BallotIcon, component: ProposalsWindow, defaultSize: { w: 600, h: 640 } },
+  taxi: { group: "draft", label: "Taxi Squads", title: "Taxi Squads", Icon: TaxiIcon, component: TaxiWindow, defaultSize: { w: 600, h: 640 } },
+  "ai-review": { group: "community", label: "AI Review", title: "AI Review", Icon: NewsFeedIcon, component: AIReviewWindow, defaultSize: { w: 640, h: 640 } },
   "ai-report": {
     label: "AI Report",
     title: reportTitle,
@@ -123,10 +130,10 @@ const SPECS = {
     link: readReportLink,
     drillOnly: true,
   },
-  rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
-  settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
-  "my-team": { label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
+  rules: { group: "league", label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
+  "my-team": { group: "mine", label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
   profile: {
+    group: "mine",
     label: "Profile",
     title: profileTitle,
     Icon: ProfileIcon,
@@ -134,8 +141,10 @@ const SPECS = {
     defaultSize: { w: 520, h: 560 },
     link: readIdLink("userId"),
   },
-  analyzer: { label: "Team Analyzer", title: "Team Analyzer", Icon: TradeIcon, component: AnalyzerWindow, defaultSize: { w: 760, h: 620 } },
+  analyzer: { group: "mine", label: "Team Analyzer", title: "Team Analyzer", Icon: TradeIcon, component: AnalyzerWindow, defaultSize: { w: 760, h: 620 } },
+  settings: { group: "mine", label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
   search: {
+    group: "community",
     label: "Search",
     title: "Search Sleeper",
     Icon: SearchIcon,
@@ -156,6 +165,15 @@ const SPECS = {
     link: readTeamLink,
     drillOnly: true,
   },
+  folder: {
+    label: "Folder",
+    title: (p) => groupLabel(p.id),
+    Icon: FolderIcon,
+    component: FolderWindow,
+    defaultSize: { w: 600, h: 420 },
+    link: (v) => (isGroup(v) ? { id: v } : null),
+    drillOnly: true,
+  },
   league: {
     label: "League",
     title: (p) => settled<SleeperLeague>(`league/${p.leagueId}`)?.name ?? "League",
@@ -166,6 +184,7 @@ const SPECS = {
     drillOnly: true,
   },
   members: {
+    group: "admin",
     label: "Members",
     title: "Admin: Members",
     Icon: MembersIcon,
@@ -174,6 +193,7 @@ const SPECS = {
     adminOnly: true,
   },
   "admin-ai": {
+    group: "admin",
     label: "Admin AI",
     title: "Admin: AI Review",
     Icon: AdminReportIcon,
@@ -182,6 +202,7 @@ const SPECS = {
     adminOnly: true,
   },
   "admin-announcements": {
+    group: "admin",
     label: "Announcements",
     title: "Admin: Announcements",
     Icon: BellIcon,
@@ -203,6 +224,18 @@ export function useLaunchers() {
   return Object.entries(REGISTRY)
     .filter(([, spec]) => !spec.drillOnly && (!spec.adminOnly || isAdmin))
     .map(([kind, spec]) => ({ kind: kind as WindowKind, ...spec }));
+}
+
+export type Launcher = ReturnType<typeof useLaunchers>[number];
+
+// The launchers filed for the shell: ungrouped ones first, then each group
+// that has anything to show this member, in GROUPS order.
+export function useLauncherGroups() {
+  const launchers = useLaunchers();
+  return {
+    pinned: launchers.filter((l) => !l.group),
+    groups: GROUPS.map((g) => ({ ...g, items: launchers.filter((l) => l.group === g.id) })).filter((g) => g.items.length > 0),
+  };
 }
 
 export function windowTitle({ kind, params }: WindowView): string {
