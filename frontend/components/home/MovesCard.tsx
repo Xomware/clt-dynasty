@@ -1,6 +1,9 @@
 "use client";
 
+import { Fragment, type ReactNode } from "react";
+
 import { LoadError } from "@/components/xp/LoadError";
+import { PlayerLink } from "@/components/xp/PlayerLink";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { playerName } from "@/lib/api/players";
 import { type Move, recentMoves } from "@/lib/home/transactions";
@@ -31,7 +34,13 @@ function Moves({ week, live, teamFor, myRosterId }: MovesCardProps & { week: num
   const [load, retry] = useLoad(() => recentMoves(week, live), `moves/${week}`);
   const players = usePlayers();
   const name = (id: string) => playerName(players.status === "ok" ? players.players[id] : undefined, id);
-  const list = (ids: string[]) => ids.map(name).join(", ");
+  const list = (ids: string[]) =>
+    ids.map((id, i) => (
+      <Fragment key={id}>
+        {i > 0 && ", "}
+        <PlayerLink id={id}>{name(id)}</PlayerLink>
+      </Fragment>
+    ));
 
   return (
     <>
@@ -53,14 +62,19 @@ function Moves({ week, live, teamFor, myRosterId }: MovesCardProps & { week: num
                 <div key={s.rosterId} className="home-list-detail">
                   <TeamLink rosterId={s.rosterId} {...teamFor(s.rosterId)} isMine={s.rosterId === myRosterId} />
                   <span>
-                    {[
-                      s.adds.length > 0 && `${m.type === "trade" ? "gets" : "adds"} ${list(s.adds)}`,
-                      s.picks.length > 0 && `gets ${s.picks.join(", ")}`,
-                      s.faab > 0 && `gets $${s.faab} FAAB`,
-                      m.type !== "trade" && s.drops.length > 0 && `drops ${list(s.drops)}`,
-                    ]
-                      .filter(Boolean)
-                      .join("; ")}
+                    {(
+                      [
+                        s.adds.length > 0 && <>{m.type === "trade" ? "gets" : "adds"} {list(s.adds)}</>,
+                        s.picks.length > 0 && `gets ${s.picks.join(", ")}`,
+                        s.faab > 0 && `gets $${s.faab} FAAB`,
+                        m.type !== "trade" && s.drops.length > 0 && <>drops {list(s.drops)}</>,
+                      ].filter(Boolean) as ReactNode[]
+                    ).map((part, i) => (
+                      <Fragment key={i}>
+                        {i > 0 && "; "}
+                        {part}
+                      </Fragment>
+                    ))}
                   </span>
                 </div>
               ))}

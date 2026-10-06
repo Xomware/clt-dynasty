@@ -3,7 +3,9 @@
 import { useContext } from "react";
 
 import { DrillLink } from "@/components/xp/DrillLink";
+import { NflTeamLink } from "@/components/xp/NflTeamLink";
 import { PlayerFace } from "@/components/xp/PlayerFace";
+import { PlayerLink } from "@/components/xp/PlayerLink";
 import { LoadError } from "@/components/xp/LoadError";
 import { StarIcon } from "@/components/xp/icons";
 import { TeamAvatar } from "@/components/xp/TeamAvatar";
@@ -221,13 +223,19 @@ const experience = (p: Player | undefined) => (p?.years_exp === undefined ? "" :
 
 function PlayerCell({ id, player }: { id: string; player: Player | undefined }) {
   const injury = injuryTag(player);
-  const meta = [player?.position, player?.team ?? "FA"].filter(Boolean).join(" · ");
   return (
     <span className="team-player">
       <PlayerFace id={id} position={player?.position} />
       <span className="min-w-0">
-        <span className="team-player-name">{playerName(player, id)}</span>
-        {player && <span className="team-player-meta">{meta}</span>}
+        <PlayerLink id={id} className="team-player-name">
+          {playerName(player, id)}
+        </PlayerLink>
+        {player && (
+          <span className="team-player-meta">
+            {player.position && `${player.position} · `}
+            {player.position === "DEF" || !player.team ? (player.team ?? "FA") : <NflTeamLink team={player.team} />}
+          </span>
+        )}
       </span>
       {injury && (
         <span className="xp-tag team-injury" title={player?.injury_status}>

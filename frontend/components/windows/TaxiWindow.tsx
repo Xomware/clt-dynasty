@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { pastDrafts } from "@/components/windows/DraftHistoryWindow";
 import { LoadError } from "@/components/xp/LoadError";
+import { NflTeamLink } from "@/components/xp/NflTeamLink";
+import { PlayerFace } from "@/components/xp/PlayerFace";
+import { PlayerLink } from "@/components/xp/PlayerLink";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { useAlerts } from "@/lib/alerts/alerts";
 import { type Player, playerName } from "@/lib/api/players";
@@ -148,8 +151,12 @@ function TaxiRow({ id, player, slot, slotsLoaded, mine, request, team, onRequest
   return (
     <li className="xp-player-row flex-wrap">
       <span className="xp-player-pos">{player?.position ?? ""}</span>
+      <PlayerFace id={id} position={player?.position} className="xp-face-sm" />
       <span className="xp-player-name">
-        {name} <span className="xp-player-team">{player?.team || "FA"}</span>
+        <PlayerLink id={id}>{name}</PlayerLink>{" "}
+        <span className="xp-player-team">
+          <NflTeamLink team={player?.team} />
+        </span>
         <span className="block text-xs">{slot ? `Drafted ${slot}` : slotsLoaded ? "Not drafted in this league" : ""}</span>
       </span>
       {request ? (

@@ -2,6 +2,8 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { fixture } from "@/lib/test/league-mock";
+
 vi.mock("aws-amplify/auth", () => ({
   fetchAuthSession: vi.fn(async () => ({ tokens: { idToken: { toString: () => "id-token" } } })),
 }));
@@ -19,6 +21,7 @@ import { MemberProvider } from "@/lib/member/use-member";
 import { stubSleeper } from "@/lib/test/league-mock";
 import { HistoryWindow } from "./HistoryWindow";
 import { HomeWindow } from "./HomeWindow";
+import { ScoresWindow } from "./ScoresWindow";
 import { StandingsWindow } from "./StandingsWindow";
 
 const navigate = vi.fn();
@@ -64,5 +67,22 @@ describe("team names open Team Profile", () => {
     open(<HomeWindow />);
     fireEvent.click(await screen.findByRole("button", { name: "2027 Rookie Draft" }));
     expect(navigate).toHaveBeenLastCalledWith({ kind: "drafts", params: {} });
+  });
+});
+
+describe("players open the Player window", () => {
+  it("from a Scores lineup, with his NFL team beside him", async () => {
+    open(<ScoresWindow />);
+    const [game] = await screen.findAllByRole("region", { name: /^Matchup / });
+    fireEvent.click(within(game).getByRole("button", { name: /Show lineups/ }));
+    const [starters] = await within(game).findAllByRole("list", { name: /starters$/ });
+    const rosterId = Number(/Team (\d+)/.exec(starters.getAttribute("aria-label")!)![1]);
+    const first = fixture.matchups["4"].find((m) => m.roster_id === rosterId)!.starters![0];
+    const row = (await within(starters).findAllByRole("listitem"))[0];
+    const [name, team] = within(row).getAllByRole("button");
+    fireEvent.click(name);
+    expect(navigate).toHaveBeenLastCalledWith({ kind: "player", params: { playerId: first } });
+    fireEvent.click(team);
+    expect(navigate.mock.lastCall?.[0].kind).toBe("nfl");
   });
 });

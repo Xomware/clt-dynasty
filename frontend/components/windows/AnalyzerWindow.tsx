@@ -6,6 +6,7 @@ import { HexagonChart } from "@/components/analyzer/HexagonChart";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { TeamName } from "@/components/xp/TeamName";
 import { LoadError } from "@/components/xp/LoadError";
+import { PlayerLink } from "@/components/xp/PlayerLink";
 import { type Tab, Tabs } from "@/components/xp/Tabs";
 import { analyze, AXES, type AxisValues, leagueShape, standing, type TeamAnalysis } from "@/lib/analyzer/analysis";
 import { recommendTrades, type TradePlayer } from "@/lib/analyzer/trades";
@@ -339,7 +340,9 @@ function TradeSide({ label, player }: { label: string; player: TradePlayer }) {
     <div>
       <dt>{label}</dt>
       <dd>
-        <span className="font-bold break-words">{player.name}</span>
+        <PlayerLink id={player.id} className="font-bold break-words">
+          {player.name}
+        </PlayerLink>
         <span className="analyzer-trade-meta">
           {player.position} · {fmt(player.value)}
         </span>
