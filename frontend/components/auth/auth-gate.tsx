@@ -3,13 +3,13 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { Landing } from "@/components/landing/Landing";
 import { BrandLoader } from "@/components/xp/BrandLoader";
 import { AlertsProvider } from "@/lib/alerts/alerts";
 import { authConfigured, CALLBACK_PATH } from "@/lib/auth/amplify";
 import { useAuth } from "@/lib/auth/use-auth";
 import { MemberProvider, useMember } from "@/lib/member/use-member";
 import { LogonLoading, LogonScreen } from "./LogonScreen";
-import { SignIn } from "./SignIn";
 
 interface GateProps {
   children: ReactNode;
@@ -80,7 +80,7 @@ export function AuthGate({ children }: GateProps) {
       </LogonLoading>
     );
   }
-  if (status !== "signedIn") return <SignIn onSignIn={authConfigured ? () => void signInWithGoogle() : undefined} />;
+  if (status !== "signedIn") return <Landing onSignIn={authConfigured ? () => void signInWithGoogle() : undefined} />;
   return (
     <MemberProvider>
       <AlertsProvider>
