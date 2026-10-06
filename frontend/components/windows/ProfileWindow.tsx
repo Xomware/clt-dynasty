@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useContext } from "react";
 
 import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
+import { TeamAvatar } from "@/components/xp/TeamAvatar";
 import { TeamName } from "@/components/xp/TeamName";
 import { LEAGUE_ID } from "@/lib/config";
 import { DrillContext } from "@/lib/desktop/navigation";
@@ -54,7 +54,6 @@ function Profile({ userId }: { userId: string }) {
   if (!load.value) return <p role="alert">Sleeper has no user {userId}.</p>;
 
   const { account, season, leagues, clt } = load.value;
-  const avatar = avatarUrl(account.avatar);
   const rosterId = rosterOf(clt.rosters, account.user_id);
   const roster = clt.rosters.find((r) => r.roster_id === rosterId);
   const others = leagues.filter((l) => l.league_id !== LEAGUE_ID);
@@ -63,13 +62,7 @@ function Profile({ userId }: { userId: string }) {
   return (
     <div className="flex flex-col gap-3">
       <section aria-label={account.display_name} className="team-head">
-        <span className="team-avatar" aria-hidden>
-          {avatar ? (
-            <Image src={avatar} alt="" width={56} height={56} unoptimized className="size-full object-cover" />
-          ) : (
-            account.display_name.charAt(0).toUpperCase()
-          )}
-        </span>
+        <TeamAvatar name={account.display_name} url={avatarUrl(account.avatar)} size={56} className="team-avatar" />
         <div className="team-who">
           <h3 className="team-name">
             <span className="truncate">{account.display_name}</span>
@@ -85,7 +78,7 @@ function Profile({ userId }: { userId: string }) {
         {roster ? (
           <div className="team-list-row">
             <DrillLink to={teamLink(LEAGUE_ID, roster.roster_id)}>
-              <TeamName name={teamOf(clt.users, roster, roster.roster_id).name} avatarUrl={avatarUrl(account.avatar)} />
+              <TeamName {...teamOf(clt.users, roster, roster.roster_id)} />
             </DrillLink>
             <span className="ml-auto flex-none text-xs tabular-nums">
               {roster.settings.wins}-{roster.settings.losses}

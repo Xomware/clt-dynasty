@@ -35,7 +35,8 @@ describe("Draft History: Live", () => {
     open();
     const round1 = await screen.findByRole("region", { name: "Round 1" });
     expect(screen.getByText("Complete")).toBeTruthy();
-    expect(within(round1).getAllByRole("listitem")[0].textContent).toMatch(/^1\.01Jeremiyah Love RB ARI, Arizona CardinalsTeam 6/);
+    expect(within(round1).getAllByRole("listitem")[0].textContent).toMatch(/^1\.01Jeremiyah Love RB ARI/);
+    expect(within(round1).getAllByRole("listitem")[0].querySelector(".xp-pick-owner .xp-team-name")?.textContent).toBe("Team 6");
     expect(screen.getAllByRole("region", { name: /^Round / })).toHaveLength(5);
   });
 

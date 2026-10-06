@@ -13,7 +13,7 @@ vi.mock("@/lib/api/clt", () => ({
 
 import { MemberProvider } from "@/lib/member/use-member";
 import { parseOpen } from "./deep-link";
-import { GROUPS, START_PINNED, START_PLACES } from "./groups";
+import { ADMIN, GROUPS, START_PINNED, START_PLACES } from "./groups";
 import { REGISTRY, useLauncherGroups, useLaunchers } from "./registry";
 
 const wrapper = ({ children }: { children: ReactNode }) => <MemberProvider>{children}</MemberProvider>;
@@ -39,7 +39,7 @@ describe("launcher groups", () => {
   const launchable = Object.keys(REGISTRY).filter((k) => !REGISTRY[k].drillOnly);
 
   it("files every launchable window but Home in a known group", () => {
-    const ids: string[] = GROUPS.map((g) => g.id);
+    const ids: string[] = [...GROUPS, ADMIN].map((g) => g.id);
     expect(launchable.filter((k) => !REGISTRY[k].group)).toEqual(["home"]);
     expect(launchable.filter((k) => REGISTRY[k].group && !ids.includes(REGISTRY[k].group))).toEqual([]);
     expect(Object.keys(REGISTRY).filter((k) => REGISTRY[k].adminOnly && REGISTRY[k].group !== "admin")).toEqual([]);
@@ -60,15 +60,18 @@ describe("launcher groups", () => {
     });
   });
 
-  it("shows Admin once /clt/me says admin", async () => {
+  it("lists Admin apart from the groups once /clt/me says admin", async () => {
     me.isAdmin = true;
     const { result } = renderHook(() => useLauncherGroups(), { wrapper });
-    await waitFor(() => expect(result.current.groups.at(-1)?.items.map((l) => l.kind)).toEqual(admin));
+    await waitFor(() => expect(result.current.admin.map((l) => l.kind)).toEqual(admin));
+    expect(result.current.groups.map((g) => g.id)).not.toContain("admin");
+    expect(result.current.pinned.map((l) => l.kind)).toEqual(["home"]);
   });
 
   it("deep-links every launchable window and every folder", () => {
     for (const kind of launchable) expect(parseOpen(`?open=${kind}`)).toEqual([{ kind, params: {} }]);
     for (const { id } of GROUPS) expect(parseOpen(`?open=folder:${id}`)).toEqual([{ kind: "folder", params: { id } }]);
     expect(parseOpen("?open=folder:attic")).toEqual([]);
+    expect(parseOpen("?open=folder:admin")).toEqual([]);
   });
 });

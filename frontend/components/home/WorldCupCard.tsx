@@ -2,8 +2,9 @@
 
 import { LoadError } from "@/components/xp/LoadError";
 import { TeamLink } from "@/components/xp/TeamLink";
+import { TeamName } from "@/components/xp/TeamName";
 import { getWorldCup } from "@/lib/api/clt";
-import type { LeagueData, Team } from "@/lib/league/use-league";
+import { type LeagueData, type Team, teamAvatar } from "@/lib/league/use-league";
 import { rosterOf } from "@/lib/sleeper/rosters";
 import { useLoad } from "@/lib/use-load";
 import { HomeCard } from "./HomeCard";
@@ -39,7 +40,7 @@ export function WorldCupCard({ data, teamFor, myRosterId }: WorldCupCardProps) {
                       {rosterId !== null ? (
                         <TeamLink rosterId={rosterId} {...teamFor(rosterId)} isMine={rosterId === myRosterId} />
                       ) : (
-                        <span className="xp-team-name">{t.teamName || t.username}</span>
+                        <TeamName name={t.teamName || t.username} avatarUrl={teamAvatar(data?.users.find((u) => u.user_id === t.userId))} />
                       )}
                       <span className="home-row-stat">
                         {t.wins}-{t.losses}

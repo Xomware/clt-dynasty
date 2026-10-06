@@ -59,7 +59,7 @@ import { readIdLink, readTeamLink } from "@/lib/team/links";
 
 import { useMember } from "@/lib/member/use-member";
 
-import { GROUPS, type GroupId, groupLabel, isGroup } from "./groups";
+import { ADMIN, GROUPS, type GroupId, groupLabel, isGroup } from "./groups";
 import type { WindowParams, WindowView } from "./windows";
 
 export interface WindowSpec {
@@ -81,14 +81,20 @@ export interface WindowSpec {
   group?: GroupId;
 }
 
-// Titles name what the window shows once Sleeper has answered for it.
-function teamTitle(p: WindowParams): string {
+// The team a `team` window shows, once Sleeper has answered for its league.
+export function settledTeam(p: WindowParams) {
   const leagueId = String(p.leagueId ?? LEAGUE_ID);
   const rosterId = Number(p.rosterId);
   const users = settled<SleeperUser[]>(`users/${leagueId}`);
   const rosters = settled<SleeperRoster[]>(`rosters/${leagueId}`);
-  if (!users || !rosters) return "Team Profile";
-  return `Team Profile - ${teamOf(users, rosters.find((r) => r.roster_id === rosterId), rosterId).name}`;
+  if (!users || !rosters) return null;
+  return teamOf(users, rosters.find((r) => r.roster_id === rosterId), rosterId);
+}
+
+// Titles name what the window shows once Sleeper has answered for it.
+function teamTitle(p: WindowParams): string {
+  const team = settledTeam(p);
+  return team ? `Team Profile - ${team.name}` : "Team Profile";
 }
 
 function profileTitle(p: WindowParams): string {
@@ -252,12 +258,14 @@ export function useLaunchers() {
 export type Launcher = ReturnType<typeof useLaunchers>[number];
 
 // The launchers filed for the shell: ungrouped ones first, then each group
-// that has anything to show this member, in GROUPS order.
+// that has anything to show this member, in GROUPS order. `admin` is empty
+// for everyone but admins, and only the account menus list it.
 export function useLauncherGroups() {
   const launchers = useLaunchers();
   return {
     pinned: launchers.filter((l) => !l.group),
     groups: GROUPS.map((g) => ({ ...g, items: launchers.filter((l) => l.group === g.id) })).filter((g) => g.items.length > 0),
+    admin: launchers.filter((l) => l.group === ADMIN.id),
   };
 }
 

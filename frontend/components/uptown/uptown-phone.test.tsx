@@ -12,9 +12,23 @@ vi.mock("@/lib/api/clt", () => ({
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
+// The hub's real cards fetch half the API; these tests are about the shell.
+vi.mock("./UptownHome", () => ({
+  UptownHome: ({ ref, phone }: { ref?: React.Ref<HTMLHeadingElement>; phone?: boolean }) => {
+    const Title = phone ? "h2" : "h1";
+    return (
+      <div>
+        <Title ref={ref} tabIndex={-1}>
+          The Queen City&rsquo;s dynasty league
+        </Title>
+        <p>home body</p>
+      </div>
+    );
+  },
+}));
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
-  useLeague: () => ({ data: null }),
+  useLeague: () => ({ data: null, myRosterId: null, teamFor: () => ({ name: "", avatarUrl: null }) }),
 }));
 
 import { AppShell } from "@/components/AppShell";
@@ -87,6 +101,20 @@ describe("Uptown phone", () => {
     expect(screen.queryByRole("navigation", { name: "Programs" })).toBeNull();
   });
 
+  it("offers the weekly pages in the tab bar, marking the one showing", async () => {
+    await renderPhone();
+    const dock = () => within(screen.getByRole("navigation", { name: "Quick" }));
+    expect(dock().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "Standings"]);
+    expect(dock().getByRole("button", { name: "Home" }).getAttribute("aria-current")).toBe("page");
+
+    fireEvent.click(dock().getByRole("button", { name: "Standings" }));
+    expect(bar().textContent).toBe("League Standings");
+    expect(dock().getByRole("button", { name: "Standings" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(dock().getByRole("button", { name: "Standings" }));
+    expect(window.location.search).toBe("?open=standings");
+    expect(bar().textContent).toBe("League Standings");
+  });
+
   it("lists every group's pages in the menu and opens one as a screen Back closes", async () => {
     await renderPhone();
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
@@ -122,17 +150,21 @@ describe("Uptown phone", () => {
     expect(screen.getByRole("button", { name: "Menu" }).getAttribute("aria-expanded")).toBe("false");
   });
 
-  it("leaves the Admin section out for members", async () => {
+  it("leaves Admin out for members", async () => {
     await renderPhone();
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(drawer().queryByRole("region", { name: "Admin" })).toBeNull();
+    expect(drawer().queryByRole("navigation", { name: "Admin" })).toBeNull();
+    expect(drawer().queryByRole("button", { name: "Members" })).toBeNull();
   });
 
-  it("shows the Admin section to an admin", async () => {
+  it("files Admin under an admin's account, not the page groups", async () => {
     admin.on = true;
     await renderPhone();
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(drawer().getByRole("region", { name: "Admin" })).toBeTruthy();
+    expect(within(drawer().getByRole("navigation", { name: "Pages" })).queryByRole("button", { name: "Members" })).toBeNull();
+    const account = within(drawer().getByRole("region", { name: "Account" }));
+    fireEvent.click(within(account.getByRole("navigation", { name: "Admin" })).getByRole("button", { name: "Members" }));
+    expect(bar().textContent).toBe("Admin: Members");
   });
 
   it("searches from the bar", async () => {

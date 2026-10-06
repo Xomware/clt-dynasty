@@ -9,6 +9,7 @@ import { PlayerLink } from "@/components/xp/PlayerLink";
 import { Markdown } from "@/components/xp/Markdown";
 import { Tabs } from "@/components/xp/Tabs";
 import { StarIcon } from "@/components/xp/icons";
+import { TeamName } from "@/components/xp/TeamName";
 import { type AIReport, getLatestReport, listReports } from "@/lib/api/ai-reports";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { draftPicks, drafts, rosters, tradedPicks, users } from "@/lib/league/cache";
@@ -186,7 +187,7 @@ function LiveTab() {
                     )}
                   </span>
                   <span className="xp-pick-owner">
-                    {owner(c.owner)}
+                    {c.owner === null ? "TBD" : <TeamName {...teamFor(c.owner)} />}
                     {c.from !== null && <span className="block text-xs">via {owner(c.from)}</span>}
                   </span>
                   {isMine(c) && <StarIcon className="shrink-0" role="img" aria-hidden={false} aria-label="Your pick" />}
@@ -264,7 +265,7 @@ function PicksTab() {
   const shown = past.drafts.find((d) => d.draft.draft_id === pick) ?? past.drafts[0];
   const rounds = [...new Set(shown.picks.map((p) => p.round))].sort((a, b) => a - b);
   const pickedBy = (p: SleeperDraftPick) =>
-    teamOf(shown.users, shown.rosters.find((r) => r.roster_id === Number(p.roster_id)), Number(p.roster_id)).name;
+    teamOf(shown.users, shown.rosters.find((r) => r.roster_id === Number(p.roster_id)), Number(p.roster_id));
 
   return (
     <div className="grid grid-cols-1 gap-3">
@@ -301,7 +302,9 @@ function PicksTab() {
                     </span>
                   </span>
                   {p.is_keeper && <span className="xp-tag">Keeper</span>}
-                  <span className="xp-pick-owner">{pickedBy(p)}</span>
+                  <span className="xp-pick-owner">
+                    <TeamName {...pickedBy(p)} />
+                  </span>
                 </li>
               ))}
           </ol>

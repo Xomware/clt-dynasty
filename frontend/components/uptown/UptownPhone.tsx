@@ -9,18 +9,23 @@ import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY, useWindowTitle } from "@/lib/desktop/registry";
 import { viewKey } from "@/lib/desktop/windows";
 import { usePhoneStack } from "@/lib/phone/use-phone-stack";
+import { REVEAL, useReveal } from "@/components/motion/use-reveal";
 import { ViewParamsContext } from "@/lib/view-params";
 import { Backdrop } from "./Backdrop";
 import { OVERRIDES } from "./bodies";
 import { DrawerNav } from "./DrawerNav";
 import { LINE, LineIcon } from "./icons";
 import { MenuDrawer } from "./MenuDrawer";
+import { PhoneDock } from "./PhoneDock";
+import { Related } from "./Related";
+import { ScoreTicker } from "./ScoreTicker";
 import { Spotlight } from "./Spotlight";
 import { UptownHome } from "./UptownHome";
 
 import "./uptown.css";
 import "./uptown-skin.css";
 import "./uptown-phone.css";
+import "./uptown-motion.css";
 
 // The phone in Uptown: Home under a short bar, every other page stacked over
 // it, and the groups in a menu drawer. Same stack and history as the XP phone.
@@ -31,6 +36,10 @@ export function UptownPhone() {
   const windowTitle = useWindowTitle();
   const heading = useRef<HTMLHeadingElement>(null);
   const shown = useRef(stack.length);
+  const main = useReveal<HTMLElement>(REVEAL);
+  // A push slides the new screen in from the right; Back brings the last one in from the left.
+  const [depth, setDepth] = useState({ at: stack.length, dir: "in" });
+  if (depth.at !== stack.length) setDepth({ at: stack.length, dir: stack.length > depth.at ? "next" : "back" });
   const drawerId = useId();
   const title = top ? windowTitle(top) : "CLT Dynasty";
   const Page = top ? (OVERRIDES[top.kind] ?? REGISTRY[top.kind].component) : null;
@@ -51,6 +60,7 @@ export function UptownPhone() {
     if (to.kind === "home") home();
     else go(to);
   };
+  const fromDock = (to: WindowLink) => (to.kind === "home" ? home() : go(to));
   // Safari never focuses a tapped button, and the drawer and Spotlight hand focus back to it.
   const opener = (show: () => void) => (e: MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.focus();
@@ -87,24 +97,37 @@ export function UptownPhone() {
         </button>
       </header>
       <DrillContext value={go}>
+        {!top && <ScoreTicker />}
         <NavigateContext value={go}>
-          <main className="up-screen">
+          <main ref={main} className="up-screen">
             {top && Page ? (
-              <section key={stack.length} aria-label={title} className="up-page">
-                <WindowBoundary>
-                  <ViewParamsContext value={patch}>
-                    <Page params={top.params} />
-                  </ViewParamsContext>
-                </WindowBoundary>
-              </section>
+              <div key={stack.length} className="u-route" data-dir={depth.dir}>
+                <section aria-label={title} className="up-page">
+                  <WindowBoundary>
+                    <ViewParamsContext value={patch}>
+                      <Page params={top.params} />
+                    </ViewParamsContext>
+                  </WindowBoundary>
+                </section>
+                <Related
+                  kind={top.kind}
+                  onNav={(e, to) => {
+                    e.preventDefault();
+                    go(to);
+                  }}
+                />
+              </div>
             ) : (
-              <WindowBoundary>
-                <UptownHome phone />
-              </WindowBoundary>
+              <div key={0} className="u-route" data-dir={depth.dir}>
+                <WindowBoundary>
+                  <UptownHome phone />
+                </WindowBoundary>
+              </div>
             )}
           </main>
         </NavigateContext>
       </DrillContext>
+      <PhoneDock current={top?.kind ?? "home"} onGo={fromDock} />
       {searching && <Spotlight onClose={() => setSearching(false)} onGo={go} />}
       <MenuDrawer id={drawerId} open={menuOpen} onClose={() => setMenuOpen(false)}>
         <DrawerNav current={top} onGo={fromMenu} />

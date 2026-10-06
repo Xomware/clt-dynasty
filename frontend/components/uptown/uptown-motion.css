@@ -1,0 +1,241 @@
+/* Uptown's motion: pages slide in the way the nav reads, cards rise in a
+   stagger, cards below the fold wait for the scroll, numbers roll (CountUp),
+   live things pulse, and loading reads as shimmer. Everything here sits under
+   no-preference, so reduced motion gets the still page. Transforms and
+   opacity only, so phones composite it instead of repainting. */
+
+/* Routes never start fully transparent: the old page is gone on the first
+   frame, and a blank one between reads as a flicker. */
+@keyframes u-route-next {
+  from {
+    opacity: 0.4;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes u-route-back {
+  from {
+    opacity: 0.4;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@keyframes u-route-in {
+  from {
+    opacity: 0.4;
+    transform: translateY(1rem) scale(0.985);
+  }
+}
+
+@keyframes u-rise {
+  from {
+    opacity: 0.25;
+    transform: translateY(1.25rem);
+  }
+}
+
+@keyframes u-row-in {
+  from {
+    opacity: 0.15;
+    transform: translateX(-0.75rem);
+  }
+}
+
+@keyframes u-bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes u-shimmer {
+  to {
+    background-position: -150% 0;
+  }
+}
+
+@keyframes u-live-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 120 100 / 0.55);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 0.45rem rgb(255 120 100 / 0);
+  }
+}
+
+@keyframes u-live-glow {
+  50% {
+    border-color: rgb(255 140 120 / 0.65);
+    box-shadow: var(--u-card-shadow), 0 0 26px rgb(224 85 69 / 0.28);
+  }
+}
+
+/* Standings: each PF as a bar against the table's best, under the number. */
+.uptown .standings-pf {
+  position: relative;
+}
+
+.uptown .standings-pf::after {
+  content: "";
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.3rem;
+  left: 0.5rem;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, rgb(21 144 168 / 0.5), var(--u-gold));
+  transform: scaleX(var(--share, 0));
+  transform-origin: right;
+}
+
+/* Live: the tag carries a beating dot. */
+.uptown .home-live {
+  gap: 0.3125rem;
+  border-color: rgb(255 140 120 / 0.6);
+  color: #ffe2dc;
+  background: rgb(224 85 69 / 0.22);
+}
+
+.uptown .home-live::before {
+  content: "";
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 999px;
+  background: #ff8a78;
+}
+
+/* Loading: the status line dims and a skeleton of rows shimmers under it. */
+.uptown :is(.u-panel, .up-page, .home-card) :is(p[role="status"]) {
+  position: relative;
+  padding-bottom: 4.25rem;
+  color: var(--u-muted);
+}
+
+.uptown :is(.u-panel, .up-page, .home-card) p[role="status"]::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3.25rem;
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, transparent 30%, rgb(255 255 255 / 0.09) 50%, transparent 70%) 0 0 / 250% 100%,
+    linear-gradient(var(--u-row), var(--u-row)) 0 0 / 100% 0.875rem no-repeat,
+    linear-gradient(var(--u-row), var(--u-row)) 0 1.25rem / 82% 0.875rem no-repeat,
+    linear-gradient(var(--u-row), var(--u-row)) 0 2.5rem / 64% 0.75rem no-repeat;
+}
+
+/* Hover: cards lift toward the light. */
+.uptown .u-home .home-card,
+.uptown .u-panel .xp-matchup,
+.uptown .u-group-card {
+  transition:
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.28s,
+    border-color 0.2s,
+    background-color 0.15s;
+}
+
+@media (hover: hover) {
+  .uptown .u-home .home-card:hover {
+    border-color: rgb(227 178 60 / 0.42);
+    transform: translateY(-3px);
+    box-shadow: var(--u-card-shadow), 0 18px 40px rgb(2 8 20 / 0.5), 0 0 0 1px rgb(227 178 60 / 0.12);
+  }
+
+  .uptown .u-panel .xp-matchup:hover,
+  .uptown .u-group-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgb(2 8 20 / 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .u-route[data-dir="next"] {
+    animation: u-route-next 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .u-route[data-dir="back"] {
+    animation: u-route-back 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .u-route[data-dir="in"] {
+    animation: u-route-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  /* The stagger: Home's hero and cards, a page's groups, the Keep going row. */
+  .u-home > *,
+  .u-home .home > *,
+  .u-home .home-pulse > *,
+  .u-home .home-col > *,
+  .u-panel > * > .xp-group,
+  .u-panel > * > * > .xp-group,
+  .up-page > * > .xp-group,
+  .u-related li {
+    animation: u-rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 0.05s);
+  }
+
+  :is(.u-home > *, .u-home .home > *, .u-home .home-pulse > *, .u-home .home-col > *, .u-panel > * > .xp-group, .u-panel > * > * > .xp-group, .up-page > * > .xp-group, .u-related li):nth-child(2) {
+    --i: 1;
+  }
+
+  :is(.u-home > *, .u-home .home > *, .u-home .home-pulse > *, .u-home .home-col > *, .u-panel > * > .xp-group, .u-panel > * > * > .xp-group, .up-page > * > .xp-group, .u-related li):nth-child(3) {
+    --i: 2;
+  }
+
+  :is(.u-home > *, .u-home .home > *, .u-home .home-pulse > *, .u-home .home-col > *, .u-panel > * > .xp-group, .u-panel > * > * > .xp-group, .up-page > * > .xp-group, .u-related li):nth-child(4) {
+    --i: 3;
+  }
+
+  :is(.u-home > *, .u-home .home > *, .u-home .home-pulse > *, .u-home .home-col > *, .u-panel > * > .xp-group, .u-panel > * > * > .xp-group, .up-page > * > .xp-group, .u-related li):nth-child(n + 5) {
+    --i: 4;
+  }
+
+  /* Table rows slide in one after another, the first dozen staggered. */
+  .u-panel .xp-table tbody tr,
+  .up-page .xp-table tbody tr {
+    animation: u-row-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(0.05s + min(var(--r, 12), 12) * 0.03s);
+  }
+
+  .xp-table tbody tr:nth-child(1) { --r: 0; }
+  .xp-table tbody tr:nth-child(2) { --r: 1; }
+  .xp-table tbody tr:nth-child(3) { --r: 2; }
+  .xp-table tbody tr:nth-child(4) { --r: 3; }
+  .xp-table tbody tr:nth-child(5) { --r: 4; }
+  .xp-table tbody tr:nth-child(6) { --r: 5; }
+  .xp-table tbody tr:nth-child(7) { --r: 6; }
+  .xp-table tbody tr:nth-child(8) { --r: 7; }
+  .xp-table tbody tr:nth-child(9) { --r: 8; }
+  .xp-table tbody tr:nth-child(10) { --r: 9; }
+  .xp-table tbody tr:nth-child(11) { --r: 10; }
+
+  .uptown .standings-pf::after {
+    animation: u-bar-grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+  }
+
+  /* Below the fold: held until the scroll reaches it (use-reveal.ts). */
+  .uptown [data-reveal="wait"] {
+    opacity: 0;
+    animation: none;
+  }
+
+  .uptown [data-reveal="in"] {
+    animation: u-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .uptown .home-live::before {
+    animation: u-live-ring 1.4s ease-out infinite;
+  }
+
+  .uptown .u-home .home-mine:has(.home-live) {
+    animation: u-rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both, u-live-glow 2.4s ease-in-out 0.6s infinite;
+  }
+
+  .uptown :is(.u-panel, .up-page, .home-card) p[role="status"]::after,
+  .u-shimmer-line {
+    animation: u-shimmer 1.4s linear infinite;
+  }
+}

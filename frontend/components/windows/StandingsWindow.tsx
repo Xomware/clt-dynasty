@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { type CSSProperties, useMemo } from "react";
 
 import { Tabs } from "@/components/xp/Tabs";
+import { CountUp } from "@/components/motion/CountUp";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { divisionName, playoffSeeds, type Standing, sortStandings } from "@/lib/league/standings";
 import { type Team, useLeague } from "@/lib/league/use-league";
@@ -23,6 +24,8 @@ interface TableProps {
 const streak = (s: string) => s.replace(/^(\d+)([WLT])$/, "$2$1");
 
 function StandingsTable({ label, rows, seedOf, playoffTeams, teamFor, myRosterId }: TableProps) {
+  // Uptown draws each PF as a bar against the table's best; XP ignores it.
+  const maxPf = Math.max(1, ...rows.map((s) => s.pf));
   return (
     <div className="xp-table-scroll">
       <table className="xp-table">
@@ -65,7 +68,9 @@ function StandingsTable({ label, rows, seedOf, playoffTeams, teamFor, myRosterId
                   {s.ties > 0 && `-${s.ties}`}
                 </td>
                 <td className="standings-extra tabular-nums">{streak(s.streak) || "-"}</td>
-                <td className="text-right tabular-nums">{s.pf.toFixed(2)}</td>
+                <td className="standings-pf text-right tabular-nums" style={{ "--share": s.pf / maxPf } as CSSProperties}>
+                  <CountUp value={s.pf} decimals={2} />
+                </td>
                 <td className="standings-extra text-right tabular-nums">{s.pa.toFixed(2)}</td>
                 <td className="text-right tabular-nums">{seed <= playoffTeams ? seed : ""}</td>
               </tr>

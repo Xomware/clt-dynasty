@@ -74,7 +74,7 @@ describe("Team Analyzer", () => {
     renderAnalyzer();
     fireEvent.click(await screen.findByRole("tab", { name: "League" }));
     const rows = within(screen.getByRole("table", { name: "Teams ranked by total roster value" })).getAllByRole("row").slice(1);
-    expect(rows.map((r) => within(r).getByRole("button").textContent)).toEqual(["Team Name 6", "Team Name 4"]);
+    expect(rows.map((r) => r.querySelector(".xp-team-name")?.textContent)).toEqual(["Team Name 6", "Team Name 4"]);
     expect(rows[1].textContent).toMatch(/\(your team\)/);
     expect(within(screen.getByLabelText("League averages")).getByText("7,500")).toBeTruthy();
   });

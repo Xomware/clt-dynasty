@@ -4,7 +4,7 @@ import { LoadError } from "@/components/xp/LoadError";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { TeamName } from "@/components/xp/TeamName";
 import { getWorldCup, type WorldCupDivision, type WorldCupTeam } from "@/lib/api/clt";
-import { useLeague } from "@/lib/league/use-league";
+import { teamAvatar, useLeague } from "@/lib/league/use-league";
 import { useMember } from "@/lib/member/use-member";
 import { rosterOf } from "@/lib/sleeper/rosters";
 import { useLoad } from "@/lib/use-load";
@@ -107,13 +107,10 @@ export function WorldCupWindow() {
   if (divisions.length === 0) return <p>No divisional games have been played yet.</p>;
 
   // A manager still in the league links to their team; one who has left shows an initial.
-  const current = (userId: string): Current => {
-    const avatar = data?.users.find((u) => u.user_id === userId)?.avatar;
-    return {
-      rosterId: data ? rosterOf(data.rosters, userId) : null,
-      avatarUrl: avatar ? `https://sleepercdn.com/avatars/thumbs/${avatar}` : null,
-    };
-  };
+  const current = (userId: string): Current => ({
+    rosterId: data ? rosterOf(data.rosters, userId) : null,
+    avatarUrl: teamAvatar(data?.users.find((u) => u.user_id === userId)),
+  });
 
   return (
     <div className="grid grid-cols-1 gap-3">

@@ -7,12 +7,14 @@ import { LeaguePulse } from "@/components/home/LeaguePulse";
 import { MovesCard } from "@/components/home/MovesCard";
 import { MyTeamCard } from "@/components/home/MyTeamCard";
 import { ProposalsCard } from "@/components/home/ProposalsCard";
+import { QuickActions } from "@/components/home/QuickActions";
 import { TaxiCard } from "@/components/home/TaxiCard";
 import { WorldCupCard } from "@/components/home/WorldCupCard";
 import { AIHeadline } from "@/components/windows/AIReviewWindow";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { WarningIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
+import { CountUp } from "@/components/motion/CountUp";
 import { TeamName } from "@/components/xp/TeamName";
 import { announcements as announcementsResource } from "@/lib/announcements";
 import { LEAGUE_ID } from "@/lib/config";
@@ -41,6 +43,7 @@ export function HomeWindow() {
   return (
     <div className="home">
       <LeaguePulse data={data} week={week} error={error} />
+      <QuickActions />
       <Announcements />
       <MyTeamCard data={data} games={games} week={week} live={live} memberLoading={member.status === "loading"} {...league} />
       <div className="home-cols">
@@ -79,7 +82,7 @@ export function HomeWindow() {
   );
 }
 
-function Announcements() {
+export function Announcements() {
   const state = announcementsResource.use();
   return (
     <HomeCard title="Announcements">
@@ -110,7 +113,7 @@ function Announcements() {
   );
 }
 
-interface LeagueProps {
+export interface LeagueProps {
   teamFor: (rosterId: number) => Team;
   myRosterId: number | null;
 }
@@ -141,7 +144,7 @@ function StandingsList({ data, teamFor, myRosterId }: LeagueProps & { data: Leag
   );
 }
 
-function ThisWeek({ games, live, teamFor, myRosterId }: LeagueProps & { games: Game[]; live: boolean }) {
+export function ThisWeek({ games, live, teamFor, myRosterId }: LeagueProps & { games: Game[]; live: boolean }) {
   const mine = (g: Game) => g.sides.some((s) => s.rosterId === myRosterId);
   const sorted = [...games].sort((a, b) => Number(mine(b)) - Number(mine(a)) || a.id - b.id);
   return (
@@ -167,7 +170,7 @@ function ThisWeek({ games, live, teamFor, myRosterId }: LeagueProps & { games: G
                   <DrillLink to={teamLink(LEAGUE_ID, s.rosterId)}>
                     <TeamName name={team.name} avatarUrl={team.avatarUrl} isMine={s.rosterId === myRosterId} />
                   </DrillLink>
-                  <span className="home-game-points">{s.points > 0 ? s.points.toFixed(2) : "-"}</span>
+                  <CountUp value={s.points} decimals={2} empty="-" className="home-game-points" />
                 </span>
               );
             })}
