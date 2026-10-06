@@ -104,7 +104,7 @@ const SPECS = {
   home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: HomeWindow, defaultSize: { w: 760, h: 700 } },
   standings: { group: "league", label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
   scores: { group: "league", label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
-  playoffs: { group: "league", label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 720, h: 560 } },
+  playoffs: { group: "league", label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 900, h: 620 } },
   history: { group: "history", label: "History", title: "League History", Icon: CalendarIcon, component: HistoryWindow, defaultSize: { w: 640, h: 600 } },
   "matchup-history": {
     group: "history",
