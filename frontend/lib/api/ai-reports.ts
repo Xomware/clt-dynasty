@@ -34,6 +34,13 @@ export function periodLabel(period: string): string {
 export const getLatestReport = (type: ReportType) =>
   request<{ report: AIReport | null }>(`/ai-reports/latest?type=${type}`).then((r) => r.report);
 
+// The 2024-2025 reports were backfilled in one batch and share a created_at to
+// the second, so the API's order among them is arbitrary; the period breaks the tie.
+// Only weekly recaps order by period; the sort is stable, so other ties keep the API's order.
+const newestFirst = (a: AIReport, b: AIReport) =>
+  b.created_at.localeCompare(a.created_at) ||
+  (a.report_type === "weekly" && b.report_type === "weekly" ? b.period.localeCompare(a.period) : 0);
+
 export interface ReportPage {
   rows: AIReport[];
   next_cursor: string | null;
@@ -45,7 +52,10 @@ export function listReports(type?: ReportType, cursor?: string | null): Promise<
   if (type) qs.set("type", type);
   if (cursor) qs.set("cursor", cursor);
   const query = qs.toString();
-  return request<ReportPage>(`/ai-reports/list${query ? `?${query}` : ""}`);
+  return request<ReportPage>(`/ai-reports/list${query ? `?${query}` : ""}`).then((page) => ({
+    ...page,
+    rows: [...page.rows].sort(newestFirst),
+  }));
 }
 
 // No route reads one report by period, so walk that type's pages, as the iOS app does.
