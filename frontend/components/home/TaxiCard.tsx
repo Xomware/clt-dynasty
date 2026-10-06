@@ -1,6 +1,7 @@
 "use client";
 
 import { LoadError } from "@/components/xp/LoadError";
+import { PlayerLink } from "@/components/xp/PlayerLink";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { playerName } from "@/lib/api/players";
 import { listTaxiRequests } from "@/lib/api/taxi";
@@ -33,7 +34,9 @@ export function TaxiCard({ teamFor, myRosterId }: TaxiCardProps) {
             return (
               <li key={r.playerId} className="home-list-item">
                 <p>
-                  <span className="font-bold">{playerName(player, r.playerId)}</span>
+                  <PlayerLink id={r.playerId} className="font-bold">
+                    {playerName(player, r.playerId)}
+                  </PlayerLink>
                   {player?.position && ` (${player.position})`}
                   <span className="text-xs">, {DATE.format(new Date(r.createdAt))}</span>
                 </p>

@@ -106,9 +106,9 @@ describe("Team window", () => {
 
     await screen.findByRole("region", { name: "Starters" });
     const starters = group("Starters").getAllByRole("row").slice(1).map((r) => r.textContent);
-    expect(starters[0]).toMatch(/^QBJosh AllenQB · BUF308$/);
+    expect(starters[0]).toMatch(/^QBJosh AllenQB · BUF, Buffalo Bills308$/);
     expect(starters[1]).toMatch(/^RBEmpty/);
-    expect(starters[2]).toMatch(/^FLEXBijan RobinsonRB · ATLQ/);
+    expect(starters[2]).toMatch(/^FLEXBijan RobinsonRB · ATL, Atlanta FalconsQ/);
     expect(group("Bench").getByText("Dallas Cowboys")).toBeTruthy();
     expect(group("Bench").getByText("WR · FA")).toBeTruthy();
     expect(group("Bench").getByText("R")).toBeTruthy();
@@ -127,6 +127,19 @@ describe("Team window", () => {
     expect(navigate).toHaveBeenLastCalledWith({ kind: "profile", params: { userId: "u6" } });
     fireEvent.click(screen.getByRole("button", { name: "2nd of 3" }));
     expect(navigate).toHaveBeenLastCalledWith({ kind: "league", params: { leagueId: LEAGUE_ID } });
+  });
+
+  it("opens a rostered player and his NFL team", async () => {
+    const navigate = vi.fn();
+    inMember(
+      <NavigateContext value={navigate}>
+        <TeamWindow params={{ rosterId: 4 }} />
+      </NavigateContext>,
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "Josh Allen" }));
+    expect(navigate).toHaveBeenLastCalledWith({ kind: "player", params: { playerId: "4984" } });
+    fireEvent.click(screen.getByRole("button", { name: "BUF, Buffalo Bills" }));
+    expect(navigate).toHaveBeenLastCalledWith({ kind: "nfl", params: { team: "BUF" } });
   });
 
   it("keeps the team up when player names fail, and retries them", async () => {

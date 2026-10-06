@@ -3,6 +3,9 @@
 import { useId, useState } from "react";
 
 import { DrillLink } from "@/components/xp/DrillLink";
+import { NflTeamLink } from "@/components/xp/NflTeamLink";
+import { PlayerFace } from "@/components/xp/PlayerFace";
+import { PlayerLink } from "@/components/xp/PlayerLink";
 import { TeamName } from "@/components/xp/TeamName";
 import { type Player, playerName } from "@/lib/api/players";
 import { LEAGUE_ID } from "@/lib/config";
@@ -81,7 +84,7 @@ function Lineup({ side, team, leagueId = LEAGUE_ID }: { side: Side; team: string
     );
   }
   return (
-    <div className="min-w-0">
+    <div className="@container min-w-0">
       {heading}
       {players.status === "loading" && <p role="status">Loading player names...</p>}
       {players.status === "error" && <p role="alert">Couldn&rsquo;t load player names, so these are Sleeper ids.</p>}
@@ -116,8 +119,25 @@ function PlayerRow({ slot, id, points, names }: PlayerRowProps) {
   return (
     <li className="xp-player-row">
       <span className="xp-player-pos">{slot === "SUPER_FLEX" ? "SF" : slot}</span>
-      <span className="xp-player-name">{id ? playerName(player, id) : "Empty"}</span>
-      {player && <span className="xp-player-team">{player.position === "DEF" ? "DEF" : `${player.position ?? ""} ${player.team ?? "FA"}`}</span>}
+      {id ? (
+        <PlayerFace id={id} position={player?.position} className="xp-face-sm" />
+      ) : (
+        <span className="xp-face xp-face-sm" aria-hidden />
+      )}
+      <span className="xp-player-name">{id ? <PlayerLink id={id}>{playerName(player, id)}</PlayerLink> : "Empty"}</span>
+      {player && (
+        <span className="xp-player-team">
+          {player.position === "DEF" ? (
+            "DEF"
+          ) : (
+            <>
+              {/* The slot says it already, except in a flex. */}
+              {player.position !== slot && `${player.position ?? ""} `}
+              <NflTeamLink team={player.team} />
+            </>
+          )}
+        </span>
+      )}
       <span className="xp-player-pts">{points.toFixed(2)}</span>
     </li>
   );

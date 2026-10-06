@@ -4,6 +4,8 @@ import { useEffect, useId, useState } from "react";
 
 import { ReportView } from "@/components/windows/AIReviewWindow";
 import { LoadError } from "@/components/xp/LoadError";
+import { NflTeamLink } from "@/components/xp/NflTeamLink";
+import { PlayerLink } from "@/components/xp/PlayerLink";
 import { Markdown } from "@/components/xp/Markdown";
 import { Tabs } from "@/components/xp/Tabs";
 import { StarIcon } from "@/components/xp/icons";
@@ -174,9 +176,9 @@ function LiveTab() {
                   <span className="xp-player-name">
                     {c.pick ? (
                       <>
-                        {pickedName(c.pick)}{" "}
+                        <PlayerLink id={c.pick.player_id}>{pickedName(c.pick)}</PlayerLink>{" "}
                         <span className="xp-player-team">
-                          {c.pick.metadata.position} {c.pick.metadata.team || "FA"}
+                          {c.pick.metadata.position} <NflTeamLink team={c.pick.metadata.team} />
                         </span>
                       </>
                     ) : (
@@ -217,7 +219,9 @@ function LiveTab() {
                     <td key={c.pickNo} data-mine={isMine(c) || undefined} data-dim={(mine === "mine" && !isMine(c)) || undefined}>
                       {c.pick ? (
                         <>
-                          <span className="block font-bold">{c.pick.metadata.last_name || pickedName(c.pick)}</span>
+                          <PlayerLink id={c.pick.player_id} className="block font-bold">
+                            {c.pick.metadata.last_name || pickedName(c.pick)}
+                          </PlayerLink>
                           <span className="block text-xs">{c.pick.metadata.position}</span>
                         </>
                       ) : (
@@ -291,9 +295,9 @@ function PicksTab() {
                 <li key={p.pick_no} className="xp-player-row">
                   <span className="xp-player-pos tabular-nums">{p.pick_no}</span>
                   <span className="xp-player-name">
-                    {pickedName(p)}{" "}
+                    <PlayerLink id={p.player_id}>{pickedName(p)}</PlayerLink>{" "}
                     <span className="xp-player-team">
-                      {p.metadata.position} {p.metadata.team || "FA"}
+                      {p.metadata.position} <NflTeamLink team={p.metadata.team} />
                     </span>
                   </span>
                   {p.is_keeper && <span className="xp-tag">Keeper</span>}

@@ -37,3 +37,16 @@
   height: 1rem;
   object-fit: contain;
 }
+
+/* Lineup and taxi rows: a smaller face beside the name. */
+.xp-face.xp-face-sm {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* A two-column lineup in a tiled window is too narrow for faces. */
+@container (max-width: 19rem) {
+  .xp-face.xp-face-sm {
+    display: none;
+  }
+}
