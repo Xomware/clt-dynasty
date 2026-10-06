@@ -15,6 +15,7 @@ import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
 import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
+import { WorldCupWindow } from "@/components/windows/WorldCupWindow";
 import {
   BracketIcon,
   CalendarIcon,
@@ -93,6 +94,7 @@ const SPECS = {
     component: DraftOrderWindow,
     defaultSize: { w: 600, h: 620 },
   },
+  "world-cup": { label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
   rules: { label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   settings: { label: "Settings", title: "Settings", Icon: ControlPanelIcon, component: SettingsWindow, defaultSize: { w: 520, h: 520 } },
   "my-team": { label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
