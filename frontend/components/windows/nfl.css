@@ -1,0 +1,95 @@
+/* NFL team depth charts and the 32-team index. */
+.nfl-logo-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.nfl-logo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.nfl-table td {
+  vertical-align: middle;
+}
+
+.nfl-owner-col {
+  width: 40%;
+}
+
+.nfl-table td:last-child .xp-team {
+  max-width: 100%;
+}
+
+.nfl-fa {
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.nfl-rest td {
+  padding-top: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nfl-divisions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem;
+}
+
+.nfl-team-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.nfl-team-tile {
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.25rem;
+  border-radius: 3px;
+}
+
+.nfl-team-logo {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+}
+
+@media (hover: hover) {
+  .nfl-team-tile:hover {
+    background: var(--xp-cream);
+  }
+}
+
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  /* Fixed columns, so long player and team names truncate instead of crushing the owner column. */
+  .xp-table.nfl-table {
+    table-layout: fixed;
+  }
+
+  .nfl-table th:first-child {
+    width: 2.25rem;
+  }
+
+  .nfl-owner-col {
+    width: 36%;
+  }
+
+  .nfl-table .team-player-name {
+    white-space: normal;
+  }
+
+  .nfl-rest td {
+    font-size: 0.75rem;
+  }
+}

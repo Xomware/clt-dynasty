@@ -1,0 +1,93 @@
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import type { ReactNode } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("aws-amplify/auth", () => ({
+  fetchAuthSession: vi.fn(async () => ({ tokens: { idToken: { toString: () => "id-token" } } })),
+}));
+
+import { API_BASE } from "@/lib/config";
+import { parseOpen } from "@/lib/desktop/deep-link";
+import { NavigateContext } from "@/lib/desktop/navigation";
+import { windowTitle } from "@/lib/desktop/registry";
+import { MemberProvider } from "@/lib/member/use-member";
+import { fixture, stubSleeper } from "@/lib/test/league-mock";
+import { NflTeamsWindow, NflTeamWindow } from "./NflTeamWindow";
+
+const p = (player_id: string, first_name: string, position: string, depth_chart_order?: number, extra = {}) => ({
+  player_id,
+  first_name,
+  last_name: "Charger",
+  position,
+  team: "LAC",
+  depth_chart_order,
+  ...extra,
+});
+const PLAYERS = {
+  "1": p("1", "Justin", "QB", 1),
+  "2": p("2", "Trey", "QB", 2),
+  "3": p("3", "Ladd", "WR", 1, { injury_status: "Out" }),
+  "4": p("4", "Practice", "WR", undefined),
+  "5": { player_id: "5", first_name: "Josh", last_name: "Allen", position: "QB", team: "BUF", depth_chart_order: 1 },
+};
+const ROSTERS = fixture.rosters.map((r) => (r.roster_id === 3 ? { ...r, players: ["3"] } : r));
+
+const navigate = vi.fn();
+beforeEach(() => {
+  navigate.mockReset();
+  stubSleeper({
+    [`${API_BASE}/players/list`]: { count: 5, players: PLAYERS },
+    [`/league/${fixture.league.league_id}/rosters`]: ROSTERS,
+    "https://api.sleeper.com/schedule/nfl/regular/2026": [{ week: 1, home: "KC", away: "DEN", status: "complete" }],
+  });
+});
+afterEach(() => vi.restoreAllMocks());
+
+const open = (ui: ReactNode) =>
+  render(
+    <MemberProvider>
+      <NavigateContext value={navigate}>{ui}</NavigateContext>
+    </MemberProvider>,
+  );
+
+describe("NFL Team window", () => {
+  it("lists the team's depth chart by position, off-chart players last", async () => {
+    open(<NflTeamWindow params={{ team: "LAC" }} />);
+    const qbs = await screen.findByRole("region", { name: "Quarterbacks" });
+    expect(within(qbs).getAllByRole("row").slice(1).map((r) => r.textContent)).toEqual([
+      expect.stringMatching(/^1Justin Charger/),
+      expect.stringMatching(/^2Trey Charger/),
+    ]);
+    const wrs = screen.getByRole("region", { name: "Wide receivers" });
+    expect(within(wrs).getByText("Off the depth chart")).toBeTruthy();
+    expect(within(wrs).getByText("Out")).toBeTruthy();
+    expect(screen.queryByText("Josh Allen")).toBeNull();
+    expect(screen.queryByRole("region", { name: "Tight ends" })).toBeNull();
+    expect(screen.getByText(/bye in week 1/)).toBeTruthy();
+  });
+
+  it("opens a player and the CLT team that owns him", async () => {
+    open(<NflTeamWindow params={{ team: "LAC" }} />);
+    const wrs = await screen.findByRole("region", { name: "Wide receivers" });
+    fireEvent.click(within(wrs).getByRole("button", { name: "Ladd Charger" }));
+    expect(navigate).toHaveBeenLastCalledWith({ kind: "player", params: { playerId: "3" } });
+    fireEvent.click(within(wrs).getByRole("button", { name: "Team 3" }));
+    expect(navigate).toHaveBeenLastCalledWith({ kind: "team", params: { rosterId: 3 } });
+    expect(within(wrs).getAllByText("Free agent")).toHaveLength(1);
+  });
+
+  it("reads its link and names itself", () => {
+    expect(parseOpen("?open=nfl:LAC,nfl:XYZ,nfl:lac")).toEqual([{ kind: "nfl", params: { team: "LAC" } }]);
+    expect(windowTitle({ kind: "nfl", params: { team: "BAL" } })).toBe("Baltimore Ravens");
+  });
+});
+
+describe("NFL Teams index", () => {
+  it("files 32 teams in 8 divisions, each opening its depth chart", () => {
+    open(<NflTeamsWindow />);
+    expect(screen.getAllByRole("region")).toHaveLength(8);
+    expect(screen.getAllByRole("button")).toHaveLength(32);
+    fireEvent.click(within(screen.getByRole("region", { name: "AFC North" })).getByRole("button", { name: "Baltimore Ravens" }));
+    expect(navigate).toHaveBeenLastCalledWith({ kind: "nfl", params: { team: "BAL" } });
+  });
+});

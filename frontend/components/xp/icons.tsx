@@ -169,6 +169,16 @@ export function JerseyIcon(props: IconProps) {
   );
 }
 
+// The NFL: a football with its laces.
+export function FootballIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 14c-1-4 1-9.5 6-11.5 2.5-1 5-1 6-.5 1 4-1 9.5-6 11.5-2.5 1-5 1-6 .5z" className="fill-(--xp-wood) stroke-(--xp-text)" strokeLinejoin="round" />
+      <path d="M5.5 10.5l5-5M7 6.5l1 1M8.5 5l1 1M5.5 8l1 1" className="fill-none stroke-(--xp-cream)" />
+    </Icon>
+  );
+}
+
 // The silhouette a player without a headshot gets.
 export function SilhouetteIcon(props: IconProps) {
   return (
