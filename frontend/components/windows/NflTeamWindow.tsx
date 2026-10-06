@@ -81,13 +81,16 @@ function DepthChart({ team, players, data, bye }: DepthChartProps) {
               <PlayerLink id={p.player_id} className="team-player-name">
                 {playerName(p, p.player_id)}
               </PlayerLink>
-              {p.number !== undefined && p.number > 0 && <span className="team-player-meta">#{p.number}</span>}
-            </span>
-            {injury && (
-              <span className="xp-tag team-injury" title={p.injury_status}>
-                {injury}
+              {/* The tag sits under the name, so a phone column keeps the name whole. */}
+              <span className="team-player-meta nfl-meta">
+                {p.number !== undefined && p.number > 0 && `#${p.number}`}
+                {injury && (
+                  <span className="xp-tag team-injury" title={p.injury_status}>
+                    {injury}
+                  </span>
+                )}
               </span>
-            )}
+            </span>
           </span>
         </td>
         <td>

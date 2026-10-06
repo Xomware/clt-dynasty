@@ -25,6 +25,16 @@
   max-width: 100%;
 }
 
+.nfl-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.nfl-meta .team-injury {
+  margin-left: 0;
+}
+
 .nfl-fa {
   font-style: italic;
   white-space: nowrap;
