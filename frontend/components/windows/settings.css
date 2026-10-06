@@ -50,3 +50,25 @@
   box-shadow: none;
   cursor: default;
 }
+
+.settings-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding-block: 0.5rem;
+  cursor: var(--cursor-pointer, pointer);
+}
+
+.settings-check input {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 0.125rem;
+  accent-color: var(--xp-select);
+}
+
+.settings-check input:focus-visible {
+  outline: 2px solid var(--xp-select);
+  outline-offset: 2px;
+}

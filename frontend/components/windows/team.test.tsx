@@ -209,7 +209,7 @@ describe("after linking in Settings", () => {
     };
     inMember(
       <AlertsProvider>
-        <SettingsWindow />
+        <SettingsWindow params={{}} />
         <MyTeamWindow />
       </AlertsProvider>,
     );

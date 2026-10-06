@@ -4,8 +4,11 @@ import Image from "next/image";
 import { type FormEvent, useEffect, useId, useState } from "react";
 
 import { InfoIcon, WarningIcon } from "@/components/xp/icons";
+import { Tabs } from "@/components/xp/Tabs";
 import { useAlerts } from "@/lib/alerts/alerts";
 import { getProfile, linkSleeper, type PlatformUser, unlinkSleeper } from "@/lib/api/me";
+import { getEmailNotifications, setEmailNotifications } from "@/lib/api/settings";
+import type { WindowParams } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { getRosters, rosterOf } from "@/lib/sleeper/rosters";
 
@@ -14,7 +17,22 @@ import "./settings.css";
 type Load = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; user: PlatformUser };
 type RosterCheck = { status: "checking" } | { status: "failed" } | { status: "done"; rosterId: number | null };
 
-export function SettingsWindow() {
+export function SettingsWindow({ params }: { params: WindowParams }) {
+  const { state } = useMember();
+  if (state.status !== "member" || !state.me.isAdmin) return <Account />;
+  return (
+    <Tabs
+      label="Settings"
+      selected={params.tab}
+      tabs={[
+        { id: "account", label: "Account", panel: () => <Account /> },
+        { id: "league", label: "League", panel: () => <LeagueSettings /> },
+      ]}
+    />
+  );
+}
+
+function Account() {
   const { sync } = useMember();
   const [load, setLoad] = useState<Load>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
@@ -236,5 +254,72 @@ function LinkForm({ onLinked }: { onLinked: (user: PlatformUser) => void }) {
         </p>
       )}
     </form>
+  );
+}
+
+type EmailState = { status: "loading" } | { status: "error"; message: string } | { status: "ok"; on: boolean };
+
+function LeagueSettings() {
+  const id = useId();
+  const [email, setEmail] = useState<EmailState>({ status: "loading" });
+  const [attempt, setAttempt] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    getEmailNotifications().then(
+      (on) => live && setEmail({ status: "ok", on }),
+      (e: Error) => live && setEmail({ status: "error", message: e.message }),
+    );
+    return () => {
+      live = false;
+    };
+  }, [attempt]);
+
+  const toggle = async (on: boolean) => {
+    setBusy(true);
+    setError(null);
+    await setEmailNotifications(on).then(
+      (saved) => setEmail({ status: "ok", on: saved }),
+      (e: Error) => setError(e.message),
+    );
+    setBusy(false);
+  };
+
+  return (
+    <section className="xp-group" aria-labelledby={`${id}-title`}>
+      <h2 id={`${id}-title`} className="xp-group-title">
+        League emails
+      </h2>
+      {email.status === "loading" && <p role="status">Loading league settings...</p>}
+      {email.status === "error" && (
+        <div className="flex flex-col items-start gap-2">
+          <p role="alert">Couldn&rsquo;t load league settings: {email.message}</p>
+          <button
+            type="button"
+            className="xp-button"
+            onClick={() => {
+              setEmail({ status: "loading" });
+              setAttempt((n) => n + 1);
+            }}
+          >
+            Try again
+          </button>
+        </div>
+      )}
+      {email.status === "ok" && (
+        <div className="flex flex-col gap-2">
+          <label className="settings-check">
+            <input type="checkbox" checked={email.on} disabled={busy} onChange={(e) => void toggle(e.target.checked)} />
+            Email active members about new proposals, decisions and taxi steal requests
+          </label>
+          <p className="text-xs" aria-live="polite">
+            {busy ? "Saving..." : email.on ? "Emails are on for the whole league." : "Emails are off. Nothing is sent."}
+          </p>
+          {error && <p role="alert">Couldn&rsquo;t save: {error}</p>}
+        </div>
+      )}
+    </section>
   );
 }
