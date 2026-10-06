@@ -3,10 +3,11 @@
    components) and Tailwind's utilities at any specificity. A property set
    here overrides a view's utility class too; only do that on purpose. */
 
-[data-theme="uptown"] {
+:root[data-theme="uptown"] {
   color-scheme: dark;
 
-  /* The XP tokens the views read, pointed at Uptown. */
+  /* The XP tokens the views read, pointed at Uptown. :root as well, so it
+     outranks globals.css's own :root block whichever file loads last. */
   --xp-font: var(--u-body);
   --xp-title-font: var(--u-display);
   --xp-text: var(--u-text);
@@ -137,8 +138,9 @@
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
-/* Your own rows and picks: a gold wash with the gold edge. */
-[data-theme="uptown"] [data-mine] {
+/* Your own rows and picks: a gold wash with the gold edge. :root outranks the
+   windows' own .row[data-mine] rules, whichever loads last. */
+:root[data-theme="uptown"] [data-mine] {
   background: rgb(227 178 60 / 0.1);
   box-shadow: inset 3px 0 var(--u-gold);
 }
