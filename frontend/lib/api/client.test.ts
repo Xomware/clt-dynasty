@@ -43,6 +43,12 @@ describe("request", () => {
     });
   });
 
+  it("reads the older admin routes' Message", async () => {
+    session("t");
+    reply(403, { Success: false, Message: "Not authorized" });
+    await expect(request("/admin/reports-flag", { method: "POST" })).rejects.toMatchObject({ status: 403, message: "Not authorized" });
+  });
+
   it("falls back to the status when the body is not JSON", async () => {
     session("t");
     vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("<html>", { status: 502 }));

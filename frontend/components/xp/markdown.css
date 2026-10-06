@@ -1,0 +1,41 @@
+.md {
+  display: grid;
+  gap: 0.625rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.md-h1 {
+  font-family: var(--xp-title-font);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--xp-title-dark);
+}
+
+.md-h2 {
+  margin-top: 0.5rem;
+  padding-bottom: 0.125rem;
+  border-bottom: 1px solid var(--xp-face-shadow);
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  color: var(--xp-title-dark);
+}
+
+.md-h3 {
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.md-ul {
+  padding-left: 1.25rem;
+  list-style: square;
+}
+
+.md-ol {
+  padding-left: 1.5rem;
+  list-style: decimal;
+}
+
+.md li + li {
+  margin-top: 0.25rem;
+}

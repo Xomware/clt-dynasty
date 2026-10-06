@@ -2,14 +2,19 @@
 
 import { useEffect, useId, useState } from "react";
 
+import { ReportView } from "@/components/windows/AIReviewWindow";
+import { LoadError } from "@/components/xp/LoadError";
+import { Markdown } from "@/components/xp/Markdown";
 import { Tabs } from "@/components/xp/Tabs";
 import { StarIcon } from "@/components/xp/icons";
+import { type AIReport, getLatestReport, listReports } from "@/lib/api/ai-reports";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { draftPicks, drafts, rosters, tradedPicks, users } from "@/lib/league/cache";
 import { type Cell, draftBoard, latestDraft, pickedName } from "@/lib/league/drafts";
 import { leagueChain } from "@/lib/league/history";
 import { teamOf, useLeague } from "@/lib/league/use-league";
 import { sharedResource } from "@/lib/shared-resource";
+import { useLoad } from "@/lib/use-load";
 import type { SleeperDraft, SleeperDraftPick, SleeperTradedPick } from "@/lib/sleeper/types";
 
 import "./league.css";
@@ -302,6 +307,93 @@ function PicksTab() {
   );
 }
 
+// The AI's post-draft review of the latest rookie draft.
+function RecapTab() {
+  const [load, retry] = useLoad(() => getLatestReport("postDraft"), "postDraft");
+  if (load.status === "loading") return <p role="status">Loading the draft recap...</p>;
+  if (load.status === "error") return <LoadError what="the draft recap" message={load.message} onRetry={retry} />;
+  if (!load.value) return <p>No recap yet. The AI writes one once the rookie draft finishes.</p>;
+  return <ReportView report={load.value} />;
+}
+
+// A mock report's metadata, as the mock-draft engine writes it. Numbers can arrive as strings.
+interface MockPick {
+  pick_no: number | string;
+  round: number | string;
+  slot: number | string;
+  team: string;
+  handle: string;
+  player_name: string;
+  position: string;
+  nfl_team: string;
+}
+
+const PERSONALITY: Record<string, string> = { bpa: "Best Player Available", "team-fit": "Team Fit", wildcard: "Wildcard" };
+const personalityOf = (r: AIReport) => String(r.metadata.personality ?? "");
+const picksOf = (r: AIReport) => (Array.isArray(r.metadata.picks) ? (r.metadata.picks as MockPick[]) : []);
+
+function MocksTab() {
+  const [load, retry] = useLoad(() => listReports("mock").then((p) => p.rows), "mock");
+  const [pick, setPick] = useState<string | null>(null);
+
+  if (load.status === "loading") return <p role="status">Loading mock drafts...</p>;
+  if (load.status === "error") return <LoadError what="mock drafts" message={load.message} onRetry={retry} />;
+  if (load.value.length === 0) return <p>No mock drafts yet.</p>;
+
+  // Newest first, so the first of each personality is its latest run.
+  const latest = load.value.filter((r, i, all) => all.findIndex((x) => personalityOf(x) === personalityOf(r)) === i);
+  const shown = latest.find((r) => r.sk === pick) ?? latest[0];
+  const picks = picksOf(shown);
+  const rounds = [...new Set(picks.map((p) => Number(p.round)))].sort((a, b) => a - b);
+  const year = String(shown.metadata.draft_year ?? "");
+
+  return (
+    <div className="grid grid-cols-1 gap-3">
+      {latest.length > 1 && (
+        <ToggleGroup
+          label="Mock draft style"
+          value={shown.sk}
+          options={latest.map((r): [string, string] => [r.sk, PERSONALITY[personalityOf(r)] ?? (personalityOf(r) || r.period)])}
+          onChange={setPick}
+        />
+      )}
+      <h3 className="font-bold">
+        {year && `${year} `}mock draft: {PERSONALITY[personalityOf(shown)] ?? (personalityOf(shown) || shown.period)}
+      </h3>
+      {shown.body_markdown.trim() && (
+        <div className="xp-group bg-(--xp-cream)">
+          <Markdown text={shown.body_markdown} />
+        </div>
+      )}
+      {picks.length === 0 && <p>This mock has no picks recorded.</p>}
+      {rounds.map((round) => (
+        <section key={round} aria-label={`Round ${round}`}>
+          <h3 className="xp-round-title">Round {round}</h3>
+          <ol className="bg-(--xp-cream)">
+            {picks
+              .filter((p) => Number(p.round) === round)
+              .sort((a, b) => Number(a.pick_no) - Number(b.pick_no))
+              .map((p) => (
+                <li key={p.pick_no} className="xp-player-row">
+                  <span className="xp-player-pos tabular-nums">
+                    {round}.{String(p.slot).padStart(2, "0")}
+                  </span>
+                  <span className="xp-player-name">
+                    {p.player_name}{" "}
+                    <span className="xp-player-team">
+                      {p.position} {p.nfl_team || "FA"}
+                    </span>
+                  </span>
+                  <span className="xp-pick-owner">{p.team || p.handle}</span>
+                </li>
+              ))}
+          </ol>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 export function DraftHistoryWindow({ params }: { params: WindowParams }) {
   return (
     <Tabs
@@ -310,6 +402,8 @@ export function DraftHistoryWindow({ params }: { params: WindowParams }) {
       tabs={[
         { id: "live", label: "Live", panel: () => <LiveTab /> },
         { id: "picks", label: "Picks", panel: () => <PicksTab /> },
+        { id: "recap", label: "Recap", panel: () => <RecapTab /> },
+        { id: "mocks", label: "Mocks", panel: () => <MocksTab /> },
       ]}
     />
   );

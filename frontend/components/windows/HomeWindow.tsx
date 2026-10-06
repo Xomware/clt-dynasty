@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { AIHeadline } from "@/components/windows/AIReviewWindow";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { CalendarIcon, WarningIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
@@ -29,6 +30,7 @@ export function HomeWindow() {
   return (
     <div className="home">
       <Announcements />
+      <AIHeadline />
       <DraftCountdown />
       <section className="xp-group" aria-labelledby="home-standings">
         <h3 id="home-standings" className="xp-group-title">

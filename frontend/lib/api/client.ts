@@ -12,12 +12,13 @@ export class ApiError extends Error {
   }
 }
 
-// Xomper handlers answer `{ error: { message } }`; the authorizer and API
-// Gateway answer `{ message }`.
+// Xomper handlers answer `{ error: { message } }`, its older admin and AI
+// routes `{ Success: false, Message }`; the authorizer and API Gateway `{ message }`.
 function messageOf(body: unknown, status: number): string {
   if (body && typeof body === "object") {
-    const { error, message } = body as { error?: { message?: unknown }; message?: unknown };
+    const { error, message, Message } = body as { error?: { message?: unknown }; message?: unknown; Message?: unknown };
     if (typeof error?.message === "string") return error.message;
+    if (typeof Message === "string") return Message;
     if (typeof message === "string") return message;
   }
   return `Request failed (${status})`;
