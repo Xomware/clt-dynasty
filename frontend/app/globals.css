@@ -677,7 +677,7 @@
   .xp-start-menu {
     display: flex;
     flex-direction: column;
-    width: min(20rem, 100vw);
+    width: min(25rem, 100vw);
     border: 2px solid var(--xp-taskbar-dark);
     border-radius: 8px 8px 0 0;
     overflow: hidden;
@@ -720,11 +720,64 @@
     flex: none;
   }
 
-  .xp-start-menu-list {
+  /* XP's two columns: programs on white, places on pale blue, under an orange rule. */
+  .xp-start-columns {
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 11rem);
+    min-height: 0;
+    border-top: 2px solid var(--xp-logon-rule);
+  }
+
+  .xp-start-programs {
+    display: flex;
+    flex-direction: column;
     min-height: 0;
     overflow-y: auto;
     padding: 0.25rem;
-    border-right: 4rem solid var(--xp-menu-side);
+    background: var(--xp-cream);
+  }
+
+  .xp-start-recent,
+  .xp-start-all {
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--xp-face);
+  }
+
+  .xp-start-recent .xp-start-menu-link {
+    font-weight: normal;
+  }
+
+  .xp-start-all {
+    margin-top: auto;
+  }
+
+  .xp-start-all-link {
+    justify-content: center;
+  }
+
+  .xp-start-all-link .ml-auto {
+    margin-left: 0;
+    color: var(--xp-start);
+  }
+
+  .xp-start-places {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.25rem;
+    border-left: 1px solid var(--xp-title-inactive-light);
+    background: var(--xp-menu-side);
+  }
+
+  .xp-start-places .xp-start-menu-link {
+    color: var(--clt-navy);
+  }
+
+  .xp-start-places-rule {
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--xp-title-inactive-light);
   }
 
   .xp-start-menu-link {
@@ -739,19 +792,34 @@
 
   .xp-start-menu-link:hover,
   .xp-start-menu-link:focus-visible,
-  .xp-start-menu-link[aria-expanded="true"] {
+  .xp-start-menu-link[aria-expanded="true"],
+  .xp-start-places .xp-start-menu-link:is(:hover, :focus-visible) {
     color: var(--xp-text-inverse);
     background: var(--xp-select);
+  }
+
+  .xp-start-menu-link:active {
+    background: var(--xp-title-dark);
+  }
+
+  .xp-start-all-link:is(:hover, :focus-visible, [aria-expanded="true"]) .ml-auto {
+    color: inherit;
   }
 
   .xp-start-submenu {
     position: fixed;
     z-index: 51;
     min-width: 12rem;
+    max-height: calc(100dvh - var(--taskbar-top));
+    overflow-y: auto;
     padding: 0.25rem;
     border: 1px solid var(--xp-face-shadow);
     background: var(--xp-cream);
     box-shadow: 2px 2px 6px rgb(10 30 80 / 0.4);
+  }
+
+  .xp-start-submenu .xp-start-menu-link {
+    font-weight: normal;
   }
 
   .xp-team {

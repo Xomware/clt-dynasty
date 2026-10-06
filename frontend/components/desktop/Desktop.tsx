@@ -2,11 +2,12 @@
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 
+import { FolderIcon } from "@/components/xp/icons";
 import { openLinks, parseOpen, syncUrl } from "@/lib/desktop/deep-link";
 import { useDesktop } from "@/lib/desktop/desktop-context";
 import { DrillContext } from "@/lib/desktop/navigation";
 import { loadLayout, saveLayout } from "@/lib/desktop/persist";
-import { useLaunchers } from "@/lib/desktop/registry";
+import { useLauncherGroups } from "@/lib/desktop/registry";
 import { defaultLayout, type WindowState } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { DesktopWindow } from "./DesktopWindow";
@@ -20,6 +21,7 @@ export function Desktop() {
   const owner = state.status === "member" ? state.me.member.email : undefined;
   const restored = useRef<WindowState[] | null>(null);
   const live = useRef(false);
+  const { pinned, groups } = useLauncherGroups();
 
   // Before paint, so the default layout never flashes up first.
   useLayoutEffect(() => {
@@ -56,9 +58,14 @@ export function Desktop() {
       <main className="xp-desktop">
         <h1 className="sr-only">CLT Dynasty League</h1>
         <ul className="xp-desktop-icons" aria-label="Desktop">
-          {useLaunchers().map(({ kind, label, Icon }) => (
+          {pinned.map(({ kind, label, Icon }) => (
             <li key={kind}>
               <IconButton Icon={Icon} label={label} onOpen={() => open(kind)} />
+            </li>
+          ))}
+          {groups.map((g) => (
+            <li key={g.id}>
+              <IconButton Icon={FolderIcon} label={g.label} onOpen={() => open("folder", { id: g.id })} />
             </li>
           ))}
         </ul>

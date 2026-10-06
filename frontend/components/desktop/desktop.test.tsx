@@ -34,6 +34,12 @@ const renderShell = async () => {
 const windowNamed = (name: string) => document.querySelector<HTMLElement>(`section[aria-label="${name}"]`);
 const tab = (name: string) => within(screen.getByRole("list", { name: "Open windows" })).getByRole("button", { name });
 const icon = (name: string) => within(screen.getByRole("list", { name: "Desktop" })).getByRole("button", { name });
+// The stand-in programs live in the League folder.
+const launch = (name: string) => {
+  if (!windowNamed("League")) fireEvent.doubleClick(icon("League"));
+  fireEvent.doubleClick(within(windowNamed("League")!).getByRole("button", { name }));
+};
+const startMenu = () => within(screen.getByRole("navigation", { name: "Start menu" }));
 
 beforeEach(() => {
   // jsdom has no pointer capture.
@@ -47,26 +53,37 @@ afterEach(() => {
 });
 
 describe("desktop", () => {
-  it("lists every launcher on the desktop but keeps drill-only windows off it", async () => {
+  it("shows Home and a folder per group, with no drill-only windows", async () => {
     await renderShell();
     const names = within(screen.getByRole("list", { name: "Desktop" }))
       .getAllByRole("button")
       .map((b) => b.textContent);
-    expect(names).toEqual(["Home", "Standings", "Broken"]);
+    expect(names).toEqual(["Home", "League"]);
   });
 
-  it("opens a window on double-click and mirrors it into the URL", async () => {
+  it("opens a folder, then a program from it in its own window, mirrored into the URL", async () => {
     await renderShell();
-    fireEvent.doubleClick(icon("Standings"));
+    fireEvent.doubleClick(icon("League"));
+    const folder = windowNamed("League")!;
+    expect(within(folder).getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Standings", "Broken"]);
+    expect(within(folder).getByText("2 objects")).toBeTruthy();
 
+    fireEvent.doubleClick(within(folder).getByRole("button", { name: "Standings" }));
     expect(windowNamed("League Standings")).not.toBeNull();
+    expect(windowNamed("League")).not.toBeNull();
     expect(tab("League Standings").getAttribute("aria-pressed")).toBe("true");
-    expect(window.location.search).toBe("?open=home,standings");
+    expect(window.location.search).toBe("?open=home,folder:league,standings");
+  });
+
+  it("opens a folder from a deep link", async () => {
+    window.history.replaceState(null, "", "/?open=folder:league");
+    await renderShell();
+    expect(within(windowNamed("League")!).getByRole("button", { name: "Broken" })).toBeTruthy();
   });
 
   it("drags by the title bar and stays inside the viewport above the taskbar", async () => {
     await renderShell();
-    fireEvent.doubleClick(icon("Standings"));
+    launch("Standings");
     const win = windowNamed("League Standings")!;
     const bar = within(win).getByRole("heading", { name: "League Standings" }).parentElement!;
     const { left, top } = win.style;
@@ -85,7 +102,7 @@ describe("desktop", () => {
 
   it("navigates in place on a drill, with Back and Alt+Left", async () => {
     await renderShell();
-    fireEvent.doubleClick(icon("Standings"));
+    launch("Standings");
     const win = windowNamed("League Standings")!;
 
     fireEvent.click(within(win).getByRole("button", { name: "Team 6" }));
@@ -102,7 +119,7 @@ describe("desktop", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     await renderShell();
     fireEvent.doubleClick(icon("Home"));
-    fireEvent.doubleClick(icon("Broken"));
+    launch("Broken");
 
     expect(within(windowNamed("Broken")!).getByRole("alert").textContent).toMatch(/hit an error/);
     expect(within(windowNamed("CLT Dynasty League")!).getByText("home body")).toBeTruthy();
@@ -135,13 +152,60 @@ describe("taskbar", () => {
     await renderShell();
     const start = screen.getByRole("button", { name: /start/i });
     fireEvent.click(start);
-    const menu = within(screen.getByRole("navigation", { name: "Start menu" }));
+    const menu = startMenu();
     expect(menu.getByText("Roster 4")).toBeTruthy();
+    expect(within(menu.getByRole("list", { name: "Pinned" })).getAllByRole("button").map((b) => b.textContent)).toEqual([
+      "Home",
+      "Standings",
+    ]);
 
     fireEvent.click(menu.getByRole("button", { name: "Standings" }));
     expect(screen.queryByRole("navigation", { name: "Start menu" })).toBeNull();
     expect(start.getAttribute("aria-expanded")).toBe("false");
     expect(tab("League Standings").getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("cascades All Programs into the groups and opens a program from one", async () => {
+    await renderShell();
+    fireEvent.click(screen.getByRole("button", { name: /start/i }));
+    fireEvent.click(startMenu().getByRole("button", { name: "All Programs" }));
+    const all = within(screen.getByRole("list", { name: "All Programs" }));
+    expect(all.getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "League"]);
+
+    fireEvent.click(all.getByRole("button", { name: "League" }));
+    const league = within(screen.getByRole("list", { name: "League" }));
+    fireEvent.click(league.getByRole("button", { name: "Broken" }));
+    expect(screen.queryByRole("navigation", { name: "Start menu" })).toBeNull();
+    expect(windowNamed("Broken")).not.toBeNull();
+
+    // A program opened from anywhere is offered again under Recent.
+    fireEvent.click(screen.getByRole("button", { name: /start/i }));
+    expect(within(startMenu().getByRole("list", { name: "Recent" })).getByRole("button").textContent).toBe("Broken");
+  });
+
+  it("walks the cascades with the arrow keys", async () => {
+    await renderShell();
+    const start = screen.getByRole("button", { name: /start/i });
+    fireEvent.click(start, { detail: 0 });
+    expect(document.activeElement?.textContent).toBe("Home");
+
+    const programs = startMenu().getByRole("button", { name: "All Programs" });
+    act(() => programs.focus());
+    fireEvent.keyDown(programs, { key: "ArrowRight" });
+    expect(document.activeElement?.textContent).toBe("Home");
+    fireEvent.keyDown(document.activeElement!, { key: "ArrowDown" });
+    const league = document.activeElement as HTMLElement;
+    expect(league.textContent).toBe("League");
+    fireEvent.keyDown(league, { key: "ArrowRight" });
+    expect(document.activeElement?.textContent).toBe("Standings");
+
+    fireEvent.keyDown(document.activeElement!, { key: "ArrowLeft" });
+    expect(document.activeElement).toBe(league);
+    expect(screen.queryByRole("list", { name: "League" })).toBeNull();
+    fireEvent.keyDown(league, { key: "Escape" });
+    expect(document.activeElement).toBe(programs);
+    expect(screen.queryByRole("list", { name: "All Programs" })).toBeNull();
+    expect(screen.getByRole("navigation", { name: "Start menu" })).toBeTruthy();
   });
 
   it("closes Start on Escape, returning focus, and signs out from it", async () => {
@@ -158,7 +222,7 @@ describe("taskbar", () => {
 
   it("resets the desktop from Start", async () => {
     await renderShell();
-    fireEvent.doubleClick(icon("Standings"));
+    launch("Standings");
     fireEvent.click(screen.getByRole("button", { name: /start/i }));
     fireEvent.click(screen.getByRole("button", { name: "Reset desktop" }));
     expect(windowNamed("League Standings")).toBeNull();

@@ -191,6 +191,20 @@ export function FolderIcon(props: IconProps) {
   );
 }
 
+// Draft History: a clipboard holding the pick grid, so it never reads as a folder.
+export function DraftBoardIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="2.5" y="2.5" width="11" height="12" className="fill-(--xp-wood) stroke-(--xp-text)" />
+      <rect x="3.5" y="4.5" width="9" height="9" className="fill-(--xp-cream)" />
+      <path d="M5.5 1.5h5v2h-5z" className="fill-(--xp-silver) stroke-(--xp-text)" />
+      <path d="M4.5 5.5h2v2h-2zM9.5 8.5h2v2h-2z" className="fill-(--xp-select)" />
+      <path d="M7 5.5h2v2H7zM4.5 11h2v2h-2z" className="fill-(--clt-crown)" />
+      <path d="M9.5 5.5h2v2h-2zM7 8.5h2v2H7z" className="fill-(--xp-start)" />
+    </Icon>
+  );
+}
+
 // The League News feed: an Outlook Express inbox tray with a letter in it.
 export function NewsFeedIcon(props: IconProps) {
   return (

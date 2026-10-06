@@ -52,11 +52,100 @@
   text-align: left;
 }
 
-.m-program:hover,
+.m-program-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.m-program-detail {
+  overflow: hidden;
+  font-size: 0.8125rem;
+  font-weight: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--xp-text) 70%, var(--xp-cream));
+}
+
+.m-program:is(:focus-visible, :active) .m-program-detail {
+  color: inherit;
+}
+
+/* A folder on the phone is Explorer's List view: one full-width row per program. */
+.m-window-body .xp-folder-icons {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+}
+
+.m-window-body .xp-folder-icons .xp-desktop-icon {
+  flex-direction: row;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0 0.875rem;
+  border-bottom: 1px solid var(--xp-face);
+  font-size: 1.0625rem;
+  font-weight: bold;
+}
+
+.m-window-body .xp-folder-icons .xp-desktop-icon-label {
+  padding: 0;
+  text-align: left;
+}
+
+.m-window-body .xp-folder-icons .xp-desktop-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.m-window-body .xp-folder-icons .xp-desktop-icon:focus-visible {
+  color: var(--xp-text-inverse);
+  background: var(--xp-select);
+  outline: none;
+}
+
+/* Touch keeps :hover on whatever sits under the last tap, which here is a row of the new screen. */
+@media (hover: hover) {
+  .m-window-body .xp-folder-icons .xp-desktop-icon:hover {
+    color: var(--xp-text-inverse);
+    background: var(--xp-select);
+  }
+}
+
+.m-window-body .xp-statusbar {
+  display: none;
+}
+
+.m-window-body .xp-folder-icons .xp-desktop-icon:is(:hover, :focus, :focus-visible) :is(svg, img) {
+  filter: none;
+}
+
+.m-window-body .xp-folder-icons .xp-desktop-icon:is(:focus, :focus-visible) .xp-desktop-icon-label {
+  color: inherit;
+  background: none;
+  outline: none;
+}
+
+.m-window-body .xp-folder-icons .xp-desktop-icon:active {
+  background: var(--xp-title-dark);
+}
+
 .m-program:focus-visible {
   color: var(--xp-text-inverse);
   background: var(--xp-select);
   outline: none;
+}
+
+@media (hover: hover) {
+  .m-program:hover {
+    color: var(--xp-text-inverse);
+    background: var(--xp-select);
+  }
+
+  .m-program:hover .m-program-detail {
+    color: inherit;
+  }
 }
 
 .m-program:active {
