@@ -65,7 +65,7 @@ function WelcomeBack() {
 // Drawn over everything, and takes the pointer so nothing hidden under it gets clicked.
 export function ThemeTransition({ to }: { to: Theme }) {
   return (
-    <div className="theme-transition" data-to={to} aria-hidden="true">
+    <div className="theme-transition skyline-palette" data-to={to} aria-hidden="true">
       {to === "uptown" ? <NightFalls /> : <WelcomeBack />}
     </div>
   );
