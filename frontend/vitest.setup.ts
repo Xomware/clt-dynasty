@@ -33,3 +33,16 @@ vi.stubGlobal(
 // Node 25 defines its own global localStorage, which is an empty stub unless
 // node runs with --localstorage-file, and it shadows jsdom's working one.
 vi.stubGlobal("localStorage", (globalThis as unknown as { jsdom: { window: Window } }).jsdom.window.localStorage);
+
+// jsdom has neither observer. Assigned rather than stubbed, so a test's
+// unstubAllGlobals keeps them.
+class NoopObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return [];
+  }
+}
+globalThis.ResizeObserver ??= NoopObserver as unknown as typeof ResizeObserver;
+globalThis.IntersectionObserver ??= NoopObserver as unknown as typeof IntersectionObserver;

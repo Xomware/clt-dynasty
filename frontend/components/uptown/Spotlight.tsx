@@ -2,23 +2,36 @@
 
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 
+import { TeamAvatar } from "@/components/xp/TeamAvatar";
+import { LEAGUE_ID } from "@/lib/config";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { type Launcher, useLauncherGroups } from "@/lib/desktop/registry";
+import { useLeague } from "@/lib/league/use-league";
+import { teamLink } from "@/lib/team/links";
 import { LINE, LineIcon } from "./icons";
 import { ABOUT } from "./pages";
+
+// A page, or a team, as one row of results.
+interface Option {
+  key: string;
+  label: string;
+  about?: string;
+  avatar?: string | null;
+  to: WindowLink;
+}
 
 interface Section {
   id: string;
   label: string;
-  items: Launcher[];
+  items: Option[];
 }
 
-// Every word has to appear in the page's name, its group or its one-liner. A
+// Every word has to appear in the row's name, its group or its one-liner. A
 // hit in the name ranks above one in the group, and both above the one-liner.
-function score(query: string, l: Launcher, group: string): number {
+function score(query: string, o: Option, group: string): number {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const label = l.label.toLowerCase();
-  const about = (ABOUT[l.kind] ?? "").toLowerCase();
+  const label = o.label.toLowerCase();
+  const about = (o.about ?? "").toLowerCase();
   let total = 0;
   for (const w of words) {
     const hit = label.startsWith(w) ? 4 : label.includes(w) ? 3 : group.toLowerCase().includes(w) ? 2 : about.includes(w) ? 1 : 0;
@@ -28,6 +41,8 @@ function score(query: string, l: Launcher, group: string): number {
   return total;
 }
 
+const page = (l: Launcher): Option => ({ key: l.kind, label: l.label, about: ABOUT[l.kind], to: { kind: l.kind, params: {} } });
+
 interface SpotlightProps {
   onClose: () => void;
   onGo: (to: WindowLink) => void;
@@ -36,6 +51,7 @@ interface SpotlightProps {
 // Search across every page the member can open, filed under the same groups as the nav.
 export function Spotlight({ onClose, onGo }: SpotlightProps) {
   const { pinned, groups } = useLauncherGroups();
+  const { data, teamFor } = useLeague();
   const [query, setQuery] = useState("");
   const [at, setAt] = useState(0);
   const id = useId();
@@ -52,7 +68,16 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
   );
 
   // With a query, the section holding the best match comes first, so Enter takes it.
-  const sections: Section[] = [{ id: "start", label: "Start", items: pinned }, ...groups]
+  const teams: Option[] = (data?.rosters ?? []).map((r) => {
+    const team = teamFor(r.roster_id);
+    return { key: `team-${r.roster_id}`, label: team.name, avatar: team.avatarUrl, about: "Team profile", to: teamLink(LEAGUE_ID, r.roster_id) };
+  });
+  const sections: Section[] = [
+    { id: "start", label: "Start", items: pinned.map(page) },
+    ...groups.map((g) => ({ id: g.id, label: g.label, items: g.items.map(page) })),
+    // Teams only once something is typed, so the empty palette stays a page list.
+    ...(query.trim() ? [{ id: "teams", label: "Teams", items: teams }] : []),
+  ]
     .map((s) => {
       const scored = s.items.map((l) => ({ l, at: query.trim() ? score(query, l, s.label) : 1 })).filter((x) => x.at > 0);
       return { ...s, best: Math.max(0, ...scored.map((x) => x.at)), items: scored.sort((a, b) => b.at - a.at).map((x) => x.l) };
@@ -68,10 +93,10 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
     document.getElementById(optionId(index))?.scrollIntoView?.({ block: "nearest" });
   });
 
-  const pick = (l: Launcher) => {
+  const pick = (o: Option) => {
     picked.current = true;
     onClose();
-    onGo({ kind: l.kind, params: {} });
+    onGo(o.to);
   };
 
   const onInputKey = (e: KeyboardEvent) => {
@@ -100,7 +125,7 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
         <div className="u-spot-field">
           <LineIcon d={LINE.search} />
           <label id={`${id}-label`} htmlFor={`${id}-input`} className="sr-only">
-            Search every page
+            Search pages and teams
           </label>
           <input
             id={`${id}-input`}
@@ -111,7 +136,7 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
             autoCapitalize="off"
             spellCheck={false}
             enterKeyHint="go"
-            placeholder="Standings, taxi, drafts..."
+            placeholder="Standings, taxi, a team name..."
             aria-expanded={flat.length > 0}
             aria-controls={`${id}-list`}
             aria-autocomplete="list"
@@ -137,19 +162,21 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
                 const i = flat.indexOf(l);
                 return (
                   <div
-                    key={l.kind}
+                    key={l.key}
                     id={optionId(i)}
                     role="option"
                     aria-selected={i === index}
                     aria-label={l.label}
                     className="u-spot-option"
+                    data-team={l.avatar !== undefined || undefined}
                     // Keeps focus, and so the active option, in the input.
                     onMouseDown={(e) => e.preventDefault()}
                     onMouseMove={() => i !== index && setAt(i)}
                     onClick={() => pick(l)}
                   >
+                    {l.avatar !== undefined && <TeamAvatar name={l.label} url={l.avatar} size={32} className="u-spot-avatar" />}
                     <span className="u-spot-name">{l.label}</span>
-                    {ABOUT[l.kind] && <span className="u-spot-about">{ABOUT[l.kind]}</span>}
+                    {l.about && <span className="u-spot-about">{l.about}</span>}
                   </div>
                 );
               })}

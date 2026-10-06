@@ -77,14 +77,20 @@ export interface WindowSpec {
   group?: GroupId;
 }
 
-// Titles name what the window shows once Sleeper has answered for it.
-function teamTitle(p: WindowParams): string {
+// The team a `team` window shows, once Sleeper has answered for its league.
+export function settledTeam(p: WindowParams) {
   const leagueId = String(p.leagueId ?? LEAGUE_ID);
   const rosterId = Number(p.rosterId);
   const users = settled<SleeperUser[]>(`users/${leagueId}`);
   const rosters = settled<SleeperRoster[]>(`rosters/${leagueId}`);
-  if (!users || !rosters) return "Team Profile";
-  return `Team Profile - ${teamOf(users, rosters.find((r) => r.roster_id === rosterId), rosterId).name}`;
+  if (!users || !rosters) return null;
+  return teamOf(users, rosters.find((r) => r.roster_id === rosterId), rosterId);
+}
+
+// Titles name what the window shows once Sleeper has answered for it.
+function teamTitle(p: WindowParams): string {
+  const team = settledTeam(p);
+  return team ? `Team Profile - ${team.name}` : "Team Profile";
 }
 
 function profileTitle(p: WindowParams): string {
