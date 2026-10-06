@@ -1,0 +1,26 @@
+.xp-face {
+  display: block;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  overflow: hidden;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: var(--xp-face);
+}
+
+.xp-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.xp-face[data-logo] img {
+  object-fit: contain;
+}
+
+[data-theme="uptown"] .xp-face {
+  border-color: var(--u-edge);
+  border-radius: 999px;
+}

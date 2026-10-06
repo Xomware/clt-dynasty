@@ -12,6 +12,7 @@ import { HomeWindow } from "@/components/windows/HomeWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
 import { MembersWindow } from "@/components/windows/MembersWindow";
+import { PlayerWindow, playerTitle, readPlayerLink } from "@/components/windows/PlayerWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
 import { ProposalsWindow } from "@/components/windows/ProposalsWindow";
@@ -34,6 +35,7 @@ import {
   DraftBoardIcon,
   FolderIcon,
   HomeIcon,
+  JerseyIcon,
   MembersIcon,
   NewsFeedIcon,
   NewspaperIcon,
@@ -50,7 +52,7 @@ import {
 import { LEAGUE_ID } from "@/lib/config";
 import { settled, settledVersion, subscribeSettled } from "@/lib/league/cache";
 import { teamOf } from "@/lib/league/use-league";
-import type { SleeperAccount, SleeperLeague, SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
+import type { SleeperAccount, SleeperLeague, SleeperPlayer, SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
 import { readIdLink, readTeamLink } from "@/lib/team/links";
 
 import { useMember } from "@/lib/member/use-member";
@@ -169,6 +171,15 @@ const SPECS = {
     component: TeamWindow,
     defaultSize: { w: 640, h: 640 },
     link: readTeamLink,
+    drillOnly: true,
+  },
+  player: {
+    label: "Player",
+    title: (p) => playerTitle(settled<SleeperPlayer | null>(`player/${p.playerId}`)),
+    Icon: JerseyIcon,
+    component: PlayerWindow,
+    defaultSize: { w: 640, h: 680 },
+    link: readPlayerLink,
     drillOnly: true,
   },
   folder: {

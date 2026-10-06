@@ -147,3 +147,41 @@ export interface SleeperNflState {
   season_type: string;
   leg: number;
 }
+
+// api.sleeper.com/players/nfl/<id>: one player, fresher than Xomper's nightly
+// list. A defense's id is its team code. Height is inches as a string.
+export interface SleeperPlayer {
+  player_id: string;
+  first_name: string;
+  last_name: string;
+  position: string | null;
+  team: string | null;
+  number?: number | null;
+  age?: number | null;
+  height?: string | null;
+  weight?: string | null;
+  college?: string | null;
+  years_exp?: number | null;
+  status?: string | null;
+  injury_status?: string | null;
+  injury_body_part?: string | null;
+  depth_chart_position?: string | null;
+  depth_chart_order?: number | null;
+}
+
+// One week of api.sleeper.com/stats/nfl/player/<id>. Keys are Sleeper's stat
+// names (pass_yd, rec, fgm, ...); a week not yet played, a bye or a game the
+// player missed is null.
+export interface SleeperWeekStats {
+  week: number;
+  team: string;
+  opponent: string;
+  stats: Record<string, number>;
+}
+
+export interface SleeperGame {
+  week: number;
+  home: string;
+  away: string;
+  status: "pre_game" | "in_game" | "complete" | "canceled" | string;
+}

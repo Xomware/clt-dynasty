@@ -3,13 +3,16 @@ import type {
   SleeperBracketMatch,
   SleeperDraft,
   SleeperDraftPick,
+  SleeperGame,
   SleeperLeague,
   SleeperMatchup,
   SleeperNflState,
+  SleeperPlayer,
   SleeperRoster,
   SleeperTradedPick,
   SleeperTransaction,
   SleeperUser,
+  SleeperWeekStats,
 } from "./types";
 
 export const SLEEPER_BASE = "https://api.sleeper.app/v1";
@@ -24,8 +27,12 @@ export class SleeperError extends Error {
   }
 }
 
-async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${SLEEPER_BASE}${path}`);
+// Sleeper's own site reads players, stats and the schedule from here; the
+// documented v1 API has none of them. Both send CORS headers for any origin.
+export const SLEEPER_WEB = "https://api.sleeper.com";
+
+async function get<T>(path: string, base = SLEEPER_BASE): Promise<T> {
+  const res = await fetch(`${base}${path}`);
   if (!res.ok) throw new SleeperError(res.status, path);
   return (await res.json()) as T;
 }
@@ -45,3 +52,9 @@ export const getNflState = () => get<SleeperNflState>("/state/nfl");
 // Sleeper answers an unknown name or id with a 200 and `null`.
 export const getAccount = (nameOrId: string) => get<SleeperAccount | null>(`/user/${encodeURIComponent(nameOrId)}`);
 export const getUserLeagues = (userId: string, season: string) => get<SleeperLeague[]>(`/user/${userId}/leagues/nfl/${season}`);
+
+// An unknown id is a 200 and `null`.
+export const getPlayer = (id: string) => get<SleeperPlayer | null>(`/players/nfl/${id}`, SLEEPER_WEB);
+export const getPlayerStats = (id: string, season: string) =>
+  get<Record<string, SleeperWeekStats | null>>(`/stats/nfl/player/${id}?season_type=regular&season=${season}&grouping=week`, SLEEPER_WEB);
+export const getSchedule = (season: string) => get<SleeperGame[]>(`/schedule/nfl/regular/${season}`, SLEEPER_WEB);
