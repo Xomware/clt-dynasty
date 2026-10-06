@@ -40,7 +40,10 @@ export function PhoneShell() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  useEffect(() => window.scrollTo(0, 0), [stack.length]);
+  // A block body: Chromium's scrollTo returns a promise, and an effect must not return one.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [stack.length]);
 
   const open = useCallback((link: WindowLink) => {
     setStack((s) => {
