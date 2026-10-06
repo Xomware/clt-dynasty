@@ -250,6 +250,17 @@ export function MembersIcon(props: IconProps) {
   );
 }
 
+// Admin AI Review: the report tray under a gold commissioner's shield.
+export function AdminReportIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="1.5" y="3.5" width="9" height="11" className="fill-(--xp-cream) stroke-(--xp-text)" />
+      <path d="M3.5 6.5h5M3.5 8.5h5M3.5 10.5h3" className="stroke-(--xp-face-shadow)" />
+      <path d="M11.5 1.5l3.5 1.5v3c0 2.5-1.5 4-3.5 5-2-1-3.5-2.5-3.5-5v-3z" className="fill-(--xp-gold) stroke-(--xp-text)" />
+    </Icon>
+  );
+}
+
 export function TradeIcon(props: IconProps) {
   return (
     <Icon {...props}>
