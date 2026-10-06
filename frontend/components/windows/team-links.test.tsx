@@ -5,7 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("aws-amplify/auth", () => ({
   fetchAuthSession: vi.fn(async () => ({ tokens: { idToken: { toString: () => "id-token" } } })),
 }));
-vi.mock("@/lib/api/clt", () => ({
+vi.mock("@/lib/api/clt", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/clt")>()),
   getCltMe: vi.fn(async () => ({
     member: { email: "member@example.com", displayName: "Roster 4", role: "member", sleeperUserId: "" },
     linkedSleeperUserId: "u4",

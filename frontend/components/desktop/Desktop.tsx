@@ -26,7 +26,7 @@ export function Desktop() {
   // Before paint, so the default layout never flashes up first.
   useLayoutEffect(() => {
     const { innerWidth: vw, innerHeight: vh } = window;
-    const base = (owner && loadLayout(owner)) || defaultLayout();
+    const base = (owner && loadLayout(owner)) || defaultLayout(vw, vh);
     restored.current = openLinks(base, parseOpen(window.location.search), vw, vh);
     dispatch({ type: "restore", windows: restored.current });
   }, [owner, dispatch]);

@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { activeWindow, desktopReducer, historyOf, viewKey, type WindowParams, type WindowState } from "./windows";
+import {
+  activeWindow,
+  defaultLayout,
+  desktopReducer,
+  historyOf,
+  TASKBAR_HEIGHT,
+  viewKey,
+  type WindowParams,
+  type WindowState,
+} from "./windows";
 
 const size = { w: 400, h: 300 };
 
@@ -107,5 +116,31 @@ describe("window history", () => {
 
     expect(new Set(state.map((w) => w.id)).size).toBe(2);
     expect(activeWindow(state)?.kind).toBe("standings");
+  });
+});
+
+describe("defaultLayout", () => {
+  const overlaps = (a: WindowState, b: WindowState) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+
+  it.each([
+    [1280, 800],
+    [1440, 900],
+    [1920, 1080],
+  ])("tiles Home, Standings and Scores at %ix%i with Home in front and nothing overlapping", (vw, vh) => {
+    const state = defaultLayout(vw, vh);
+    expect(state.map((w) => w.kind)).toEqual(["standings", "scores", "home"]);
+    expect(activeWindow(state)?.kind).toBe("home");
+    for (const w of state) {
+      expect(w.x + w.w).toBeLessThanOrEqual(vw);
+      expect(w.y + w.h).toBeLessThanOrEqual(vh - TASKBAR_HEIGHT);
+      expect(w.w).toBeGreaterThanOrEqual(500);
+    }
+    expect(state.some((a) => state.some((b) => a !== b && overlaps(a, b)))).toBe(false);
+  });
+
+  it("opens Home alone on a smaller screen, sized to fit", () => {
+    const [home, ...rest] = defaultLayout(1024, 700);
+    expect(rest).toEqual([]);
+    expect(home).toMatchObject({ kind: "home", w: 760, h: 700 - TASKBAR_HEIGHT });
   });
 });
