@@ -102,6 +102,20 @@ describe("phone shell", () => {
     await waitFor(() => expect(screen.getByRole("navigation", { name: "Programs" })).toBeTruthy());
   });
 
+  // Chromium's scrollTo returns a promise now; an effect handing it back as its
+  // cleanup threw "destroy is not a function" on the next screen change.
+  it("survives a scrollTo that returns a promise", async () => {
+    vi.mocked(window.scrollTo).mockImplementation((() => Promise.resolve()) as typeof window.scrollTo);
+    const failed = vi.fn();
+    window.addEventListener("error", failed);
+    await renderPhone();
+    openStandings();
+    fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
+    expect(screen.getByRole("region", { name: "Team 6" })).toBeTruthy();
+    window.removeEventListener("error", failed);
+    expect(failed).not.toHaveBeenCalled();
+  });
+
   it("opens a deep link full-screen, and Back stays on the site", async () => {
     window.history.replaceState(null, "", "/?open=team:3");
     mount();
