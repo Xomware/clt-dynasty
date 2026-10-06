@@ -3,6 +3,7 @@
 import { Desktop } from "@/components/desktop/Desktop";
 import { XpCursor } from "@/components/desktop/XpCursor";
 import { PhoneShell } from "@/components/phone/PhoneShell";
+import { UptownPhone } from "@/components/uptown/UptownPhone";
 import { UptownShell } from "@/components/uptown/UptownShell";
 import { SignInGreeting } from "@/components/xp/SignInGreeting";
 import { Taskbar } from "@/components/xp/Taskbar";
@@ -16,7 +17,11 @@ export function AppShell() {
   return (
     <>
       {phone ? (
-        <PhoneShell />
+        theme === "uptown" ? (
+          <UptownPhone />
+        ) : (
+          <PhoneShell />
+        )
       ) : theme === "uptown" ? (
         <UptownShell />
       ) : (

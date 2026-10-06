@@ -165,6 +165,10 @@
   background: var(--xp-face);
 }
 
+.m-theme {
+  margin-bottom: 0.75rem;
+}
+
 /* A window opened on the phone fills the screen, title bar pinned under the notch. */
 .m-window {
   width: 100%;

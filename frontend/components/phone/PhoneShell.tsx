@@ -1,6 +1,7 @@
 "use client";
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { BackArrowIcon, CrownIcon, FolderIcon } from "@/components/xp/icons";
 import { SpeakerToggle } from "@/components/xp/SpeakerToggle";
 import { useAuth } from "@/lib/auth/use-auth";
@@ -32,6 +33,10 @@ export function PhoneShell() {
             <h1 className="m-bar-title">CLT Dynasty League</h1>
           </header>
           <Programs onOpen={open} />
+          <section className="m-account m-theme" aria-label="Theme">
+            <span>Theme</span>
+            <ThemeToggle />
+          </section>
           <section className="m-account" aria-label="Account">
             <span className="truncate">{name ? `Signed in as ${name}` : "Signed in"}</span>
             <button type="button" className="xp-log-off" onClick={() => void signOut()}>
