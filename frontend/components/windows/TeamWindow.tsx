@@ -6,6 +6,7 @@ import { useContext, useState } from "react";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
 import { StarIcon } from "@/components/xp/icons";
+import { TeamAvatar } from "@/components/xp/TeamAvatar";
 import { LEAGUE_ID } from "@/lib/config";
 import { DrillContext } from "@/lib/desktop/navigation";
 import type { WindowParams } from "@/lib/desktop/windows";
@@ -99,9 +100,7 @@ function TeamHead({ data: { league, users, rosters }, roster, isMine }: TeamHead
 
   return (
     <section aria-label={name} className="team-head">
-      <span className="team-avatar" aria-hidden>
-        {avatar ? <Image src={avatar} alt="" width={56} height={56} unoptimized className="size-full object-cover" /> : name.charAt(0).toUpperCase()}
-      </span>
+      <TeamAvatar name={name} url={avatar} size={56} className="team-avatar" />
       <div className="team-who">
         <h3 className="team-name">
           <span className="truncate">{name}</span>

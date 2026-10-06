@@ -14,7 +14,7 @@ interface DrawerNavProps {
 
 // The phone's menu: Home, then a section per group with its pages, then the account.
 export function DrawerNav({ current, onGo }: DrawerNavProps) {
-  const { pinned, groups } = useLauncherGroups();
+  const { pinned, groups, admin } = useLauncherGroups();
   const { state } = useMember();
   const { signOut } = useAuth();
   const name = state.status === "member" ? state.me.member.displayName : "";
@@ -44,6 +44,14 @@ export function DrawerNav({ current, onGo }: DrawerNavProps) {
       </nav>
       <section aria-label="Account" className="u-drawer-account">
         <p className="u-drawer-label">{name ? `Signed in as ${name}` : "Signed in"}</p>
+        {admin.length > 0 && (
+          <nav aria-labelledby="drawer-admin">
+            <h3 id="drawer-admin" className="u-drawer-label">
+              Admin
+            </h3>
+            <ul className="u-drawer-group">{admin.map((l) => row(l.kind, l.label))}</ul>
+          </nav>
+        )}
         <div className="u-drawer-theme">
           <span>Theme</span>
           <ThemeToggle />

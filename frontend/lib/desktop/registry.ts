@@ -55,7 +55,7 @@ import { readIdLink, readTeamLink } from "@/lib/team/links";
 
 import { useMember } from "@/lib/member/use-member";
 
-import { GROUPS, type GroupId, groupLabel, isGroup } from "./groups";
+import { ADMIN, GROUPS, type GroupId, groupLabel, isGroup } from "./groups";
 import type { WindowParams, WindowView } from "./windows";
 
 export interface WindowSpec {
@@ -229,12 +229,14 @@ export function useLaunchers() {
 export type Launcher = ReturnType<typeof useLaunchers>[number];
 
 // The launchers filed for the shell: ungrouped ones first, then each group
-// that has anything to show this member, in GROUPS order.
+// that has anything to show this member, in GROUPS order. `admin` is empty
+// for everyone but admins, and only the account menus list it.
 export function useLauncherGroups() {
   const launchers = useLaunchers();
   return {
     pinned: launchers.filter((l) => !l.group),
     groups: GROUPS.map((g) => ({ ...g, items: launchers.filter((l) => l.group === g.id) })).filter((g) => g.items.length > 0),
+    admin: launchers.filter((l) => l.group === ADMIN.id),
   };
 }
 

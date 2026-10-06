@@ -14,7 +14,7 @@ vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), 
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
-  useLeague: () => ({ data: null }),
+  useLeague: () => ({ data: null, myRosterId: null, teamFor: () => ({ name: "", avatarUrl: null }) }),
 }));
 
 import { AppShell } from "@/components/AppShell";
@@ -122,17 +122,21 @@ describe("Uptown phone", () => {
     expect(screen.getByRole("button", { name: "Menu" }).getAttribute("aria-expanded")).toBe("false");
   });
 
-  it("leaves the Admin section out for members", async () => {
+  it("leaves Admin out for members", async () => {
     await renderPhone();
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(drawer().queryByRole("region", { name: "Admin" })).toBeNull();
+    expect(drawer().queryByRole("navigation", { name: "Admin" })).toBeNull();
+    expect(drawer().queryByRole("button", { name: "Members" })).toBeNull();
   });
 
-  it("shows the Admin section to an admin", async () => {
+  it("files Admin under an admin's account, not the page groups", async () => {
     admin.on = true;
     await renderPhone();
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(drawer().getByRole("region", { name: "Admin" })).toBeTruthy();
+    expect(within(drawer().getByRole("navigation", { name: "Pages" })).queryByRole("button", { name: "Members" })).toBeNull();
+    const account = within(drawer().getByRole("region", { name: "Account" }));
+    fireEvent.click(within(account.getByRole("navigation", { name: "Admin" })).getByRole("button", { name: "Members" }));
+    expect(bar().textContent).toBe("Admin: Members");
   });
 
   it("searches from the bar", async () => {

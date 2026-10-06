@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 
 import { HexagonChart } from "@/components/analyzer/HexagonChart";
 import { DrillLink } from "@/components/xp/DrillLink";
+import { TeamName } from "@/components/xp/TeamName";
 import { LoadError } from "@/components/xp/LoadError";
 import { type Tab, Tabs } from "@/components/xp/Tabs";
 import { analyze, AXES, type AxisValues, leagueShape, standing, type TeamAnalysis } from "@/lib/analyzer/analysis";
@@ -241,8 +242,8 @@ function LeagueRanks({ teams, mine }: ViewProps) {
               <tr key={t.rosterId} data-mine={t.rosterId === mine || undefined}>
                 <td className="text-right tabular-nums">{i + 1}</td>
                 <td className="analyzer-team-col">
-                  <DrillLink to={teamLink(LEAGUE_ID, t.rosterId)}>
-                    <span className="truncate font-bold">{t.name}</span>
+                  <DrillLink to={teamLink(LEAGUE_ID, t.rosterId)} className="max-w-full">
+                    <TeamName name={t.name} avatarUrl={t.avatarUrl} />
                   </DrillLink>
                   {t.rosterId === mine && <span className="sr-only"> (your team)</span>}
                 </td>
@@ -313,8 +314,8 @@ function Trades({ teams, mine, rosters, players, values }: TradesProps) {
               <li key={`${t.partner.rosterId}:${t.give.id}:${t.receive.id}`} className="analyzer-trade">
                 <h3 className="analyzer-trade-head">
                   <span>With</span>
-                  <DrillLink to={teamLink(LEAGUE_ID, t.partner.rosterId)}>
-                    <span className="truncate font-bold">{t.partner.name}</span>
+                  <DrillLink to={teamLink(LEAGUE_ID, t.partner.rosterId)} className="min-w-0">
+                    <TeamName name={t.partner.name} avatarUrl={t.partner.avatarUrl} />
                   </DrillLink>
                 </h3>
                 <dl className="analyzer-trade-sides">

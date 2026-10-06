@@ -22,7 +22,8 @@ export interface SleeperUser {
   user_id: string;
   display_name: string;
   avatar: string | null;
-  metadata: { team_name?: string; [key: string]: unknown } | null;
+  // `avatar` here is the league team's own picture, a full URL.
+  metadata: { team_name?: string; avatar?: string; [key: string]: unknown } | null;
 }
 
 export interface SleeperRoster {
