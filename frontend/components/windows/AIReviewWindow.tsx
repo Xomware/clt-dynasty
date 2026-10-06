@@ -170,7 +170,7 @@ export const reportTitle = (p: WindowParams) => {
 };
 
 // The report's own first heading and paragraph, without markdown marks.
-function headline(r: AIReport): { title: string; excerpt: string } {
+export function headline(r: AIReport): { title: string; excerpt: string } {
   const blocks = r.body_markdown
     .split(/\n{2,}/)
     .map((b) => b.trim())

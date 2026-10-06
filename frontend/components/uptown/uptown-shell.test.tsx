@@ -13,6 +13,20 @@ vi.mock("@/lib/api/clt", () => ({
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
+// The hub's real cards fetch half the API; these tests are about the shell.
+vi.mock("./UptownHome", () => ({
+  UptownHome: ({ ref, phone }: { ref?: React.Ref<HTMLHeadingElement>; phone?: boolean }) => {
+    const Title = phone ? "h2" : "h1";
+    return (
+      <div>
+        <Title ref={ref} tabIndex={-1}>
+          The Queen City&rsquo;s dynasty league
+        </Title>
+        <p>home body</p>
+      </div>
+    );
+  },
+}));
 // The Home hero reads the league; these tests are about the shell.
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),

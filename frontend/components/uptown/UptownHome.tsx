@@ -1,67 +1,83 @@
 "use client";
 
-import { type Ref, useContext } from "react";
+import { type Ref, useState } from "react";
 
-import { DrillContext } from "@/lib/desktop/navigation";
-import { REGISTRY } from "@/lib/desktop/registry";
-import { leagueWeek, weekOf } from "@/lib/league/default-week";
-import { type LeagueData, useLeague } from "@/lib/league/use-league";
+import { HomeCard } from "@/components/home/HomeCard";
+import { LeaguePulse } from "@/components/home/LeaguePulse";
+import { MovesCard } from "@/components/home/MovesCard";
+import { ProposalsCard } from "@/components/home/ProposalsCard";
+import { TaxiCard } from "@/components/home/TaxiCard";
+import { Announcements, ThisWeek } from "@/components/windows/HomeWindow";
+import { leagueWeek } from "@/lib/league/default-week";
+import { useWeekGames } from "@/lib/league/use-week-games";
+import { useMember } from "@/lib/member/use-member";
+import { HomeHero } from "./home/HomeHero";
+import { CupRace, StandingsRace } from "./home/Races";
+import { Recaps } from "./home/Recaps";
 
+import "@/components/windows/home.css";
 import "./uptown-home.css";
-
-function kicker(data: LeagueData | null): string {
-  if (!data) return "Charlotte, NC";
-  const { league } = data;
-  if (league.status !== "in_season") return `${league.season} season`;
-  const week = leagueWeek(league, data.nfl);
-  return `Week ${week} of ${weekOf(league, week)} · ${league.season}`;
-}
-
-function lede(data: LeagueData | null): string {
-  if (!data) return "Standings, scores, drafts and rule proposals for the league.";
-  const { league, rosters } = data;
-  const teams = `${rosters.length} teams, superflex, full PPR.`;
-  if (league.status === "pre_draft" || league.status === "drafting") return `The ${league.season} season starts with the draft. ${teams}`;
-  if (league.status === "complete") return `The ${league.season} season is in the books. ${teams}`;
-  return `${teams} Here is where the week stands.`;
-}
 
 interface UptownHomeProps {
   ref?: Ref<HTMLHeadingElement>;
-  // The phone's bar holds the page's h1, so the hero title steps down to an h2.
   phone?: boolean;
 }
 
-// Home's own cards under an Uptown hero. The cards are the Home window's body,
-// so both themes show the same dashboard.
+// Uptown's hub: the member's team and this week's game up top, then the
+// races, the recaps, and the league's comings and goings. The cards are the
+// Home window's own where they exist, so XP and Uptown say the same things.
 export function UptownHome({ ref, phone = false }: UptownHomeProps) {
-  const { data } = useLeague();
-  const open = useContext(DrillContext);
-  const Title = phone ? "h2" : "h1";
-  const Cards = REGISTRY.home.component;
+  const [week, setWeek] = useState<number>();
+  const { data, games, error, teamFor, myRosterId } = useWeekGames(week);
+  const member = useMember().state;
+  const current = data ? leagueWeek(data.league, data.nfl) : undefined;
+  if (current !== undefined && week !== current && data?.league.status === "in_season") setWeek(current);
+  const inSeason = data?.league.status === "in_season";
+  const live = inSeason && week !== undefined && week >= (data?.nfl.week ?? 0);
+  const movesWeek = data ? (week ?? Math.max(1, data.nfl.leg)) : undefined;
+  const league = { teamFor, myRosterId };
 
   return (
     <div className="u-home">
-      <section aria-label="This week" className="u-hero">
-        <div className="u-hero-copy">
-          <p className="u-hero-kicker">{kicker(data)}</p>
-          <Title ref={ref} tabIndex={-1} className="u-hero-title">
-            The Queen City&rsquo;s <span>dynasty league</span>
-          </Title>
-          <p className="u-hero-lede">{lede(data)}</p>
-        </div>
-        {!phone && (
-          <div className="u-hero-ctas">
-            <button type="button" className="u-cta u-cta-go" onClick={() => open({ kind: "scores", params: {} })}>
-              This week&rsquo;s scores
-            </button>
-            <button type="button" className="u-cta" onClick={() => open({ kind: "standings", params: {} })}>
-              Standings
-            </button>
+      <HomeHero
+        data={data}
+        games={games}
+        week={week}
+        live={live}
+        memberLoading={member.status === "loading"}
+        headingRef={ref}
+        phone={phone}
+        {...league}
+      />
+      <div className="home u-hub">
+        <Announcements />
+        <div className="u-hub-grid">
+          <StandingsRace data={data} {...league} />
+          <div className="u-hub-side">
+            <HomeCard title={inSeason && week ? `Week ${week} matchups` : "This week"} more={{ to: { kind: "scores", params: {} }, label: "Scores" }}>
+              {error ? (
+                <p role="alert">Couldn&rsquo;t reach Sleeper ({error}).</p>
+              ) : !data || (inSeason && !games) ? (
+                <p role="status">Loading this week...</p>
+              ) : !inSeason ? (
+                <p>This week&rsquo;s matchups show here once games begin.</p>
+              ) : games && games.length > 0 ? (
+                <ThisWeek games={games} live={live} {...league} />
+              ) : (
+                <p>No matchups scheduled for Week {week}.</p>
+              )}
+            </HomeCard>
+            <CupRace data={data} {...league} />
           </div>
-        )}
-      </section>
-      <Cards params={{}} />
+        </div>
+        <Recaps />
+        <div className="u-hub-trio">
+          <MovesCard week={movesWeek} live={live} {...league} />
+          <ProposalsCard />
+          <TaxiCard {...league} />
+        </div>
+        <LeaguePulse data={data} week={week} error={error} />
+      </div>
     </div>
   );
 }
