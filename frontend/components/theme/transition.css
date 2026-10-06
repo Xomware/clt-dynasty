@@ -106,7 +106,7 @@
   inset: 0;
   background: linear-gradient(to top, var(--intro-ember), var(--clt-crown) 18%, #f3d79c 34%, var(--xp-sky-bottom) 62%, var(--xp-sky-top));
   animation:
-    tt-flood 420ms cubic-bezier(0.3, 0.6, 0.2, 1) both,
+    tt-flood 380ms cubic-bezier(0.3, 0.6, 0.2, 1) both,
     tt-hide 1ms linear 560ms forwards;
 }
 
@@ -115,7 +115,7 @@
   display: grid;
   grid-template-rows: 12% 1fr 12%;
   animation:
-    tt-fade-in 240ms ease-out 300ms both,
+    tt-fade-in 180ms ease-out 360ms both,
     tt-fade-out 400ms ease-in 1030ms forwards;
 }
 
