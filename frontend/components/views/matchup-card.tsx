@@ -20,11 +20,12 @@ interface MatchupCardProps {
   myRosterId: number | null;
   // A tag beside the game, like "Consolation".
   note?: string;
+  defaultOpen?: boolean;
 }
 
 // Two teams and their scores; opening it shows both lineups.
-export function MatchupCard({ game, leagueId, teamFor, myRosterId, note }: MatchupCardProps) {
-  const [open, setOpen] = useState(false);
+export function MatchupCard({ game, leagueId, teamFor, myRosterId, note, defaultOpen = false }: MatchupCardProps) {
+  const [open, setOpen] = useState(defaultOpen);
   const lineups = useId();
   const top = Math.max(...game.sides.map((s) => s.points));
   const scored = top > 0;
