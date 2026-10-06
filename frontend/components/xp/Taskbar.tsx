@@ -7,7 +7,8 @@ import { useDesktop } from "@/lib/desktop/desktop-context";
 import { REGISTRY, useWindowTitle } from "@/lib/desktop/registry";
 import { defaultLayout } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
-import { CrownIcon } from "./icons";
+import { useTheme } from "@/lib/theme/theme";
+import { CrownIcon, UptownIcon } from "./icons";
 import { SpeakerToggle } from "./SpeakerToggle";
 import { StartMenu } from "./StartMenu";
 
@@ -38,6 +39,7 @@ export function Taskbar() {
   const time = useSyncExternalStore(subscribeToClock, readClock, readServerClock);
   const name = (state.status === "member" && state.me.member.displayName) || "CLT Dynasty League";
   const title = useWindowTitle();
+  const { setTheme, switching } = useTheme();
 
   useEffect(() => {
     if (!open) return;
@@ -71,6 +73,10 @@ export function Taskbar() {
           onReset={() => {
             setOpen(false);
             dispatch({ type: "restore", windows: defaultLayout(window.innerWidth, window.innerHeight) });
+          }}
+          onUptown={() => {
+            setOpen(false);
+            setTheme("uptown");
           }}
           onSignOut={() => void signOut()}
         />
@@ -110,6 +116,16 @@ export function Taskbar() {
           })}
         </ul>
         <div className="xp-tray">
+          <button
+            type="button"
+            className="xp-tray-button"
+            aria-label="Switch to the Uptown theme"
+            title="Uptown theme"
+            disabled={switching}
+            onClick={() => setTheme("uptown")}
+          >
+            <UptownIcon width={18} height={18} />
+          </button>
           <SpeakerToggle />
           <time>{time}</time>
         </div>

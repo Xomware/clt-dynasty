@@ -44,6 +44,18 @@ export function HomeIcon(props: IconProps) {
   );
 }
 
+// The Uptown theme: the skyline at night, its tallest tower crowned gold.
+export function UptownIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="0.5" y="0.5" width="15" height="15" rx="2" className="fill-(--clt-navy) stroke-(--clt-navy-dark)" />
+      <path d="M2 14.5V9h3v5.5zM6 14.5V4.5L7.5 3 9 4.5v10zM10 14.5V7h3.5v7.5z" className="fill-(--clt-teal) stroke-(--clt-navy-dark) stroke-[0.5]" />
+      <path d="M6.5 3.5h2" className="stroke-(--clt-crown)" />
+      <path d="M3 10.5h1M7 6.5h1M7 9h1M7 11.5h1M11 8.5h1M11 11h1" className="stroke-(--clt-crown)" />
+    </Icon>
+  );
+}
+
 export function DesktopIcon(props: IconProps) {
   return (
     <Icon {...props}>

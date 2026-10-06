@@ -4,7 +4,7 @@ import { createContext, type ReactNode, useCallback, useContext, useLayoutEffect
 import { flushSync } from "react-dom";
 
 import { ThemeTransition, TIMING } from "@/components/theme/ThemeTransition";
-import { isTheme, type Theme, THEME_KEY, UPTOWN_CHROME } from "./script";
+import { isTheme, type Theme, THEME_KEY, UPTOWN_CHROME, UPTOWN_FONTS } from "./script";
 
 export type { Theme } from "./script";
 
@@ -124,6 +124,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext value={{ theme, setTheme, switching: playing !== null }}>
+      {theme === "uptown" && <link rel="stylesheet" href={UPTOWN_FONTS} precedence="default" />}
       {children}
       {playing && <ThemeTransition to={playing} />}
       <p role="status" className="sr-only">
