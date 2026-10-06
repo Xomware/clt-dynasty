@@ -5,7 +5,7 @@ import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { CrownIcon } from "@/components/xp/icons";
 import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
-import type { GroupId } from "@/lib/desktop/groups";
+import { ADMIN, type GroupId } from "@/lib/desktop/groups";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY, useLauncherGroups, useWindowTitle } from "@/lib/desktop/registry";
 import { patchParams, viewKey, windowId, type WindowParams } from "@/lib/desktop/windows";
@@ -35,13 +35,16 @@ export function UptownShell() {
     return { view, group: groupOf(view, null) };
   });
   const [searching, setSearching] = useState(false);
-  const { groups } = useLauncherGroups();
+  const { groups, admin } = useLauncherGroups();
   const windowTitle = useWindowTitle();
   const heading = useRef<HTMLHeadingElement>(null);
   const id = windowId(view.kind, view.params);
   const title = windowTitle(view);
   const Page = OVERRIDES[view.kind] ?? REGISTRY[view.kind].component;
-  const pages = groups.find((g) => g.id === group)?.items ?? [];
+  // Admin pages get their group's sub-nav too, though the main nav leaves them out.
+  const sections = [...groups, { ...ADMIN, items: admin }];
+  const section = sections.find((g) => g.id === group);
+  const pages = section?.items ?? [];
 
   // The clicked link went with the old page, so the new title takes focus. A
   // tab switch stays on the page, so it is keyed without the tab.
@@ -126,7 +129,7 @@ export function UptownShell() {
         <AccountMenu onNav={onNav} />
       </header>
       {pages.length > 0 && (
-        <nav aria-label={`${groups.find((g) => g.id === group)?.label} pages`} className="u-subnav">
+        <nav aria-label={`${section?.label} pages`} className="u-subnav">
           {pages.map((p) => {
             const to = { kind: p.kind, params: {} };
             return (

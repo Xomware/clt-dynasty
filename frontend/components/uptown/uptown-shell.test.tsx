@@ -15,7 +15,7 @@ vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }))
 // The Home hero reads the league; these tests are about the shell.
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
-  useLeague: () => ({ data: null }),
+  useLeague: () => ({ data: null, myRosterId: null, teamFor: () => ({ name: "", avatarUrl: null }) }),
 }));
 
 import { AppShell } from "@/components/AppShell";
@@ -127,10 +127,23 @@ describe("UptownShell", () => {
     expect(nav("Main")).toBeTruthy();
   });
 
-  it("offers the Admin group only to admins", async () => {
+  it("keeps Admin out of the header and in an admin's account menu", async () => {
     admin.on = true;
     await renderShell();
-    expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["League", "Admin"]);
+    expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["League"]);
+    fireEvent.click(screen.getByRole("button", { name: "Roster 4, account menu" }));
+    fireEvent.click(within(screen.getByRole("list", { name: "Admin" })).getByRole("link", { name: "Members" }));
+
+    expect(title().textContent).toBe("Admin: Members");
+    expect(window.location.search).toBe("?open=members");
+    expect(nav("Admin pages").getAllByRole("link").map((a) => a.textContent)).toEqual(["Members"]);
+  });
+
+  it("gives a member no Admin in the account menu", async () => {
+    await renderShell();
+    fireEvent.click(screen.getByRole("button", { name: "Roster 4, account menu" }));
+    expect(screen.queryByRole("list", { name: "Admin" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Members" })).toBeNull();
   });
 
   it("puts the member's pages, the theme and sign-out in the account menu", async () => {

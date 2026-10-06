@@ -293,7 +293,22 @@
   text-transform: uppercase;
 }
 
-.u-account-menu li:last-child {
+.u-account-label {
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.75rem 0;
+  border-top: 1px solid var(--u-line);
+  color: var(--u-label);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.u-account-label + ul {
+  margin-top: 0.25rem;
+}
+
+.u-account-foot li:last-child {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--u-line);
