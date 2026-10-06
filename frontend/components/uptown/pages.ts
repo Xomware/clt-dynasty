@@ -10,6 +10,7 @@ export const ABOUT: Partial<Record<WindowKind, string>> = {
   scores: "Every matchup, live on game days, with full lineups.",
   playoffs: "The six-team bracket, projected all season.",
   "world-cup": "The league inside the league: divisional games only.",
+  "nfl-teams": "All 32 NFL teams, their depth charts and who owns each player.",
   rules: "The rulebook, scoring, league settings and payouts.",
   history: "Champions, season finishes and head-to-head records.",
   "matchup-history": "Every past week's matchups, with full lineups.",

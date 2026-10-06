@@ -12,6 +12,7 @@ import { HomeWindow } from "@/components/windows/HomeWindow";
 import { LeagueWindow } from "@/components/windows/LeagueWindow";
 import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow";
 import { MembersWindow } from "@/components/windows/MembersWindow";
+import { NflTeamsWindow, NflTeamWindow, nflTitle, readNflLink } from "@/components/windows/NflTeamWindow";
 import { PlayerWindow, playerTitle, readPlayerLink } from "@/components/windows/PlayerWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
@@ -34,6 +35,7 @@ import {
   ControlPanelIcon,
   DraftBoardIcon,
   FolderIcon,
+  FootballIcon,
   HomeIcon,
   JerseyIcon,
   MembersIcon,
@@ -138,6 +140,7 @@ const SPECS = {
     link: readReportLink,
     drillOnly: true,
   },
+  "nfl-teams": { group: "league", label: "NFL Teams", title: "NFL Teams", Icon: FootballIcon, component: NflTeamsWindow, defaultSize: { w: 680, h: 640 } },
   rules: { group: "league", label: "Rules", title: "League Rules", Icon: NewspaperIcon, component: RulesWindow, defaultSize: { w: 600, h: 600 } },
   "my-team": { group: "mine", label: "My Team", title: "My Team", Icon: StarIcon, component: MyTeamWindow, defaultSize: { w: 640, h: 640 } },
   profile: {
@@ -180,6 +183,15 @@ const SPECS = {
     component: PlayerWindow,
     defaultSize: { w: 640, h: 680 },
     link: readPlayerLink,
+    drillOnly: true,
+  },
+  nfl: {
+    label: "NFL Team",
+    title: nflTitle,
+    Icon: FootballIcon,
+    component: NflTeamWindow,
+    defaultSize: { w: 600, h: 680 },
+    link: readNflLink,
     drillOnly: true,
   },
   folder: {

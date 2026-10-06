@@ -17,18 +17,6 @@
   font-size: 0.8125rem;
 }
 
-.player-team {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.player-logo {
-  width: 1.25rem;
-  height: 1.25rem;
-  object-fit: contain;
-}
-
 /* team-stats grows along a row; in this column it would grow tall. */
 .player-bio {
   flex: none;

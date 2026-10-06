@@ -24,3 +24,16 @@
   border-color: var(--u-edge);
   border-radius: 999px;
 }
+
+.xp-nfl {
+  align-items: center;
+  gap: 0.25rem;
+  vertical-align: middle;
+}
+
+.xp-nfl-logo {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+}

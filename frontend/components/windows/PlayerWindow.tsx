@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
-
 import { LoadError } from "@/components/xp/LoadError";
+import { NflTeamLink } from "@/components/xp/NflTeamLink";
 import { PlayerFace } from "@/components/xp/PlayerFace";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { LEAGUE_ID } from "@/lib/config";
@@ -10,7 +9,6 @@ import type { WindowParams } from "@/lib/desktop/windows";
 import { leagueMatchups, nflSchedule, nflState, player as getPlayer, playerStats } from "@/lib/league/cache";
 import { defaultWeek, leagueWeek } from "@/lib/league/default-week";
 import { teamOf } from "@/lib/league/use-league";
-import { nflLogo, nflTeam, nflTeamName } from "@/lib/nfl/teams";
 import { byeWeek, type FantasyWeek, fantasyWeek, heightLabel, type NflGame, nflGame, rosterSpot, statLine } from "@/lib/player/season";
 import { rosterOf } from "@/lib/sleeper/rosters";
 import type { SleeperGame, SleeperPlayer, SleeperWeekStats } from "@/lib/sleeper/types";
@@ -91,7 +89,6 @@ export function PlayerWindow({ params }: { params: WindowParams }) {
 }
 
 function PlayerHead({ player }: { player: SleeperPlayer }) {
-  const team = nflTeam(player.team ?? undefined);
   const injury = injuryTag({ player_id: player.player_id, injury_status: player.injury_status ?? undefined });
   const injuryText = [player.injury_status, player.injury_body_part].filter(Boolean).join(", ");
   return (
@@ -110,14 +107,7 @@ function PlayerHead({ player }: { player: SleeperPlayer }) {
         <p className="player-sub">
           {player.number ? <span>#{player.number}</span> : null}
           {player.position && <span className="font-bold">{player.position}</span>}
-          {team ? (
-            <span className="player-team">
-              <Image src={nflLogo(team.abbr)} alt="" width={20} height={20} unoptimized className="player-logo" />
-              {nflTeamName(team)}
-            </span>
-          ) : (
-            <span>Free agent</span>
-          )}
+          {player.team ? <NflTeamLink team={player.team} long /> : <span>Free agent</span>}
         </p>
       </div>
     </section>

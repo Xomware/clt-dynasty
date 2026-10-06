@@ -6,7 +6,7 @@ import { useState } from "react";
 import { headshot } from "@/lib/nfl/teams";
 import { SilhouetteIcon } from "./icons";
 
-import "./player-face.css";
+import "./players.css";
 
 interface PlayerFaceProps {
   id: string;
