@@ -1,0 +1,225 @@
+/* Delays are milliseconds from mount, against TIMING in ThemeTransition.tsx:
+   to Uptown the screen is covered at 640 and the overlay goes at 1500; to XP,
+   covered at 540 and gone at 1450. Every keyframe holds its last frame, so a
+   dropped frame shows the cover, never the page mid-swap. Above the balloons,
+   dialogs and menus, below the first-load intro. */
+.theme-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  overflow: hidden;
+  contain: layout paint;
+  cursor: progress;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-transition > *,
+.tt-welcome > * {
+  position: absolute;
+}
+
+/* XP to Uptown */
+
+.tt-grey {
+  inset: 0;
+  background: rgb(7 15 34 / 0.18);
+  -webkit-backdrop-filter: grayscale(1) brightness(0.85);
+  backdrop-filter: grayscale(1) brightness(0.85);
+  animation:
+    tt-fade-in 240ms ease-out both,
+    tt-hide 1ms linear 660ms forwards;
+}
+
+.tt-sky {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 30% at 50% 100%, var(--intro-ember), transparent 70%),
+    linear-gradient(var(--intro-night), var(--intro-sky-top) 30%, var(--intro-sky-mid) 62%, var(--intro-dusk) 88%, var(--intro-ember));
+  /* The gold horizon leads the night down, and trails it back up. */
+  box-shadow:
+    0 2px 0 var(--clt-crown),
+    0 0 48px 10px rgb(227 178 60 / 0.45);
+  animation:
+    tt-drop 500ms cubic-bezier(0.65, 0, 0.25, 1) 140ms both,
+    tt-lift 420ms cubic-bezier(0.55, 0, 0.2, 1) 1060ms forwards;
+}
+
+.tt-city {
+  /* The intro's skyline unit, a little lower so the mark has the sky. */
+  --u: max(calc(100vw / 2400), calc(36dvh / 500));
+
+  bottom: 0;
+  left: 50%;
+  width: calc(var(--u) * 2400);
+  height: calc(var(--u) * 500);
+  transform: translateX(-50%);
+  animation:
+    tt-rise 480ms cubic-bezier(0.2, 0.7, 0.2, 1) 300ms both,
+    tt-sink 400ms cubic-bezier(0.5, 0, 0.75, 0) 1060ms forwards;
+}
+
+.theme-transition .intro-lights-far {
+  animation-delay: 700ms;
+}
+
+.theme-transition :is(.intro-rods, .intro-tower-glow) {
+  animation-delay: 850ms;
+}
+
+.tt-mark {
+  top: 34%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--intro-text);
+  transform: translate(-50%, -50%);
+  animation:
+    tt-pop 300ms cubic-bezier(0.2, 0.8, 0.3, 1.25) 620ms both,
+    tt-fade-out 160ms ease-in 1000ms forwards;
+}
+
+.tt-crown {
+  width: clamp(5rem, 16vmin, 9rem);
+  height: clamp(5rem, 16vmin, 9rem);
+  filter: drop-shadow(0 0 18px rgb(227 178 60 / 0.55));
+}
+
+.tt-kicker {
+  color: var(--clt-crown);
+  font: bold 0.8125rem var(--xp-title-font);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.tt-word {
+  font: italic bold clamp(2.25rem, 7vmin, 3.75rem) / 1 var(--xp-title-font);
+  text-shadow: 0 2px 12px rgb(7 15 34 / 0.8);
+}
+
+/* Uptown to XP */
+
+/* Fixed to the screen and revealed upward, so the ember stays on the horizon
+   and the blue only reaches the top at the end. */
+.tt-dawn {
+  inset: 0;
+  background: linear-gradient(to top, var(--intro-ember), var(--clt-crown) 18%, #f3d79c 34%, var(--xp-sky-bottom) 62%, var(--xp-sky-top));
+  animation:
+    tt-flood 380ms cubic-bezier(0.3, 0.6, 0.2, 1) both,
+    tt-hide 1ms linear 560ms forwards;
+}
+
+.tt-welcome {
+  inset: 0;
+  display: grid;
+  grid-template-rows: 12% 1fr 12%;
+  animation:
+    tt-fade-in 180ms ease-out 360ms both,
+    tt-fade-out 400ms ease-in 1030ms forwards;
+}
+
+.tt-welcome > * {
+  position: static;
+}
+
+.tt-band {
+  background: var(--xp-logon-top);
+  box-shadow: inset 0 -2px 0 var(--xp-logon-rule);
+}
+
+.tt-band-foot {
+  box-shadow: inset 0 2px 0 var(--xp-logon-rule);
+}
+
+.tt-welcome-body {
+  display: grid;
+  align-items: center;
+  padding-left: 22%;
+  background: radial-gradient(ellipse 60% 70% at 20% 30%, var(--xp-title-light), transparent 70%), var(--xp-logon);
+}
+
+.tt-welcome-word {
+  color: var(--xp-text-inverse);
+  font: italic bold clamp(2.75rem, 9vmin, 5rem) / 1 var(--xp-title-font);
+  text-shadow: 2px 3px 4px var(--xp-logon-top);
+  animation: tt-welcome-word 560ms cubic-bezier(0.2, 0.7, 0.2, 1) 440ms both;
+}
+
+/* Reduced motion swaps through a short View Transitions crossfade instead. */
+html.theme-fade::view-transition-old(root),
+html.theme-fade::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+
+@keyframes tt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes tt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes tt-hide {
+  to {
+    visibility: hidden;
+  }
+}
+
+@keyframes tt-drop {
+  from {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes tt-lift {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(calc(-100% - 60px));
+  }
+}
+
+@keyframes tt-rise {
+  from {
+    transform: translate(-50%, 100%);
+  }
+}
+
+@keyframes tt-sink {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translate(-50%, 105%);
+  }
+}
+
+@keyframes tt-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+}
+
+@keyframes tt-flood {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes tt-welcome-word {
+  from {
+    opacity: 0;
+    letter-spacing: 0.3em;
+    transform: translateX(-1.5rem);
+  }
+}
