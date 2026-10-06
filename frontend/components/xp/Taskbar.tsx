@@ -28,6 +28,7 @@ function readServerClock() {
 
 export function Taskbar() {
   const [open, setOpen] = useState(false);
+  const [byKeyboard, setByKeyboard] = useState(false);
   const { signOut } = useAuth();
   const { state } = useMember();
   const { windows, active, dispatch, open: openWindow } = useDesktop();
@@ -62,6 +63,7 @@ export function Taskbar() {
         <StartMenu
           id={menuId}
           name={name}
+          autoFocus={byKeyboard}
           onOpen={(kind) => {
             setOpen(false);
             openWindow(kind);
@@ -80,7 +82,10 @@ export function Taskbar() {
           className="xp-start"
           aria-expanded={open}
           aria-controls={open ? menuId : undefined}
-          onClick={() => setOpen((o) => !o)}
+          onClick={(e) => {
+            setByKeyboard(e.detail === 0);
+            setOpen((o) => !o);
+          }}
         >
           <CrownIcon width={22} height={22} />
           start

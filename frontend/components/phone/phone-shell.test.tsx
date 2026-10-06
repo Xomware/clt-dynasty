@@ -41,6 +41,10 @@ const renderPhone = async () => {
 };
 
 const programs = () => within(screen.getByRole("navigation", { name: "Programs" }));
+const openStandings = () => {
+  fireEvent.click(programs().getByRole("button", { name: /^League/ }));
+  fireEvent.click(within(screen.getByRole("region", { name: "League" })).getByRole("button", { name: "Standings" }));
+};
 
 beforeEach(() => {
   phone(true);
@@ -53,28 +57,33 @@ afterEach(() => {
 });
 
 describe("phone shell", () => {
-  it("lists the programs instead of the desktop, without drill-only windows", async () => {
+  it("lists Home and the groups instead of the desktop, without drill-only windows", async () => {
     await renderPhone();
-    expect(programs().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "Standings", "Broken"]);
+    expect(programs().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "LeagueStandings, Broken"]);
     expect(screen.queryByRole("list", { name: "Desktop" })).toBeNull();
   });
 
-  it("opens a program full-screen as a history entry, and Back closes it", async () => {
+  it("opens a group, then a program from it, each as a history entry Back closes", async () => {
     await renderPhone();
-    fireEvent.click(programs().getByRole("button", { name: "Standings" }));
+    fireEvent.click(programs().getByRole("button", { name: /^League/ }));
+    const folder = screen.getByRole("region", { name: "League" });
+    expect(window.location.search).toBe("?open=folder:league");
 
+    fireEvent.click(within(folder).getByRole("button", { name: "Standings" }));
     const win = screen.getByRole("region", { name: "League Standings" });
     expect(screen.queryByRole("navigation", { name: "Programs" })).toBeNull();
     expect(window.location.search).toBe("?open=standings");
 
     fireEvent.click(within(win).getByRole("button", { name: "Back" }));
+    expect(await screen.findByRole("region", { name: "League" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Back" }));
     await waitFor(() => expect(screen.getByRole("navigation", { name: "Programs" })).toBeTruthy());
     expect(window.location.search).toBe("");
   });
 
   it("drills into a new screen and backs out one step at a time", async () => {
     await renderPhone();
-    fireEvent.click(programs().getByRole("button", { name: "Standings" }));
+    openStandings();
     fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
 
     expect(screen.getByRole("region", { name: "Team 6" })).toBeTruthy();
@@ -86,7 +95,7 @@ describe("phone shell", () => {
 
   it("goes straight home from Start", async () => {
     await renderPhone();
-    fireEvent.click(programs().getByRole("button", { name: "Standings" }));
+    openStandings();
     fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
 
     fireEvent.click(screen.getByRole("button", { name: /start/i }));
