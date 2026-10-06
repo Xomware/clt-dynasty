@@ -232,7 +232,7 @@ function LiveTab() {
 }
 
 // Every finished draft in the league's history, newest first.
-const pastDrafts = sharedResource(async () => {
+export const pastDrafts = sharedResource(async () => {
   const chain = await leagueChain();
   const seasons = await Promise.all(
     chain.map(async (l) => {
