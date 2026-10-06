@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 
 import { DrillLink } from "@/components/xp/DrillLink";
+import { PlayerFace } from "@/components/xp/PlayerFace";
 import { LoadError } from "@/components/xp/LoadError";
 import { StarIcon } from "@/components/xp/icons";
 import { LEAGUE_ID } from "@/lib/config";
@@ -225,7 +226,7 @@ function PlayerCell({ id, player }: { id: string; player: Player | undefined }) 
   const meta = [player?.position, player?.team ?? "FA"].filter(Boolean).join(" · ");
   return (
     <span className="team-player">
-      <PlayerFace id={id} player={player} />
+      <PlayerFace id={id} position={player?.position} />
       <span className="min-w-0">
         <span className="team-player-name">{playerName(player, id)}</span>
         {player && <span className="team-player-meta">{meta}</span>}
@@ -235,19 +236,6 @@ function PlayerCell({ id, player }: { id: string; player: Player | undefined }) 
           {injury}
         </span>
       )}
-    </span>
-  );
-}
-
-function PlayerFace({ id, player }: { id: string; player: Player | undefined }) {
-  const [failed, setFailed] = useState(false);
-  const src =
-    player?.position === "DEF"
-      ? `https://sleepercdn.com/images/team_logos/nfl/${id.toLowerCase()}.png`
-      : `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
-  return (
-    <span className="team-face" aria-hidden>
-      {!failed && <Image src={src} alt="" width={32} height={32} unoptimized loading="lazy" className="size-full object-cover" onError={() => setFailed(true)} />}
     </span>
   );
 }

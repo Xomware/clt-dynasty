@@ -159,6 +159,26 @@ export function ProfileIcon(props: IconProps) {
   );
 }
 
+// A player: a jersey with a number on it.
+export function JerseyIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5.5 1.5 1.5 4l1.5 3 1.5-.75V14.5h7V6.25L13 7l1.5-3-4-2.5a2.5 2.5 0 0 1-5 0z" className="fill-(--xp-select) stroke-(--clt-navy)" strokeLinejoin="round" />
+      <path d="M7 7.5h2v4.5" className="fill-none stroke-(--xp-cream) stroke-[1.25]" />
+    </Icon>
+  );
+}
+
+// The silhouette a player without a headshot gets.
+export function SilhouetteIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="8" cy="6" r="3" className="fill-(--xp-face-shadow)" />
+      <path d="M2 16c0-3.5 2.75-5.5 6-5.5s6 2 6 5.5z" className="fill-(--xp-face-shadow)" />
+    </Icon>
+  );
+}
+
 // XP's Control Panel: a window with two slider tracks.
 export function ControlPanelIcon(props: IconProps) {
   return (

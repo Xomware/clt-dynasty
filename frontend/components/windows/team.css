@@ -108,16 +108,6 @@
   font-size: 0.75rem;
 }
 
-.team-face {
-  flex: none;
-  width: 2rem;
-  height: 2rem;
-  overflow: hidden;
-  border: 1px solid var(--xp-face-shadow);
-  border-radius: 3px;
-  background: var(--xp-face);
-}
-
 .team-injury {
   margin-left: auto;
   color: var(--xp-red);

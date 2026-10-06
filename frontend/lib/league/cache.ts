@@ -6,7 +6,10 @@ import {
   getLeague,
   getMatchups,
   getNflState,
+  getPlayer,
+  getPlayerStats,
   getRosters,
+  getSchedule,
   getTradedPicks,
   getTransactions,
   getUserLeagues,
@@ -92,6 +95,11 @@ export function leagueMatchups(week: number, live: boolean, fresh = false, id = 
 // A finished week's moves are settled; the live week's waivers and adds keep landing.
 export const transactions = (week: number, live: boolean) =>
   cached(`transactions/${LEAGUE_ID}/${week}`, () => getTransactions(LEAGUE_ID, week), live ? LIVE_TTL : Infinity);
+
+// Injuries, depth charts and stat lines move during the week; five minutes is fresh enough for a profile.
+export const player = (id: string) => cached(`player/${id}`, () => getPlayer(id), NFL_TTL);
+export const playerStats = (id: string, season: string) => cached(`stats/${season}/${id}`, () => getPlayerStats(id, season), NFL_TTL);
+export const nflSchedule = (season: string) => cached(`schedule/${season}`, () => getSchedule(season), NFL_TTL);
 
 export function clearLeagueCache() {
   entries.clear();
