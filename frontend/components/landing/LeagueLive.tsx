@@ -39,7 +39,7 @@ export function LeagueLive() {
   );
 }
 
-function Status({ overview: o }: { overview: Overview }) {
+export function Status({ overview: o }: { overview: Overview }) {
   const reigning = o.champions[0];
   return (
     <div aria-live="polite">
@@ -76,7 +76,7 @@ function Status({ overview: o }: { overview: Overview }) {
   );
 }
 
-function Champions({ overview: o }: { overview: Overview }) {
+export function Champions({ overview: o }: { overview: Overview }) {
   if (o.champions.length === 0) return <p>No season has finished yet. The first banner is still up for grabs.</p>;
   return (
     <ol className="landing-champions" aria-label="Champions by season">
@@ -93,7 +93,7 @@ function Champions({ overview: o }: { overview: Overview }) {
   );
 }
 
-function Seeds({ overview: o }: { overview: Overview }) {
+export function Seeds({ overview: o }: { overview: Overview }) {
   if (!o.seeds) return <p>The playoff picture fills in once week 1 is played.</p>;
   return (
     <>
@@ -135,7 +135,7 @@ function Seeds({ overview: o }: { overview: Overview }) {
   );
 }
 
-function Skeleton({ label, rows }: { label: string; rows: number }) {
+export function Skeleton({ label, rows }: { label: string; rows: number }) {
   return (
     <div role="status" aria-label={label} className="landing-skeleton">
       {Array.from({ length: rows }, (_, i) => (

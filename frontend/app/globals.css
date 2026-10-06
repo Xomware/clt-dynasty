@@ -1054,3 +1054,8 @@
     outline-offset: -4px;
   }
 }
+
+/* A stored Uptown theme is on <html> before any shell loads, so the loader matches it. */
+[data-theme="uptown"] .brand-loader-page {
+  background: linear-gradient(#070f22, #0a1838 55%, #122b55);
+}

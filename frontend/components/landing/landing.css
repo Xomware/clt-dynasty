@@ -20,6 +20,23 @@
   font-size: 0.8125rem;
 }
 
+.landing-hero-end {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* A phone's band holds the badge and the theme toggle; the year gives way. */
+@media (max-width: 30rem) {
+  .landing-hero-year {
+    display: none;
+  }
+
+  .landing-hero-top .theme-toggle button {
+    padding: 0 0.5rem;
+  }
+}
+
 .landing-hero-badge {
   display: inline-flex;
   align-items: center;
