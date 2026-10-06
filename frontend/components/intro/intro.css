@@ -11,7 +11,9 @@
    Every element's resting style is its final frame, and each keyframe opens
    from its first. With animation off (reduced motion), the stage is the
    finished lockup, which simply fades. */
-.intro {
+/* The theme switch to Uptown draws the same skyline. */
+.intro,
+.theme-transition {
   --intro-night: #070f22;
   --intro-sky-top: #0a1838;
   --intro-sky-mid: #173562;
@@ -27,7 +29,9 @@
   --intro-gold-light: #ffe7a1;
   --intro-glint: #fffbea;
   --intro-text: #f6f3e8;
+}
 
+.intro {
   /* One skyline unit in px: the 2400x500 skyline covers the width and at
      least 42% of the height. Crown size and positions are in these units, so
      the lift from the tower lands the same on every screen. */

@@ -96,59 +96,66 @@ function Cells({ cells }: { cells: { x: number; y: number; warm: boolean }[] }) 
   ));
 }
 
-export function Skyline() {
+interface SkylineProps {
+  // Prefixes the SVG ids, so two skylines on one page don't share patterns.
+  uid?: string;
+  // When the first band of window light comes on, in seconds from mount.
+  lightsAt?: number;
+}
+
+export function Skyline({ uid = "intro", lightsAt = 1.2 }: SkylineProps) {
   return (
     <svg viewBox="0 0 2400 500" className="intro-skyline" aria-hidden focusable="false">
       <defs>
-        <pattern id="intro-win-a" width={54} height={120} patternUnits="userSpaceOnUse">
+        <pattern id={`${uid}-win-a`} width={54} height={120} patternUnits="userSpaceOnUse">
           <Cells cells={WINDOWS_A} />
         </pattern>
-        <pattern id="intro-win-b" width={54} height={120} patternUnits="userSpaceOnUse" x={27} y={40}>
+        <pattern id={`${uid}-win-b`} width={54} height={120} patternUnits="userSpaceOnUse" x={27} y={40}>
           <Cells cells={WINDOWS_B} />
         </pattern>
-        <clipPath id="intro-towers">
+        <clipPath id={`${uid}-towers`}>
           {TOWERS.map((d) => (
             <path key={d} d={d} />
           ))}
         </clipPath>
-        <clipPath id="intro-far">
+        <clipPath id={`${uid}-far`}>
           <path d={FAR} />
         </clipPath>
-        <radialGradient id="intro-crown-glow">
+        <radialGradient id={`${uid}-crown-glow`}>
           <stop offset="0" stopColor="var(--clt-crown)" stopOpacity={0.85} />
           <stop offset="1" stopColor="var(--clt-crown)" stopOpacity={0} />
         </radialGradient>
         {/* Dusk catches the upper floors; the streets are already dark. */}
-        <linearGradient id="intro-tower" x1="0" y1="150" x2="0" y2="500" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${uid}-tower`} x1="0" y1="150" x2="0" y2="500" gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="var(--intro-mid-lit)" />
           <stop offset="1" stopColor="var(--intro-mid)" />
         </linearGradient>
-        <linearGradient id="intro-haze" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`${uid}-haze`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="var(--intro-haze)" stopOpacity={0} />
           <stop offset="1" stopColor="var(--intro-haze)" stopOpacity={0.55} />
         </linearGradient>
       </defs>
 
       <path d={FAR} className="fill-(--intro-far)" />
-      <g clipPath="url(#intro-far)" className="intro-lights intro-lights-far">
-        <rect width={2400} height={500} fill="url(#intro-win-b)" />
+      <g clipPath={`url(#${uid}-far)`} className="intro-lights intro-lights-far">
+        <rect width={2400} height={500} fill={`url(#${uid}-win-b)`} />
       </g>
-      <rect y={300} width={2400} height={200} fill="url(#intro-haze)" />
+      <rect y={300} width={2400} height={200} fill={`url(#${uid}-haze)`} />
 
-      <g fill="url(#intro-tower)">
+      <g fill={`url(#${uid}-tower)`}>
         {TOWERS.map((d) => (
           <path key={d} d={d} />
         ))}
       </g>
       {BANDS.map((ranges, i) => (
-        <g key={i} clipPath="url(#intro-towers)" className="intro-lights" style={{ animationDelay: `${1.2 + i * 0.2}s` }}>
+        <g key={i} clipPath={`url(#${uid}-towers)`} className="intro-lights" style={{ animationDelay: `${lightsAt + i * 0.2}s` }}>
           {ranges.map(([a, b]) => (
-            <rect key={a} x={a} y={150} width={b - a} height={350} fill={`url(#intro-win-${i % 2 ? "b" : "a"})`} />
+            <rect key={a} x={a} y={150} width={b - a} height={350} fill={`url(#${uid}-win-${i % 2 ? "b" : "a"})`} />
           ))}
         </g>
       ))}
 
-      <ellipse cx={1200} cy={140} rx={70} ry={52} fill="url(#intro-crown-glow)" className="intro-tower-glow" />
+      <ellipse cx={1200} cy={140} rx={70} ry={52} fill={`url(#${uid}-crown-glow)`} className="intro-tower-glow" />
       <g className="intro-rods">
         {RODS.map((x) => (
           <rect key={x} x={x} y={122} width={1.8} height={36} />
