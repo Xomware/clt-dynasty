@@ -213,6 +213,18 @@ export function RosterMoveIcon(props: IconProps) {
   );
 }
 
+// Proposals: a ballot going into the box.
+export function BallotIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 1.5h6v6H5z" className="fill-(--xp-cream) stroke-(--xp-text)" />
+      <path d="M6.5 4.5l1 1 2-2.5" className="fill-none stroke-(--xp-start-dark) stroke-[1.5]" />
+      <path d="M1.5 7.5h13v7h-13z" className="fill-(--xp-title-light) stroke-(--xp-frame)" />
+      <path d="M4 9.5h8" className="stroke-(--xp-frame) stroke-[1.5]" />
+    </Icon>
+  );
+}
+
 export function TradeIcon(props: IconProps) {
   return (
     <Icon {...props}>
