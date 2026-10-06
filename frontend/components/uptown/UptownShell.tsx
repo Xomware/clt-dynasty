@@ -7,7 +7,7 @@ import { CrownIcon } from "@/components/xp/icons";
 import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
 import { ADMIN, type GroupId } from "@/lib/desktop/groups";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
-import { REGISTRY, useLauncherGroups, useWindowTitle } from "@/lib/desktop/registry";
+import { REGISTRY, settledTeam, useLauncherGroups, useWindowTitle } from "@/lib/desktop/registry";
 import { patchParams, viewKey, windowId, type WindowParams } from "@/lib/desktop/windows";
 import { ViewParamsContext } from "@/lib/view-params";
 import { AccountMenu } from "./AccountMenu";
@@ -15,12 +15,15 @@ import { Backdrop } from "./Backdrop";
 import { OVERRIDES } from "./bodies";
 import { LINE, LineIcon } from "./icons";
 import { groupOf, HOME, urlOf } from "./pages";
+import { PageHeader } from "./PageHeader";
+import { Related } from "./Related";
+import { ScoreTicker } from "./ScoreTicker";
 import { Spotlight } from "./Spotlight";
+import { useInk } from "./use-ink";
 import { UptownHome } from "./UptownHome";
 
 import "./uptown.css";
 import "./uptown-skin.css";
-
 
 // The XP desktop's link names several windows; the last is the one it had in front.
 const fromUrl = (): WindowLink => parseOpen(window.location.search).at(-1) ?? HOME;
@@ -48,6 +51,9 @@ export function UptownShell() {
 
   // The clicked link went with the old page, so the new title takes focus. A
   // tab switch stays on the page, so it is keyed without the tab.
+  const mainNav = useInk(view.kind === "home" ? "home" : group);
+  const subNav = useInk(`${group}:${view.kind}`);
+
   const page = viewKey(view.kind, view.params);
   const shown = useRef(page);
   useEffect(() => {
@@ -97,48 +103,65 @@ export function UptownShell() {
     return kind ? { kind, params: {} } : { kind: "folder", params: { id: g } };
   };
 
+  const crumb = section && group !== null ? { label: section.label, to: first(group) } : null;
+
   return (
     <div className="uptown">
       <Backdrop />
-      <header className="u-header">
-        <a href={urlOf(HOME)} className="u-brand" aria-current={view.kind === "home" ? "page" : undefined} onClick={(e) => onNav(e, HOME)}>
-          <CrownIcon width={34} height={34} />
-          <span>CLT Dynasty</span>
-        </a>
-        <nav aria-label="Main" className="u-nav">
-          {groups.map((g) => (
-            <a key={g.id} href={urlOf(first(g.id))} aria-current={g.id === group ? "true" : undefined} onClick={(e) => onNav(e, first(g.id))}>
-              {g.label}
+      <div className="u-top">
+        <header className="u-header">
+          <a href={urlOf(HOME)} className="u-brand" onClick={(e) => onNav(e, HOME)}>
+            <CrownIcon width={34} height={34} />
+            <span>CLT Dynasty</span>
+          </a>
+          <nav ref={mainNav} aria-label="Main" className="u-nav u-inked">
+            <i className="u-ink" aria-hidden />
+            <a href={urlOf(HOME)} aria-current={view.kind === "home" ? "page" : undefined} onClick={(e) => onNav(e, HOME)}>
+              <LineIcon d={LINE.home} size={16} />
+              Home
             </a>
-          ))}
-        </nav>
-        <button
-          type="button"
-          className="u-pill u-search"
-          aria-keyshortcuts="Meta+K Control+K"
-          onClick={(e) => {
-            // Safari never focuses a clicked button; Spotlight hands focus back to it.
-            e.currentTarget.focus();
-            setSearching(true);
-          }}
-        >
-          <LineIcon d={LINE.search} size={18} />
-          Search
-          <kbd aria-hidden>{isMac() ? "⌘K" : "Ctrl K"}</kbd>
-        </button>
-        <AccountMenu onNav={onNav} />
-      </header>
-      {pages.length > 0 && (
-        <nav aria-label={`${section?.label} pages`} className="u-subnav">
-          {pages.map((p) => {
-            const to = { kind: p.kind, params: {} };
-            return (
-              <a key={p.kind} href={urlOf(to)} aria-current={p.kind === view.kind ? "page" : undefined} onClick={(e) => onNav(e, to)}>
-                {p.label}
+            {groups.map((g) => (
+              <a key={g.id} href={urlOf(first(g.id))} aria-current={g.id === group ? "true" : undefined} onClick={(e) => onNav(e, first(g.id))}>
+                {g.label}
               </a>
-            );
-          })}
-        </nav>
+            ))}
+          </nav>
+          <button
+            type="button"
+            className="u-pill u-search"
+            aria-keyshortcuts="Meta+K Control+K"
+            onClick={(e) => {
+              // Safari never focuses a clicked button; Spotlight hands focus back to it.
+              e.currentTarget.focus();
+              setSearching(true);
+            }}
+          >
+            <LineIcon d={LINE.search} size={18} />
+            <span className="u-search-text">
+              Search<span className="u-search-hint"> pages and teams</span>
+            </span>
+            <kbd aria-hidden>{isMac() ? "⌘K" : "Ctrl K"}</kbd>
+          </button>
+          <AccountMenu onNav={onNav} />
+        </header>
+        <DrillContext value={go}>
+          <ScoreTicker />
+        </DrillContext>
+      </div>
+      {pages.length > 0 && (
+        <div className="u-subnav-bar">
+          <nav ref={subNav} aria-label={`${section?.label} pages`} className="u-subnav u-inked">
+            <i className="u-ink" aria-hidden />
+            {pages.map((p) => {
+              const to = { kind: p.kind, params: {} };
+              return (
+                <a key={p.kind} href={urlOf(to)} aria-current={p.kind === view.kind ? "page" : undefined} onClick={(e) => onNav(e, to)}>
+                  {p.label}
+                </a>
+              );
+            })}
+          </nav>
+        </div>
       )}
       <DrillContext value={go}>
         <NavigateContext value={go}>
@@ -149,9 +172,14 @@ export function UptownShell() {
               </WindowBoundary>
             ) : (
               <>
-                <h1 ref={heading} tabIndex={-1} className="u-title">
-                  {title}
-                </h1>
+                <PageHeader
+                  title={title}
+                  Icon={REGISTRY[view.kind].Icon}
+                  team={view.kind === "team" ? settledTeam(view.params) : null}
+                  group={crumb}
+                  headingRef={heading}
+                  onNav={onNav}
+                />
                 <section className="u-panel" aria-label={title}>
                   <WindowBoundary key={page}>
                     <ViewParamsContext value={patch}>
@@ -159,6 +187,7 @@ export function UptownShell() {
                     </ViewParamsContext>
                   </WindowBoundary>
                 </section>
+                <Related kind={view.kind} onNav={onNav} />
               </>
             )}
           </main>

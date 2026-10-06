@@ -45,7 +45,7 @@
   color: var(--u-gold);
 }
 
-.u-hero-title:focus {
+.uptown .u-hero-title:focus {
   outline: none;
 }
 

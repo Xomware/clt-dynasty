@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 const admin = vi.hoisted(() => ({ on: false }));
+const league = vi.hoisted(() => ({ rosters: null as { roster_id: number }[] | null }));
 
 vi.mock("@/lib/api/clt", () => ({
   getCltMe: vi.fn(async () => ({
@@ -15,7 +16,11 @@ vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }))
 // The Home hero reads the league; these tests are about the shell.
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
-  useLeague: () => ({ data: null, myRosterId: null, teamFor: () => ({ name: "", avatarUrl: null }) }),
+  useLeague: () => ({
+    data: league.rosters && { rosters: league.rosters, league: { status: "pre_draft", settings: { playoff_week_start: 15, playoff_teams: 6 } }, nfl: { week: 1 } },
+    myRosterId: null,
+    teamFor: (id: number) => ({ name: `Queen City ${id}`, avatarUrl: null }),
+  }),
 }));
 
 import { AppShell } from "@/components/AppShell";
@@ -26,7 +31,10 @@ import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
 import { ThemeProvider } from "@/lib/theme/theme";
-import { ABOUT } from "./pages";
+import { ABOUT, RELATED } from "./pages";
+
+const RELATED_TEST = RELATED as Record<string, string[]>;
+const standingsNext = RELATED_TEST.standings;
 import { UptownShell } from "./UptownShell";
 
 registerTestWindows();
@@ -48,6 +56,7 @@ afterAll(() => {
 
 afterEach(() => {
   admin.on = false;
+  league.rosters = null;
   vi.useRealTimers();
   localStorage.clear();
   window.history.replaceState(null, "", "/");
@@ -68,7 +77,8 @@ const title = () => screen.getByRole("heading", { level: 1 });
 describe("UptownShell", () => {
   it("files the header nav by group and starts on Home", async () => {
     await renderShell();
-    expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["League"]);
+    expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["Home", "League"]);
+    expect(nav("Main").getByRole("link", { name: "Home" }).getAttribute("aria-current")).toBe("page");
     expect(title().textContent).toBe("The Queen City\u2019s dynasty league");
     expect(screen.getByText("home body")).toBeTruthy();
     expect(screen.queryByRole("navigation", { name: "League pages" })).toBeNull();
@@ -85,6 +95,25 @@ describe("UptownShell", () => {
     const pages = nav("League pages");
     expect(pages.getAllByRole("link").map((a) => a.textContent)).toEqual(["Standings", "Broken"]);
     expect(pages.getByRole("link", { name: "Standings" }).getAttribute("aria-current")).toBe("page");
+  });
+
+  it("heads a page with its breadcrumb and ends it with where to go next", async () => {
+    window.history.replaceState(null, "", "/?open=broken");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await renderShell();
+    const crumbs = nav("Breadcrumb");
+    expect(crumbs.getAllByRole("listitem").map((li) => li.textContent)).toEqual(["Home", "League", "Broken"]);
+    fireEvent.click(crumbs.getByRole("link", { name: "League" }));
+    expect(title().textContent).toBe("League Standings");
+
+    RELATED_TEST.standings = ["broken"];
+    fireEvent.click(nav("League pages").getByRole("link", { name: "Broken" }));
+    fireEvent.click(nav("League pages").getByRole("link", { name: "Standings" }));
+    fireEvent.click(nav("Keep going").getByRole("link", { name: /^Broken/ }));
+    expect(title().textContent).toBe("Broken");
+    fireEvent.click(nav("Breadcrumb").getByRole("link", { name: "Home" }));
+    expect(window.location.search).toBe("");
+    RELATED_TEST.standings = standingsNext;
   });
 
   it("drills in place under the same group, and Back returns", async () => {
@@ -130,7 +159,7 @@ describe("UptownShell", () => {
   it("keeps Admin out of the header and in an admin's account menu", async () => {
     admin.on = true;
     await renderShell();
-    expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["League"]);
+    expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["Home", "League"]);
     fireEvent.click(screen.getByRole("button", { name: "Roster 4, account menu" }));
     fireEvent.click(within(screen.getByRole("list", { name: "Admin" })).getByRole("link", { name: "Members" }));
 
@@ -161,7 +190,7 @@ describe("Spotlight", () => {
   it("opens on Ctrl+K, filters every page by group, and opens the pick", async () => {
     await renderShell();
     fireEvent.keyDown(document, { key: "k", ctrlKey: true });
-    const dialog = within(screen.getByRole("dialog", { name: "Search every page" }));
+    const dialog = within(screen.getByRole("dialog", { name: "Search pages and teams" }));
     expect(dialog.getByRole("group", { name: "Start" })).toBeTruthy();
     expect(dialog.getByRole("option", { name: "Home" })).toBeTruthy();
     expect(within(dialog.getByRole("group", { name: "League" })).getAllByRole("option").map((o) => o.getAttribute("aria-label"))).toEqual([
@@ -178,6 +207,21 @@ describe("Spotlight", () => {
     expect(title().textContent).toBe("League Standings");
   });
 
+  it("finds a team by name once something is typed, and opens its profile", async () => {
+    league.rosters = [{ roster_id: 3 }, { roster_id: 8 }];
+    await renderShell();
+    fireEvent.keyDown(document, { key: "k", ctrlKey: true });
+    const dialog = within(screen.getByRole("dialog", { name: "Search pages and teams" }));
+    expect(dialog.queryByRole("group", { name: "Teams" })).toBeNull();
+
+    fireEvent.change(dialog.getByRole("combobox"), { target: { value: "queen 8" } });
+    expect(within(dialog.getByRole("group", { name: "Teams" })).getAllByRole("option").map((o) => o.getAttribute("aria-label"))).toEqual([
+      "Queen City 8",
+    ]);
+    fireEvent.keyDown(dialog.getByRole("combobox"), { key: "Enter" });
+    expect(window.location.search).toBe("?open=team:8");
+  });
+
   it("moves with the arrows, says when nothing matches, and closes on Escape", async () => {
     await renderShell();
     const opener = screen.getByRole("button", { name: /^Search/ });
@@ -187,7 +231,7 @@ describe("Spotlight", () => {
     expect(screen.getByRole("option", { selected: true }).getAttribute("aria-label")).toBe("Standings");
 
     fireEvent.change(box, { target: { value: "zzz" } });
-    expect(screen.getByRole("status").textContent).toContain("No page matches");
+    expect(within(screen.getByRole("dialog")).getByRole("status").textContent).toContain("No page matches");
 
     fireEvent.keyDown(box, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();

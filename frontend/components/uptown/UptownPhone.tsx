@@ -15,6 +15,9 @@ import { OVERRIDES } from "./bodies";
 import { DrawerNav } from "./DrawerNav";
 import { LINE, LineIcon } from "./icons";
 import { MenuDrawer } from "./MenuDrawer";
+import { PhoneDock } from "./PhoneDock";
+import { Related } from "./Related";
+import { ScoreTicker } from "./ScoreTicker";
 import { Spotlight } from "./Spotlight";
 import { UptownHome } from "./UptownHome";
 
@@ -51,6 +54,7 @@ export function UptownPhone() {
     if (to.kind === "home") home();
     else go(to);
   };
+  const fromDock = (to: WindowLink) => (to.kind === "home" ? home() : go(to));
   // Safari never focuses a tapped button, and the drawer and Spotlight hand focus back to it.
   const opener = (show: () => void) => (e: MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.focus();
@@ -87,16 +91,26 @@ export function UptownPhone() {
         </button>
       </header>
       <DrillContext value={go}>
+        {!top && <ScoreTicker />}
         <NavigateContext value={go}>
           <main className="up-screen">
             {top && Page ? (
-              <section key={stack.length} aria-label={title} className="up-page">
-                <WindowBoundary>
-                  <ViewParamsContext value={patch}>
-                    <Page params={top.params} />
-                  </ViewParamsContext>
-                </WindowBoundary>
-              </section>
+              <>
+                <section key={stack.length} aria-label={title} className="up-page">
+                  <WindowBoundary>
+                    <ViewParamsContext value={patch}>
+                      <Page params={top.params} />
+                    </ViewParamsContext>
+                  </WindowBoundary>
+                </section>
+                <Related
+                  kind={top.kind}
+                  onNav={(e, to) => {
+                    e.preventDefault();
+                    go(to);
+                  }}
+                />
+              </>
             ) : (
               <WindowBoundary>
                 <UptownHome phone />
@@ -105,6 +119,7 @@ export function UptownPhone() {
           </main>
         </NavigateContext>
       </DrillContext>
+      <PhoneDock current={top?.kind ?? "home"} onGo={fromDock} />
       {searching && <Spotlight onClose={() => setSearching(false)} onGo={go} />}
       <MenuDrawer id={drawerId} open={menuOpen} onClose={() => setMenuOpen(false)}>
         <DrawerNav current={top} onGo={fromMenu} />

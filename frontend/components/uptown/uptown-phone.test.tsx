@@ -87,6 +87,20 @@ describe("Uptown phone", () => {
     expect(screen.queryByRole("navigation", { name: "Programs" })).toBeNull();
   });
 
+  it("offers the weekly pages in the tab bar, marking the one showing", async () => {
+    await renderPhone();
+    const dock = () => within(screen.getByRole("navigation", { name: "Quick" }));
+    expect(dock().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "Standings"]);
+    expect(dock().getByRole("button", { name: "Home" }).getAttribute("aria-current")).toBe("page");
+
+    fireEvent.click(dock().getByRole("button", { name: "Standings" }));
+    expect(bar().textContent).toBe("League Standings");
+    expect(dock().getByRole("button", { name: "Standings" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(dock().getByRole("button", { name: "Standings" }));
+    expect(window.location.search).toBe("?open=standings");
+    expect(bar().textContent).toBe("League Standings");
+  });
+
   it("lists every group's pages in the menu and opens one as a screen Back closes", async () => {
     await renderPhone();
     fireEvent.click(screen.getByRole("button", { name: "Menu" }));
