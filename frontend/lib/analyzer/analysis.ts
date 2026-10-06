@@ -10,6 +10,7 @@ export type AxisValues = Record<Axis, number>;
 export interface TeamAnalysis {
   rosterId: number;
   name: string;
+  avatarUrl: string | null;
   ownerId: string | null;
   axes: AxisValues;
   total: number;
@@ -44,7 +45,7 @@ export function analyze(roster: SleeperRoster, users: SleeperUser[], players: Re
 
   return {
     rosterId: roster.roster_id,
-    name: teamOf(users, roster, roster.roster_id).name,
+    ...teamOf(users, roster, roster.roster_id),
     ownerId: roster.owner_id,
     axes,
     total: AXES.reduce((sum, a) => sum + axes[a], 0),

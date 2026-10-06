@@ -180,6 +180,15 @@
   overflow-wrap: anywhere;
 }
 
+.xp-pick-owner .xp-team {
+  max-width: 100%;
+}
+
+.xp-pick-owner .xp-avatar {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 /* The member's own picks: gold, with a star or "(yours)" saying so in words. */
 [data-mine] {
   background: var(--xp-balloon);

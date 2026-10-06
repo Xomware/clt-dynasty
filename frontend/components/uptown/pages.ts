@@ -29,6 +29,32 @@ export const ABOUT: Partial<Record<WindowKind, string>> = {
   "admin-announcements": "Post and retire announcements on Home.",
 };
 
+// Where a page leads next, shown at its foot. Only pages this member can open are offered.
+export const RELATED: Partial<Record<WindowKind, WindowKind[]>> = {
+  standings: ["playoffs", "world-cup", "scores"],
+  scores: ["standings", "matchup-history", "my-team"],
+  playoffs: ["standings", "history", "world-cup"],
+  "world-cup": ["standings", "scores", "history"],
+  rules: ["proposals", "standings"],
+  history: ["matchup-history", "drafts", "playoffs"],
+  "matchup-history": ["scores", "history"],
+  drafts: ["draft-order", "taxi"],
+  "draft-order": ["drafts", "standings", "taxi"],
+  taxi: ["drafts", "my-team"],
+  "my-team": ["analyzer", "scores", "taxi"],
+  profile: ["my-team", "settings"],
+  analyzer: ["my-team", "draft-order", "taxi"],
+  settings: ["profile", "my-team"],
+  proposals: ["rules", "ai-review"],
+  "ai-review": ["scores", "standings"],
+  team: ["standings", "scores", "analyzer"],
+  league: ["history"],
+  "ai-report": ["ai-review", "scores"],
+  members: ["admin-ai", "admin-announcements"],
+  "admin-ai": ["ai-review", "admin-announcements"],
+  "admin-announcements": ["members", "admin-ai"],
+};
+
 export const HOME: WindowLink = { kind: "home", params: {} };
 
 export const urlOf = (view: WindowLink) => (view.kind === "home" ? "/" : `/?open=${windowId(view.kind, view.params)}`);

@@ -37,6 +37,7 @@ export function PhoneShell() {
             <span>Theme</span>
             <ThemeToggle />
           </section>
+          <AdminPrograms onOpen={open} />
           <section className="m-account" aria-label="Account">
             <span className="truncate">{name ? `Signed in as ${name}` : "Signed in"}</span>
             <button type="button" className="xp-log-off" onClick={() => void signOut()}>
@@ -87,6 +88,29 @@ function Programs({ onOpen }: { onOpen: (link: WindowLink) => void }) {
                 <span className="m-program-detail">{g.items.map((l) => l.label).join(", ")}</span>
               </span>
               <ChevronGlyph />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+// Only admins get this list, under their own account rather than in Programs.
+function AdminPrograms({ onOpen }: { onOpen: (link: WindowLink) => void }) {
+  const { admin } = useLauncherGroups();
+  if (admin.length === 0) return null;
+  return (
+    <nav className="m-programs" aria-labelledby="m-admin">
+      <h2 id="m-admin" className="m-programs-title">
+        Admin
+      </h2>
+      <ul>
+        {admin.map(({ kind, label, Icon }) => (
+          <li key={kind}>
+            <button type="button" className="m-program" onClick={() => onOpen({ kind, params: {} })}>
+              <Icon width={32} height={32} />
+              {label}
             </button>
           </li>
         ))}

@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { teamAvatar } from "@/lib/league/use-league";
+import type { SleeperUser } from "@/lib/sleeper/types";
 import { ViewParamsContext } from "@/lib/view-params";
 import { BrandLoader } from "./BrandLoader";
 import { SpeakerToggle } from "./SpeakerToggle";
@@ -111,5 +113,23 @@ describe("TeamName", () => {
     const { container } = render(<TeamName name="Rival" avatarUrl="https://sleepercdn.com/avatars/thumbs/abc" />);
     expect(container.querySelector("img")?.getAttribute("src")).toBe("https://sleepercdn.com/avatars/thumbs/abc");
     expect(screen.queryByRole("img", { name: "Your team" })).toBeNull();
+  });
+
+  it("drops back to the initial when the picture fails to load", () => {
+    const { container } = render(<TeamName name="Rival" avatarUrl="https://sleepercdn.com/uploads/gone.jpg" />);
+    fireEvent.error(container.querySelector("img")!);
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector(".xp-avatar")?.textContent).toBe("R");
+  });
+});
+
+describe("teamAvatar", () => {
+  const user = (metadata: SleeperUser["metadata"], avatar: string | null = "acct") => ({ user_id: "1", display_name: "u", avatar, metadata });
+
+  it("prefers the league team's own picture over the account's", () => {
+    expect(teamAvatar(user({ avatar: "https://sleepercdn.com/uploads/team.jpg" }))).toBe("https://sleepercdn.com/uploads/team.jpg");
+    expect(teamAvatar(user({ team_name: "No pic" }))).toBe("https://sleepercdn.com/avatars/thumbs/acct");
+    expect(teamAvatar(user(null, null))).toBeNull();
+    expect(teamAvatar(undefined)).toBeNull();
   });
 });

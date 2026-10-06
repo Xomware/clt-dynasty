@@ -2,6 +2,7 @@
 
 import { DrillLink } from "@/components/xp/DrillLink";
 import { TeamLink } from "@/components/xp/TeamLink";
+import { CountUp } from "@/components/motion/CountUp";
 import { TeamName } from "@/components/xp/TeamName";
 import { LEAGUE_ID } from "@/lib/config";
 import { leagueMatchups } from "@/lib/league/cache";
@@ -95,7 +96,9 @@ function Mine({ data, games, week, live, teamFor, rosterId }: MineProps) {
           </div>
           <div>
             <dt>Points for</dt>
-            <dd>{me.pf.toFixed(2)}</dd>
+            <dd>
+              <CountUp value={me.pf} decimals={2} />
+            </dd>
           </div>
           <div>
             <dt>Streak</dt>
@@ -132,9 +135,9 @@ function ThisGame({ game, week, live, teamFor, rosterId }: GameProps) {
         {live && scored && <span className="xp-tag home-live">Live</span>}
       </p>
       <p className="home-mine-score">
-        <span className="tabular-nums">{scored ? mine.points.toFixed(2) : "-"}</span>
+        {scored ? <CountUp value={mine.points} decimals={2} /> : <span className="tabular-nums">-</span>}
         <span className="text-xs">vs</span>
-        <span className="tabular-nums">{scored ? them.points.toFixed(2) : "-"}</span>
+        {scored ? <CountUp value={them.points} decimals={2} /> : <span className="tabular-nums">-</span>}
       </p>
       <p className="flex flex-wrap items-center gap-x-1">
         <TeamLink rosterId={them.rosterId} {...teamFor(them.rosterId)} />

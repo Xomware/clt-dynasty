@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 
 import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
+import { TeamAvatar } from "@/components/xp/TeamAvatar";
 import { TeamName } from "@/components/xp/TeamName";
 import { LEAGUE_ID } from "@/lib/config";
 import type { WindowParams } from "@/lib/desktop/windows";
@@ -27,16 +27,13 @@ export function LeagueWindow({ params }: { params: WindowParams }) {
   if (load.status === "loading") return <p role="status">Loading the league...</p>;
   if (load.status === "error") return <LoadError what="the league from Sleeper" message={load.message} onRetry={retry} />;
   const { league, users, rosters } = load.value;
-  const avatar = avatarUrl(league.avatar);
   const mine = leagueId === LEAGUE_ID && me ? rosterOf(rosters, me) : null;
   const divisions = (league.settings.divisions ?? 0) > 1;
 
   return (
     <div className="flex flex-col gap-3">
       <section aria-label={league.name} className="team-head">
-        <span className="team-avatar" aria-hidden>
-          {avatar ? <Image src={avatar} alt="" width={56} height={56} unoptimized className="size-full object-cover" /> : league.name.charAt(0).toUpperCase()}
-        </span>
+        <TeamAvatar name={league.name} url={avatarUrl(league.avatar)} size={56} className="team-avatar" />
         <div className="team-who">
           <h3 className="team-name">
             <span className="truncate">{league.name}</span>
