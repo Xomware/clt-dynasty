@@ -1,22 +1,41 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+const admin = vi.hoisted(() => ({ on: false }));
 vi.mock("@/lib/api/clt", () => ({
   getCltMe: vi.fn(async () => ({
     member: { email: "member@example.com", displayName: "Roster 4", role: "member", sleeperUserId: "" },
     linkedSleeperUserId: "",
+    isAdmin: admin.on,
   })),
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
 
 import { AppShell } from "@/components/AppShell";
+import { MembersIcon } from "@/components/xp/icons";
 import { AlertsProvider } from "@/lib/alerts/alerts";
+import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
 import { PHONE } from "@/lib/use-media-query";
 
 registerTestWindows();
+
+beforeAll(() => {
+  REGISTRY.members = {
+    group: "admin",
+    label: "Members",
+    title: "Admin: Members",
+    Icon: MembersIcon,
+    component: () => <p>members body</p>,
+    defaultSize: { w: 400, h: 400 },
+    adminOnly: true,
+  };
+});
+afterAll(() => {
+  delete REGISTRY.members;
+});
 
 const phone = (on: boolean) =>
   vi.stubGlobal("matchMedia", (query: string) => ({
@@ -51,6 +70,7 @@ beforeEach(() => {
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
 });
 afterEach(() => {
+  admin.on = false;
   phone(false);
   vi.restoreAllMocks();
   window.history.replaceState(null, "", "/");
@@ -61,6 +81,14 @@ describe("phone shell", () => {
     await renderPhone();
     expect(programs().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "LeagueStandings, Broken"]);
     expect(screen.queryByRole("list", { name: "Desktop" })).toBeNull();
+  });
+
+  it("lists Admin under an admin's account, apart from Programs", async () => {
+    admin.on = true;
+    await renderPhone();
+    expect(programs().queryByRole("button", { name: /Admin|Members/ })).toBeNull();
+    fireEvent.click(within(screen.getByRole("navigation", { name: "Admin" })).getByRole("button", { name: "Members" }));
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Admin: Members");
   });
 
   it("opens a group, then a program from it, each as a history entry Back closes", async () => {

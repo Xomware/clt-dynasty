@@ -1,10 +1,12 @@
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+const admin = vi.hoisted(() => ({ on: false }));
 vi.mock("@/lib/api/clt", () => ({
   getCltMe: vi.fn(async () => ({
     member: { email: "member@example.com", displayName: "Roster 4", role: "member", sleeperUserId: "" },
     linkedSleeperUserId: "",
+    isAdmin: admin.on,
   })),
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
@@ -13,11 +15,28 @@ vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }))
 import { signOut } from "aws-amplify/auth";
 
 import { AppShell } from "@/components/AppShell";
+import { MembersIcon } from "@/components/xp/icons";
 import { AlertsProvider } from "@/lib/alerts/alerts";
+import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
 
 registerTestWindows();
+
+beforeAll(() => {
+  REGISTRY.members = {
+    group: "admin",
+    label: "Members",
+    title: "Admin: Members",
+    Icon: MembersIcon,
+    component: () => <p>members body</p>,
+    defaultSize: { w: 400, h: 400 },
+    adminOnly: true,
+  };
+});
+afterAll(() => {
+  delete REGISTRY.members;
+});
 
 const renderShell = async () => {
   render(
@@ -46,6 +65,7 @@ beforeEach(() => {
   Element.prototype.setPointerCapture = vi.fn();
 });
 afterEach(() => {
+  admin.on = false;
   vi.clearAllMocks();
   localStorage.clear();
   // The desktop mirrors its windows into ?open=, which the next render would reopen.
@@ -181,6 +201,25 @@ describe("taskbar", () => {
     // A program opened from anywhere is offered again under Recent.
     fireEvent.click(screen.getByRole("button", { name: /start/i }));
     expect(within(startMenu().getByRole("list", { name: "Recent" })).getByRole("button").textContent).toBe("Broken");
+  });
+
+  it("files Admin in an admin's places, never on the desktop or All Programs", async () => {
+    admin.on = true;
+    await renderShell();
+    expect(within(screen.getByRole("list", { name: "Desktop" })).queryByRole("button", { name: "Admin" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /start/i }));
+    fireEvent.click(startMenu().getByRole("button", { name: "All Programs" }));
+    expect(within(screen.getByRole("list", { name: "All Programs" })).queryByRole("button", { name: "Admin" })).toBeNull();
+
+    fireEvent.click(within(startMenu().getByRole("list", { name: "Places" })).getByRole("button", { name: "Admin" }));
+    fireEvent.click(within(screen.getByRole("list", { name: "Admin" })).getByRole("button", { name: "Members" }));
+    expect(windowNamed("Admin: Members")).not.toBeNull();
+  });
+
+  it("gives a member no Admin in Start", async () => {
+    await renderShell();
+    fireEvent.click(screen.getByRole("button", { name: /start/i }));
+    expect(startMenu().queryByRole("button", { name: "Admin" })).toBeNull();
   });
 
   it("walks the cascades with the arrow keys", async () => {

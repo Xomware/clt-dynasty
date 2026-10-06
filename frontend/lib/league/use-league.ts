@@ -27,12 +27,17 @@ async function loadLeague(): Promise<Omit<LeagueData, "nfl">> {
   return { league: l, users: u, rosters: r };
 }
 
+// The picture a manager set for this league's team (a full upload URL in
+// `metadata.avatar`), else their Sleeper account's avatar.
+export function teamAvatar(user: SleeperUser | undefined): string | null {
+  const team = user?.metadata?.avatar;
+  if (typeof team === "string" && team.startsWith("https://")) return team;
+  return user?.avatar ? `https://sleepercdn.com/avatars/thumbs/${user.avatar}` : null;
+}
+
 export function teamOf(users: SleeperUser[], roster: SleeperRoster | undefined, rosterId: number): Team {
   const user = users.find((u) => u.user_id === roster?.owner_id);
-  return {
-    name: user?.metadata?.team_name || user?.display_name || `Team ${rosterId}`,
-    avatarUrl: user?.avatar ? `https://sleepercdn.com/avatars/thumbs/${user.avatar}` : null,
-  };
+  return { name: user?.metadata?.team_name || user?.display_name || `Team ${rosterId}`, avatarUrl: teamAvatar(user) };
 }
 
 // Reads the shared league cache, plus matchups for `week` whenever it is set.

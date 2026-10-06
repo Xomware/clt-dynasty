@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { START_PINNED, START_PLACES } from "@/lib/desktop/groups";
+import { ADMIN, START_PINNED, START_PLACES } from "@/lib/desktop/groups";
 import { readRecent } from "@/lib/desktop/recent";
 import { type Launcher, useLauncherGroups, useLaunchers, type WindowKind } from "@/lib/desktop/registry";
 import { TASKBAR_HEIGHT } from "@/lib/desktop/windows";
@@ -217,6 +217,27 @@ interface StartMenuProps {
   onSignOut: () => void;
 }
 
+// The places column is XP's "your account" side, so the admin windows file there for admins.
+function AdminPlaces({ onOpen }: { onOpen: (kind: WindowKind) => void }) {
+  const { admin } = useLauncherGroups();
+  const [open, setOpen] = useState<Open | null>(null);
+  if (admin.length === 0) return null;
+  return (
+    <CascadeRow
+      id="start-admin"
+      label={ADMIN.label}
+      Icon={FolderIcon}
+      open={open}
+      onShow={setOpen}
+      onHide={() => setOpen(null)}
+    >
+      {admin.map((l) => (
+        <Program key={l.kind} launcher={l} onOpen={onOpen} />
+      ))}
+    </CascadeRow>
+  );
+}
+
 export function StartMenu({ id, name, autoFocus, onOpen, onReset, onUptown, onSignOut }: StartMenuProps) {
   const launchers = useLaunchers();
   const [recentKinds] = useState(readRecent);
@@ -262,6 +283,7 @@ export function StartMenu({ id, name, autoFocus, onOpen, onReset, onUptown, onSi
           {pick(START_PLACES).map((l) => (
             <Program key={l.kind} launcher={l} onOpen={onOpen} />
           ))}
+          <AdminPlaces onOpen={onOpen} />
           <li className="xp-start-places-rule">
             <button type="button" className="xp-start-menu-link w-full" onClick={onReset}>
               <DesktopIcon width={24} height={24} className="flex-none" />

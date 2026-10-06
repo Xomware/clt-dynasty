@@ -336,3 +336,18 @@
     margin-right: 0;
   }
 }
+
+/* Quick actions: lineup in Sleeper, a rule proposal, a taxi steal. */
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.home-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  text-decoration: none;
+}
