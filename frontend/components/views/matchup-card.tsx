@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 
 import { DrillLink } from "@/components/xp/DrillLink";
+import { CountUp } from "@/components/motion/CountUp";
 import { TeamName } from "@/components/xp/TeamName";
 import { type Player, playerName } from "@/lib/api/players";
 import { LEAGUE_ID } from "@/lib/config";
@@ -43,7 +44,7 @@ export function MatchupCard({ game, leagueId, teamFor, myRosterId, note, default
           return (
             <span key={s.rosterId} className="xp-matchup-side">
               <TeamName name={team.name} avatarUrl={team.avatarUrl} isMine={s.rosterId === myRosterId} />
-              <span className={`xp-score${scored && s.points === top ? " font-bold" : ""}`}>{s.points.toFixed(2)}</span>
+              <CountUp value={s.points} decimals={2} className={`xp-score${scored && s.points === top ? " font-bold" : ""}`} />
             </span>
           );
         })}
