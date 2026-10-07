@@ -22,7 +22,7 @@ export function SignInGreeting() {
     greeted.current = true;
     notify({
       title: member.displayName ? `Welcome back, ${member.displayName}` : "Welcome to CLT Dynasty",
-      body: "The new league site is coming together. League windows land here one at a time.",
+      body: "Everything in the league is a double-click away: open a folder or the Start menu.",
       icon: "info",
     });
   }, [member, notify]);
