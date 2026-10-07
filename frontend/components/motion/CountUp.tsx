@@ -15,7 +15,7 @@ const ease = (t: number) => 1 - (1 - t) ** 3;
 
 // A number that rolls up to its value, from 0 on mount and from the old value
 // on a change, like a live score. React renders the final text; the roll only
-// rewrites the node in between, and only under Uptown with motion allowed, so
+// rewrites the node in between, and only under Buzz City with motion allowed, so
 // XP, tests and screen readers get the real number.
 export function CountUp({ value, decimals = 0, empty, className = "tabular-nums" }: CountUpProps) {
   const el = useRef<HTMLSpanElement>(null);

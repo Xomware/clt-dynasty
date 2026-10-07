@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { REGISTRY } from "@/lib/desktop/registry";
 import { ABOUT, groupOf } from "./pages";
 
-describe("Uptown pages", () => {
+describe("Buzz City pages", () => {
   it("has a one-liner for every window a member can launch", () => {
     const launchable = Object.entries(REGISTRY).filter(([, s]) => !s.drillOnly).map(([k]) => k);
     expect(launchable.filter((k) => !(k in ABOUT))).toEqual([]);

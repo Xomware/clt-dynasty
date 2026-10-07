@@ -2,13 +2,13 @@
 
 import { Fragment } from "react";
 
+import { BuzzLanding } from "@/components/buzz/BuzzLanding";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Window } from "@/components/xp/Window";
 import { CrownIcon, FolderIcon, InfoIcon } from "@/components/xp/icons";
 import { useTheme } from "@/lib/theme/theme";
 import { FEATURES, FORMAT, GoogleMark } from "./landing-content";
 import { LeagueLive } from "./LeagueLive";
-import { UptownLanding } from "./UptownLanding";
 
 import "@/components/auth/logon.css";
 import "./landing.css";
@@ -19,7 +19,7 @@ export interface LandingProps {
 }
 
 export function Landing(props: LandingProps) {
-  return useTheme().theme === "buzz" ? <UptownLanding {...props} /> : <XpLanding {...props} />;
+  return useTheme().theme === "buzz" ? <BuzzLanding {...props} /> : <XpLanding {...props} />;
 }
 
 function XpLanding({ onSignIn }: LandingProps) {

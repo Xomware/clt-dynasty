@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 describe("CountUp", () => {
-  it("shows the real number straight away outside Uptown", () => {
+  it("shows the real number straight away outside Buzz City", () => {
     render(<CountUp value={123.456} decimals={2} />);
     expect(screen.getByText("123.46")).toBeTruthy();
   });
@@ -20,7 +20,7 @@ describe("CountUp", () => {
     expect(screen.getByText("-")).toBeTruthy();
   });
 
-  it("rolls up from zero under Uptown, then follows a live change to its new value", () => {
+  it("rolls up from zero under Buzz City, then follows a live change to its new value", () => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
     document.documentElement.dataset.theme = "buzz";
     const { container, rerender } = render(<CountUp value={100} />);

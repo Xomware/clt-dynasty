@@ -8,7 +8,7 @@ import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
 import { listReports, periodLabel, REPORT_LABEL } from "@/lib/api/ai-reports";
 import { useLoad } from "@/lib/use-load";
-import { LINE, LineIcon } from "../icons";
+import { LINE, LineIcon } from "../line-icons";
 
 // The AI's recaps and previews, newest first, as a row of cards to swipe or step through.
 export function Recaps() {

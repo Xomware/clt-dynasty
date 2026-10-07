@@ -4,7 +4,7 @@ import type { MouseEvent } from "react";
 
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { useLaunchers } from "@/lib/desktop/registry";
-import { LINE, LineIcon } from "./icons";
+import { LINE, LineIcon } from "./line-icons";
 import { ABOUT, RELATED, urlOf } from "./pages";
 
 interface RelatedProps {

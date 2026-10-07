@@ -28,7 +28,7 @@ vi.mock("./BuzzHome", () => ({
     );
   },
 }));
-vi.mock("./bodies", async () => ({ BODIES: { folder: (await import("@/components/uptown/GroupPage")).GroupPage } }));
+vi.mock("./bodies", async () => ({ BODIES: { folder: (await import("./GroupPage")).GroupPage } }));
 // The Home hero reads the league; these tests are about the shell.
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
@@ -47,7 +47,7 @@ import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
 import { ThemeProvider } from "@/lib/theme/theme";
-import { ABOUT, RELATED } from "@/components/uptown/pages";
+import { ABOUT, RELATED } from "./pages";
 
 const RELATED_TEST = RELATED as Record<string, string[]>;
 const standingsNext = RELATED_TEST.standings;

@@ -10,7 +10,7 @@ import { START_PLACES } from "@/lib/desktop/groups";
 import { type Launcher, useLauncherGroups } from "@/lib/desktop/registry";
 import { useLeague } from "@/lib/league/use-league";
 import { useMember } from "@/lib/member/use-member";
-import { LINE, LineIcon } from "./icons";
+import { LINE, LineIcon } from "./line-icons";
 import { urlOf } from "./pages";
 
 interface AccountMenuProps {

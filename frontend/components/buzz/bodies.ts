@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-import { GroupPage } from "@/components/uptown/GroupPage";
+import { GroupPage } from "./GroupPage";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { BuzzPlayer } from "./BuzzPlayer";
 import { BuzzStandings } from "./BuzzStandings";

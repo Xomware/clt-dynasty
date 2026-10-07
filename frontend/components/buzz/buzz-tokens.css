@@ -1,7 +1,8 @@
 /* Buzz City: Charlotte in the 90s. Arena teal and royal purple on a pinstriped
    home jersey, amber dot-matrix scoreboards, chunky italic lettering. */
 
-:root[data-theme="buzz"] {
+:root[data-theme="buzz"],
+.theme-transition[data-to="buzz"] {
   --bz-display: "Bowlby One", Impact, sans-serif;
   --bz-jersey: "Barlow Condensed", "Arial Narrow", sans-serif;
   --bz-body: Barlow, system-ui, sans-serif;

@@ -11,7 +11,7 @@
    Every element's resting style is its final frame, and each keyframe opens
    from its first. With animation off (reduced motion), the stage is the
    finished lockup, which simply fades. */
-/* The skyline's palette. The theme switch and Uptown's backdrop draw it too. */
+/* The skyline's palette. The switch back to XP reads its dawn colours too. */
 .intro,
 .skyline-palette {
   --intro-night: #070f22;

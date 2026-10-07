@@ -4,7 +4,7 @@ import { createContext, type ReactNode, useCallback, useContext, useLayoutEffect
 import { flushSync } from "react-dom";
 
 import { ThemeTransition, TIMING } from "@/components/theme/ThemeTransition";
-import { isTheme, LEGACY, type Theme, THEME_KEY, BUZZ_CHROME, BUZZ_FONTS, UPTOWN_FONTS } from "./script";
+import { isTheme, LEGACY, type Theme, THEME_KEY, BUZZ_CHROME, BUZZ_FONTS } from "./script";
 
 export type { Theme } from "./script";
 
@@ -84,7 +84,7 @@ interface ThemeState {
 
 const ThemeContext = createContext<ThemeState>({ theme: "xp", setTheme: () => {}, switching: false });
 
-/** This browser's theme, XP until a viewer picks Uptown. */
+/** This browser's theme, XP until a viewer picks Buzz City. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const stored = useSyncExternalStore<Theme | undefined>(subscribe, read, serverTheme);
   const theme = stored ?? "xp";
@@ -124,9 +124,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext value={{ theme, setTheme, switching: playing !== null }}>
-      {theme === "buzz" && <link rel="stylesheet" href={BUZZ_FONTS} precedence="default" />}
-      {/* The signed-out landing is still Uptown's until Buzz City's lands. */}
-      {theme === "buzz" && <link rel="stylesheet" href={UPTOWN_FONTS} precedence="default" />}
+      {(theme === "buzz" || playing === "buzz") && <link rel="stylesheet" href={BUZZ_FONTS} precedence="default" />}
       {children}
       {playing && <ThemeTransition to={playing} />}
       <p role="status" className="sr-only">
