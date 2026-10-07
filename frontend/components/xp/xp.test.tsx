@@ -75,7 +75,8 @@ describe("BrandLoader", () => {
   it("announces its label and hides the art", () => {
     const { container } = render(<BrandLoader label="Signing you in..." />);
     expect(screen.getByRole("status").textContent).toBe("Signing you in...");
-    expect(container.querySelector(".brand-loader svg")?.getAttribute("aria-hidden")).toBe("true");
+    expect(container.querySelector(".brand-loader-seal")?.getAttribute("srcset")).toMatch(/seal.* 1x, .*seal@2x.* 2x/);
+    expect(screen.queryAllByRole("img")).toEqual([]);
   });
 
   it("marches the blocks only when motion is allowed", () => {

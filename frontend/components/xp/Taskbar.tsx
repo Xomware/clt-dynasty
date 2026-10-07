@@ -2,13 +2,13 @@
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 
+import { BrandMark } from "@/components/buzz/BrandMark";
 import { useAuth } from "@/lib/auth/use-auth";
 import { useDesktop } from "@/lib/desktop/desktop-context";
 import { REGISTRY, useWindowTitle } from "@/lib/desktop/registry";
 import { defaultLayout } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { useTheme } from "@/lib/theme/theme";
-import { BuzzIcon, CrownIcon } from "./icons";
 import { SpeakerToggle } from "./SpeakerToggle";
 import { StartMenu } from "./StartMenu";
 
@@ -93,7 +93,7 @@ export function Taskbar() {
             setOpen((o) => !o);
           }}
         >
-          <CrownIcon width={22} height={22} />
+          <BrandMark mark="crown" alt="" height={18} className="flex-none" />
           start
         </button>
         <ul className="xp-tasks" aria-label="Open windows">
@@ -124,7 +124,7 @@ export function Taskbar() {
             disabled={switching}
             onClick={() => setTheme("buzz")}
           >
-            <BuzzIcon width={18} height={18} />
+            <BrandMark mark="head" alt="" height={18} />
           </button>
           <SpeakerToggle />
           <time>{time}</time>

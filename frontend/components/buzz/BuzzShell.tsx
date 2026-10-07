@@ -118,7 +118,7 @@ export function BuzzShell() {
       <div className="bz-top">
         <header className="bz-header">
           <a href={urlOf(HOME)} className="bz-brand" onClick={(e) => onNav(e, HOME)}>
-            <BrandMark mark="lockup" alt="CLT Dynasty Fantasy Football, home" className="bz-brand-lockup" priority />
+            <BrandMark mark="seal" alt="CLT Dynasty Fantasy Football, home" className="bz-brand-seal" priority />
           </a>
           <nav aria-label="Main" className="bz-nav">
             <a href={urlOf(HOME)} aria-current={view.kind === "home" ? "page" : undefined} onClick={(e) => onNav(e, HOME)}>

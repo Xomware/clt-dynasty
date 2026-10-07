@@ -1,8 +1,8 @@
 @import "./buzz-tokens.css";
 
-/* The hornet buzzes in 0-900ms, the crown drops 950-1330ms, CLT DYNASTY slaps
-   on at 1300ms and the ribbon slides in at 1500ms. Then it idles: the hornet
-   hovers and the tracking bar runs. */
+/* The hornet buzzes in 0-900ms, the crown drops 950-1330ms and the wordmark
+   slaps on at 1300ms. Then it idles: the hornet hovers, a glint crosses the
+   wordmark every few seconds and the tracking bar runs. */
 .bz-loader {
   display: none;
 }
@@ -96,33 +96,28 @@
 }
 
 .bz-ld-word {
-  margin-top: 0.75rem;
-  color: var(--bz-teal);
-  font: 800 clamp(2.5rem, 12vw, 4.25rem) / 0.95 var(--bz-jersey);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  -webkit-text-stroke: 0.14em var(--bz-paper);
-  paint-order: stroke fill;
-  filter: drop-shadow(0.06em 0.06em 0 var(--bz-purple-deep));
+  position: relative;
+  width: min(22rem, 82vw);
+  margin-top: 0.25rem;
   animation: bz-slap 420ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 1300ms both;
 }
 
-/* The lockup's ribbon: purple, notched at both ends, sliding in from the left. */
-.bz-ld-ribbon {
-  margin-top: 0.5rem;
-  padding: 0.3rem 2.25rem;
-  color: var(--bz-paper);
-  background: linear-gradient(var(--bz-purple), var(--bz-purple-deep));
-  clip-path: polygon(0 0, 100% 0, calc(100% - 0.9rem) 50%, 100% 100%, 0 100%, 0.9rem 50%);
-  font: 700 clamp(0.9375rem, 4vw, 1.125rem) / 1.2 var(--bz-jersey);
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  animation: bz-ribbon 460ms cubic-bezier(0.3, 0.7, 0.2, 1) 1500ms both;
+.bz-ld-wordmark {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 6px 8px rgb(8 4 24 / 0.5));
 }
 
-.bz-ld-ribbon span {
-  display: block;
-  margin-right: -0.32em;
+/* A band of light masked to the wordmark's own shape. Its resting place is off
+   the right edge, so with motion off there is no glint. */
+.bz-ld-glint {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 42%, rgb(255 251 234 / 0.55) 50%, transparent 58%) 3% 0 / 250% 100% no-repeat;
+  -webkit-mask: url("../../public/brand/wordmark@2x.webp") center / 100% 100% no-repeat;
+  mask: url("../../public/brand/wordmark@2x.webp") center / 100% 100% no-repeat;
+  animation: bz-glint 3.2s ease-in-out 1750ms infinite both;
 }
 
 /* A VHS tracking bar under the mark. */
@@ -245,9 +240,13 @@
   }
 }
 
-@keyframes bz-ribbon {
-  from {
-    clip-path: polygon(0 0, 0 0, 0 50%, 0 100%, 0 100%, 0 50%);
+@keyframes bz-glint {
+  0% {
+    background-position: 97% 0;
+  }
+  25%,
+  100% {
+    background-position: 3% 0;
   }
 }
 

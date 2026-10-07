@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, useSyncExternalStore, type AnimationEvent, type CSSProperties } from "react";
 
+import { BrandMark } from "@/components/buzz/BrandMark";
 import { markSeen } from "@/lib/intro/seen";
 import { Skyline } from "./Skyline";
 
@@ -79,41 +80,9 @@ export function Intro() {
         </div>
       </div>
 
-      <div className="intro-crown" aria-hidden>
-        <svg viewBox="0 0 16 16" focusable="false">
-          <defs>
-            <linearGradient id="intro-gold" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="var(--intro-gold-light)" />
-              <stop offset="0.55" stopColor="var(--clt-crown)" />
-              <stop offset="1" stopColor="var(--clt-crown-dark)" />
-            </linearGradient>
-            <linearGradient id="intro-glint" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="var(--intro-glint)" stopOpacity={0} />
-              <stop offset="0.5" stopColor="var(--intro-glint)" stopOpacity={0.9} />
-              <stop offset="1" stopColor="var(--intro-glint)" stopOpacity={0} />
-            </linearGradient>
-            <clipPath id="intro-crown-shape">
-              <path d="M3 9.5 2.5 4l3 2.5L8 2.5l2.5 4 3-2.5-.5 5.5z" />
-              <rect x="3" y="10.5" width="10" height="2" />
-            </clipPath>
-          </defs>
-          <rect x="0.5" y="0.5" width="15" height="15" rx="2" className="intro-tile" />
-          {/* The league mark's own geometry, from CrownIcon. */}
-          <path
-            d="M3 9.5 2.5 4l3 2.5L8 2.5l2.5 4 3-2.5-.5 5.5z"
-            fill="url(#intro-gold)"
-            className="stroke-(--clt-crown-dark) stroke-[0.4]"
-            strokeLinejoin="round"
-          />
-          <rect x="3" y="10.5" width="10" height="2" fill="url(#intro-gold)" className="stroke-(--clt-crown-dark) stroke-[0.4]" />
-          <circle cx="8" cy="7.25" r="0.9" className="fill-(--clt-teal)" />
-          {/* The skew sits on a wrapper: a CSS transform would replace an SVG transform attribute. */}
-          <g clipPath="url(#intro-crown-shape)">
-            <g transform="skewX(-18)">
-              <rect x="-4" y="0" width="5" height="16" fill="url(#intro-glint)" className="intro-glint" />
-            </g>
-          </g>
-        </svg>
+      <div className="intro-crest" aria-hidden>
+        <BrandMark mark="seal" alt="" className="intro-seal" priority />
+        <i className="intro-glint" />
         {SPARKS.map((s, i) => (
           <span
             key={i}
@@ -122,11 +91,13 @@ export function Intro() {
           />
         ))}
       </div>
-
-      <div className="intro-word" aria-hidden>
-        <p className="intro-name">CLT Dynasty</p>
-        <p className="intro-tagline">The Queen City&rsquo;s dynasty league</p>
+      <div className="intro-crown" aria-hidden>
+        <BrandMark mark="crown" alt="" priority />
       </div>
+
+      <p className="intro-tagline" aria-hidden>
+        The Queen City&rsquo;s dynasty league
+      </p>
 
       <button
         type="button"

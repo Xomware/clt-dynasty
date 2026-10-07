@@ -2,7 +2,8 @@
 
 import { LoadError } from "@/components/xp/LoadError";
 import { TeamName } from "@/components/xp/TeamName";
-import { BracketIcon, CrownIcon, TrophyIcon } from "@/components/xp/icons";
+import { BrandMark } from "@/components/buzz/BrandMark";
+import { BracketIcon, TrophyIcon } from "@/components/xp/icons";
 import { Window } from "@/components/xp/Window";
 import { refreshOverview, useOverview, type Overview } from "@/lib/landing/overview";
 
@@ -14,7 +15,7 @@ export function LeagueLive() {
   if (state.status === "error") {
     return (
       <div className="landing-desk-grid">
-        <Window title="League Status" icon={<CrownIcon width={16} height={16} />} controls>
+        <Window title="League Status" icon={<BrandMark mark="crown" alt="" height={14} />} controls>
           <LoadError what="the league from Sleeper" message={state.message} onRetry={refreshOverview} />
         </Window>
       </div>
@@ -25,7 +26,7 @@ export function LeagueLive() {
   return (
     <div className="landing-desk-grid">
       <div className="landing-desk-col">
-        <Window title="League Status" icon={<CrownIcon width={16} height={16} />} controls>
+        <Window title="League Status" icon={<BrandMark mark="crown" alt="" height={14} />} controls>
           {o ? <Status overview={o} /> : <Skeleton label="Loading league status" rows={4} />}
         </Window>
         <Window title="Hall of Champions" icon={<TrophyIcon width={16} height={16} />} controls>

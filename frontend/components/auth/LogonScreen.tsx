@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { CrownIcon } from "@/components/xp/icons";
+import { BrandMark } from "@/components/buzz/BrandMark";
 
 import "./logon.css";
 
@@ -18,7 +18,7 @@ export function LogonScreen({ children, footer }: LogonScreenProps) {
       <div className="xp-logon-band" />
       <div className="xp-logon-body">
         <div className="xp-logon-brand">
-          <CrownIcon width={72} height={72} />
+          <BrandMark mark="seal" alt="" height={88} className="xp-logon-seal" priority />
           <p className="xp-logon-name">CLT Dynasty</p>
           <p className="xp-logon-tagline">The Queen City&rsquo;s dynasty league</p>
         </div>

@@ -46,6 +46,10 @@
   text-align: right;
 }
 
+.xp-logon-seal {
+  filter: drop-shadow(1px 3px 4px var(--xp-logon-top));
+}
+
 .xp-logon-name {
   font: italic bold 2.25rem/1.1 var(--xp-title-font);
   text-shadow: 1px 2px 3px var(--xp-logon-top);

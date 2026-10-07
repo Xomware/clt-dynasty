@@ -1,7 +1,8 @@
 "use client";
 
-import type { ComponentType, SVGProps } from "react";
+import type { ReactNode, SVGProps } from "react";
 
+import { BrandMark } from "@/components/buzz/BrandMark";
 import { type Theme, useTheme } from "@/lib/theme/theme";
 
 import "./theme-toggle.css";
@@ -22,38 +23,18 @@ export function XpWindowGlyph(props: GlyphProps) {
   );
 }
 
-// Buzz City's hornet in one line: wing, striped body, head.
-export function HornetGlyph(props: GlyphProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width={16}
-      height={16}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinejoin="round"
-      aria-hidden
-      focusable="false"
-      {...props}
-    >
-      <path d="M12 9.5c1-4 5-6 7-4s-1.5 4.5-5 4.5M4 15.5c0-3 3-5 7-5s6 2 6 5-3 4.5-6 4.5-7-1.5-7-4.5zM9 11v9M13 10.7v9M17 13.5a3 3 0 1 0 5 0M2 15.5h2" />
-    </svg>
-  );
-}
-
-const OPTIONS: { theme: Theme; label: string; Glyph: ComponentType<GlyphProps> }[] = [
-  { theme: "xp", label: "Classic XP", Glyph: XpWindowGlyph },
-  { theme: "buzz", label: "Buzz City", Glyph: HornetGlyph },
+const OPTIONS: { theme: Theme; label: string; glyph: ReactNode }[] = [
+  { theme: "xp", label: "Classic XP", glyph: <XpWindowGlyph /> },
+  { theme: "buzz", label: "Buzz City", glyph: <BrandMark mark="head" alt="" height={18} /> },
 ];
 
 export function ThemeToggle() {
   const { theme, setTheme, switching } = useTheme();
   return (
     <div role="group" aria-label="Theme" className="theme-toggle">
-      {OPTIONS.map(({ theme: option, label, Glyph }) => (
+      {OPTIONS.map(({ theme: option, label, glyph }) => (
         <button key={option} type="button" aria-pressed={theme === option} disabled={switching} onClick={() => setTheme(option)}>
-          <Glyph />
+          {glyph}
           {label}
         </button>
       ))}
