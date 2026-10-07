@@ -453,8 +453,13 @@
 }
 
 [data-theme="buzz"] .xp-score {
+  color: var(--bz-ink);
+  font: 800 1.125rem var(--bz-jersey);
+}
+
+[data-theme="buzz"] .xp-matchup .xp-score {
   color: var(--bz-amber);
-  font: 800 1.25rem var(--bz-jersey);
+  font-size: 1.25rem;
   text-shadow: 0 0 8px rgb(255 181 46 / 0.45);
 }
 
@@ -661,6 +666,85 @@
 
 [data-theme="buzz"] .xp-balloon-close:hover {
   background: var(--bz-teal-light);
+}
+
+/* Team, profile, league, NFL team and player heads: the arena board. */
+
+[data-theme="buzz"] .team-head {
+  --xp-text: var(--bz-paper);
+
+  gap: 0.75rem 1.25rem;
+  padding: 1rem 1.25rem;
+  border: 3px solid var(--bz-ink);
+  border-radius: 14px;
+  color: var(--bz-paper);
+  background: var(--bz-led-dots), linear-gradient(var(--bz-ink-2), var(--bz-ink));
+  box-shadow:
+    0 0 0 3px var(--bz-teal) inset,
+    5px 5px 0 var(--bz-purple);
+}
+
+[data-theme="buzz"] .team-head :is(.team-avatar, .xp-face) {
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 3px solid var(--bz-paper);
+  border-radius: 50%;
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+  box-shadow: 0 0 0 2px var(--bz-teal-light);
+  font: 400 1.75rem var(--bz-display);
+}
+
+[data-theme="buzz"] .team-name {
+  color: var(--bz-paper);
+  font: italic 400 1.5rem / 1.1 var(--bz-display);
+  text-shadow: 2px 2px 0 var(--bz-purple);
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .team-head a,
+[data-theme="buzz"] .team-head .xp-drill {
+  color: var(--bz-teal-light);
+}
+
+[data-theme="buzz"] .team-head .team-stats dt {
+  color: var(--bz-teal-light);
+  font: 800 0.75rem var(--bz-jersey);
+  letter-spacing: 0.14em;
+}
+
+[data-theme="buzz"] .team-head .team-stats dd {
+  color: var(--bz-amber);
+  font: 800 1.25rem var(--bz-jersey);
+  text-shadow: 0 0 6px rgb(255 181 46 / 0.4);
+}
+
+[data-theme="buzz"] .team-streak {
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-shadow: none;
+}
+
+/* AI recaps */
+
+[data-theme="buzz"] .md-h1 {
+  color: var(--bz-purple);
+  font: italic 400 1.75rem / 1.1 var(--bz-display);
+  text-shadow: 3px 3px 0 var(--bz-teal-light);
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .md-h2 {
+  border-bottom: 3px solid var(--bz-teal);
+  color: var(--bz-purple);
+  font: italic 900 1.375rem var(--bz-jersey);
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .md-h3 {
+  color: var(--bz-ink);
+  font: italic 800 1.125rem var(--bz-jersey);
+  text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {

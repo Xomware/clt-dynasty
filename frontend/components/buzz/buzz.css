@@ -858,6 +858,19 @@
   width: 0.3em;
 }
 
+/* The strip across the top of every trading card. */
+.bz-tcard-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding: 0.125rem 0.625rem;
+  color: var(--bz-paper);
+  background: var(--bz-ink);
+  font: italic 800 0.75rem / 1.6 var(--bz-jersey);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
 /* Spotlight: a sticker card over an ink scrim. */
 
 .buzz .u-spot-scrim {
