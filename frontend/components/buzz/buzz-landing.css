@@ -23,6 +23,7 @@
 .bz-landing-lede {
   max-width: 34rem;
   margin-bottom: 1.25rem;
+  color: var(--bz-paper);
   font: 500 1.125rem / 1.5 var(--bz-body);
 }
 
@@ -144,9 +145,9 @@
 }
 
 .bz-landing-heading {
-  color: var(--bz-purple);
+  color: var(--bz-paper);
   font: italic 400 clamp(1.75rem, 4vw, 2.5rem) / 1.05 var(--bz-display);
-  text-shadow: 4px 4px 0 var(--bz-teal-light);
+  text-shadow: 4px 4px 0 var(--bz-teal);
   text-transform: uppercase;
 }
 
