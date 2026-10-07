@@ -72,7 +72,7 @@ describe("ThemeProvider", () => {
     act(() => vi.advanceTimersByTime(1));
     expect(screen.getByTestId("theme").textContent).toBe("buzz");
     expect(html.dataset.theme).toBe("buzz");
-    expect(themeColor()).toBe("#0a1838");
+    expect(themeColor()).toBe("#170d31");
     expect(localStorage.getItem(THEME_KEY)).toBe("buzz");
     expect(overlay()).not.toBeNull();
     expect(screen.getByRole("status").textContent).toBe("Buzz City theme on");
@@ -157,7 +157,7 @@ describe("THEME_SCRIPT", () => {
     localStorage.setItem(THEME_KEY, "buzz");
     run();
     expect(html.dataset.theme).toBe("buzz");
-    expect(themeColor()).toBe("#0a1838");
+    expect(themeColor()).toBe("#170d31");
   });
 
   it("moves a stored Uptown choice over to Buzz City", () => {

@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from "react";
 
-// Uptown's cards: Home's, the Keep going row, and each page's top-level groups.
-export const REVEAL = ".home-card, .u-related, .u-panel .xp-group:not(.xp-group .xp-group), .up-page .xp-group:not(.xp-group .xp-group)";
+// The themed shells' cards: Home's, the Keep going row, and each page's top-level groups.
+export const REVEAL =
+  ".home-card, .bz-card, .u-related, :is(.u-panel, .up-page, .bz-panel) .xp-group:not(.xp-group .xp-group)";
 
 // Cards that mount below the fold wait (data-reveal="wait", styled hidden)
 // until they scroll into view, then rise in (data-reveal="in"). Anything

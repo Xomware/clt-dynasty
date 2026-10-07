@@ -1,0 +1,636 @@
+/* The window bodies keep their XP markup and CSS; this re-skins them for
+   Buzz City. It is unlayered, so it beats the XP rules in globals.css (@layer
+   components) and Tailwind's utilities at any specificity. A property set
+   here overrides a view's utility class too; only do that on purpose. */
+
+:root[data-theme="buzz"] {
+  /* The XP tokens the views read, pointed at Buzz City. :root as well, so it
+     outranks globals.css's own :root block whichever file loads last. */
+  --xp-font: var(--bz-body);
+  --xp-title-font: var(--bz-jersey);
+  --xp-text: var(--bz-text);
+  --xp-text-inverse: var(--bz-paper);
+  --xp-cream: var(--bz-paper);
+  --xp-face: var(--bz-paper-2);
+  --xp-face-shadow: var(--bz-paper-3);
+  --xp-button-border: var(--bz-ink);
+  --xp-select: var(--bz-teal-deep);
+  --xp-title: var(--bz-purple);
+  --xp-title-light: var(--bz-teal);
+  --xp-title-dark: var(--bz-purple-deep);
+  --xp-frame: var(--bz-ink);
+  --xp-gold: var(--bz-amber);
+  --xp-balloon: rgb(18 163 177 / 0.14);
+  --xp-menu-side: rgb(18 163 177 / 0.14);
+  --xp-red: var(--bz-red-text);
+  --xp-close: #c11f3a;
+  --xp-close-dark: #8a1328;
+  --xp-wood: var(--bz-purple-deep);
+  --xp-screen: var(--bz-ink);
+  --xp-lime: var(--bz-led-green);
+  --xp-bronze: #b9773f;
+}
+
+/* The pixel icons keep XP's palette: they are pictures, not text. */
+[data-theme="buzz"] svg:not(.hex-chart, .bz-hornet) {
+  --xp-text: #1b1b17;
+  --xp-text-inverse: #fbfbf6;
+  --xp-cream: #fbf8ec;
+  --xp-face: #ece9d8;
+  --xp-face-shadow: #aca899;
+  --xp-select: #316ac5;
+  --xp-title: #0a5ce6;
+  --xp-title-light: #3d95ff;
+  --xp-title-dark: #0544c4;
+  --xp-frame: #0831d9;
+  --xp-gold: #e8b92c;
+  --xp-red: #c8311e;
+  --xp-wood: #9b5a24;
+  --xp-screen: #1e2c3a;
+  --xp-start: #3a9a36;
+  --xp-start-light: #5fbf55;
+  --xp-start-dark: #2b7a28;
+  --xp-lime: #7cf05a;
+  --xp-bronze: #c07a3e;
+}
+
+[data-theme="buzz"] body {
+  color: var(--bz-text);
+  background: var(--bz-paper);
+}
+
+:where([data-theme="buzz"] .buzz) a {
+  color: var(--bz-teal-deep);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+:where([data-theme="buzz"] .buzz) a:hover {
+  color: var(--bz-purple);
+}
+
+/* Headings and groups: each group a card with its title on jersey lettering. */
+
+[data-theme="buzz"] :is(.xp-group-title, .xp-round-title) {
+  color: var(--bz-purple);
+  font: italic 900 1.25rem / 1.15 var(--bz-jersey);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .xp-group {
+  padding: 1rem 1.125rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 12px;
+  background: var(--bz-paper);
+  box-shadow: 4px 4px 0 var(--bz-paper-3);
+}
+
+[data-theme="buzz"] .xp-group .xp-group {
+  box-shadow: none;
+}
+
+[data-theme="buzz"] .xp-group-title {
+  margin-bottom: 0.625rem;
+}
+
+/* Tables: a purple header band, ivory rows. */
+
+[data-theme="buzz"] .xp-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: none;
+}
+
+[data-theme="buzz"] .xp-table th {
+  padding: 0.5rem;
+  border: 0;
+  background: none;
+}
+
+[data-theme="buzz"] .xp-table thead :is(th, th button) {
+  color: var(--bz-paper);
+  font: 700 0.8125rem var(--bz-jersey);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .xp-table thead th {
+  background: var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-table thead th:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+[data-theme="buzz"] .xp-table thead th:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+[data-theme="buzz"] .xp-table td {
+  padding: 0.5625rem 0.5rem;
+  border-bottom: 1px solid var(--bz-paper-3);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme="buzz"] .xp-table tbody tr:last-child :is(td, th) {
+  border-bottom: 0;
+}
+
+[data-theme="buzz"] .xp-table tbody tr:hover :is(td, th) {
+  background-color: rgb(18 163 177 / 0.1);
+}
+
+[data-theme="buzz"] .xp-table .xp-group-start td {
+  border-top: 2px solid var(--bz-ink);
+}
+
+[data-theme="buzz"] .xp-table .xp-in td:first-child {
+  box-shadow: inset 4px 0 var(--bz-teal);
+}
+
+/* Your own rows and picks: a teal wash with the teal edge. :root outranks the
+   windows' own .row[data-mine] rules, whichever loads last. */
+:root[data-theme="buzz"] [data-mine] {
+  background: rgb(18 163 177 / 0.16);
+  box-shadow: inset 4px 0 var(--bz-teal);
+}
+
+[data-theme="buzz"] .xp-board td {
+  border-left-color: var(--bz-paper-3);
+}
+
+/* Tabs: stickers on a rail; the picked one is purple. */
+
+[data-theme="buzz"] .xp-tab-strip {
+  gap: 0.375rem;
+  padding: 0 0 0.25rem;
+  box-shadow: none;
+}
+
+[data-theme="buzz"] .xp-tab {
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0 1rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  color: var(--bz-ink);
+  background: var(--bz-paper);
+  font: italic 800 0.9375rem var(--bz-jersey);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
+}
+
+[data-theme="buzz"] .xp-tab:hover {
+  background: var(--bz-teal-light);
+}
+
+[data-theme="buzz"] .xp-tab:active {
+  box-shadow: inset 0 2px 0 rgb(23 13 49 / 0.25);
+}
+
+[data-theme="buzz"] .xp-tab[aria-selected="true"] {
+  margin: 0;
+  padding-bottom: 0;
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+  box-shadow: 3px 3px 0 var(--bz-teal);
+}
+
+/* The strip scrolls sideways, which would clip a ring drawn outside it. */
+[data-theme="buzz"] .xp-tab:focus-visible {
+  outline: 3px solid var(--bz-focus);
+  outline-offset: -5px;
+}
+
+[data-theme="buzz"] .xp-tab-panel {
+  padding: 1rem 0 0;
+  border: 0;
+  background: none;
+}
+
+[data-theme="buzz"] .xp-tab-panel:focus-visible {
+  border-radius: 8px;
+  outline-offset: 4px;
+}
+
+/* Buttons and fields: stickers with an ink edge and a hard shadow. */
+
+[data-theme="buzz"] :is(.xp-button, .xp-select, .xp-log-off) {
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 10px;
+  color: var(--bz-ink);
+  background: var(--bz-paper);
+  box-shadow: 3px 3px 0 var(--bz-ink);
+  font: italic 800 0.9375rem var(--bz-jersey);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s,
+    background-color 0.12s;
+}
+
+[data-theme="buzz"] .xp-select {
+  font: 600 0.9375rem var(--bz-body);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+[data-theme="buzz"] :is(.xp-button, .xp-select, .xp-log-off):hover:not(:disabled) {
+  background-color: var(--bz-teal-light);
+  box-shadow: 4px 4px 0 var(--bz-ink);
+  transform: translate(-1px, -1px);
+}
+
+[data-theme="buzz"] :is(.xp-button, .xp-log-off):active:not(:disabled) {
+  box-shadow: 1px 1px 0 var(--bz-ink);
+  transform: translate(2px, 2px);
+}
+
+[data-theme="buzz"] .xp-button:disabled {
+  border-color: var(--bz-paper-3);
+  color: var(--bz-muted);
+  background: var(--bz-paper-2);
+  box-shadow: none;
+  cursor: default;
+}
+
+[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled) {
+  background-color: var(--bz-amber);
+}
+
+[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled):hover {
+  background-color: var(--bz-amber-light);
+}
+
+/* Paired on/off buttons read as one segmented control. */
+[data-theme="buzz"] .xp-toggle {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-theme="buzz"] .xp-toggle:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+[data-theme="buzz"] .xp-toggle:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+[data-theme="buzz"] .xp-toggle[aria-pressed="true"] {
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-step {
+  min-width: 2.75rem;
+  padding: 0;
+}
+
+/* Selects draw their own chevron. */
+[data-theme="buzz"] .xp-select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--bz-ink) 50%) right 1rem center / 0.4rem 0.4rem no-repeat,
+    linear-gradient(135deg, var(--bz-ink) 50%, transparent 50%) right 0.6rem center / 0.4rem 0.4rem no-repeat,
+    var(--bz-paper);
+}
+
+[data-theme="buzz"] .xp-select:hover {
+  background:
+    linear-gradient(45deg, transparent 50%, var(--bz-ink) 50%) right 1rem center / 0.4rem 0.4rem no-repeat,
+    linear-gradient(135deg, var(--bz-ink) 50%, transparent 50%) right 0.6rem center / 0.4rem 0.4rem no-repeat,
+    var(--bz-teal-light);
+}
+
+[data-theme="buzz"] :is(.xp-input, .proposal-textarea, textarea) {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.875rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 10px;
+  color: var(--bz-text);
+  font: inherit;
+  background: #fffdf6;
+  box-shadow: inset 2px 2px 0 var(--bz-paper-3);
+}
+
+[data-theme="buzz"] :is(.xp-input, .proposal-textarea, textarea):focus-visible {
+  outline: 3px solid var(--bz-focus);
+  outline-offset: 1px;
+}
+
+[data-theme="buzz"] :is(.xp-input, textarea)::placeholder {
+  color: var(--bz-muted);
+}
+
+[data-theme="buzz"] .xp-input[aria-invalid="true"] {
+  border-color: var(--bz-red-text);
+}
+
+[data-theme="buzz"] :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--bz-purple);
+}
+
+/* Drill links stay text-coloured, like XP's, and go teal on hover. */
+
+[data-theme="buzz"] .xp-drill:hover,
+[data-theme="buzz"] .xp-drill:hover .xp-team-name {
+  color: var(--bz-teal-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+[data-theme="buzz"] .xp-drill:focus-visible {
+  border-radius: 6px;
+  outline: 3px solid var(--bz-focus);
+  outline-offset: 2px;
+}
+
+/* Tags, avatars, faces */
+
+[data-theme="buzz"] .xp-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
+  font: 800 0.75rem / 1.5 var(--bz-jersey);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .world-cup-status[data-status="clinched"] {
+  background: var(--bz-amber);
+}
+
+[data-theme="buzz"] .world-cup-status[data-status="eliminated"] {
+  border-color: var(--bz-paper-3);
+  color: var(--bz-muted);
+  background: none;
+}
+
+[data-theme="buzz"] .xp-avatar {
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-face {
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  background: var(--bz-teal-light);
+}
+
+/* Grouped surfaces */
+
+[data-theme="buzz"] :is(.xp-matchup, .xp-bracket-match) {
+  padding: 0.75rem 0.875rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 12px;
+  background: var(--bz-paper);
+  box-shadow: 3px 3px 0 var(--bz-ink);
+}
+
+[data-theme="buzz"] .xp-matchup {
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    background-color 0.15s;
+}
+
+[data-theme="buzz"] .xp-matchup:hover {
+  background: #fffdf6;
+  box-shadow: 5px 5px 0 var(--bz-purple);
+  transform: translate(-2px, -2px);
+}
+
+[data-theme="buzz"] .xp-matchup:active {
+  box-shadow: 1px 1px 0 var(--bz-ink);
+  transform: translate(2px, 2px);
+}
+
+[data-theme="buzz"] .xp-matchup-hint {
+  color: var(--bz-teal-deep);
+}
+
+[data-theme="buzz"] .xp-score {
+  color: var(--bz-ink);
+  font: 800 1.125rem var(--bz-jersey);
+}
+
+[data-theme="buzz"] .xp-player-row {
+  min-height: 2.75rem;
+  padding: 0.375rem 0.5rem;
+  border-bottom-color: var(--bz-paper-3);
+}
+
+[data-theme="buzz"] :is(.xp-player-pos, .xp-player-team, .xp-slot-from) {
+  color: var(--bz-muted);
+}
+
+[data-theme="buzz"] .xp-player-pos {
+  font: 800 0.8125rem var(--bz-jersey);
+}
+
+/* Notes, insets, summaries */
+
+[data-theme="buzz"] :is(.xp-note, .xp-inset, .settings-note) {
+  padding: 0.5rem 0.875rem;
+  border: 0;
+  border-radius: 10px;
+  color: var(--bz-muted);
+  background: var(--bz-paper-2);
+  box-shadow: none;
+  font-size: 0.875rem;
+}
+
+[data-theme="buzz"] .xp-summary dt {
+  color: var(--bz-muted);
+  font: 700 0.8125rem var(--bz-jersey);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .xp-summary dd {
+  color: var(--bz-ink);
+}
+
+.bz-panel p[role="alert"],
+.bz-panel .xp-group p[role="alert"] {
+  padding: 0.625rem 0.875rem;
+  border: 2px solid var(--bz-red-text);
+  border-radius: 10px;
+  color: #6e0f22;
+  background: #fde3e6;
+}
+
+[data-theme="buzz"] .search-modes {
+  padding: 0.5rem 1rem 0.75rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 12px;
+}
+
+/* Home's cards */
+
+[data-theme="buzz"] :is(.home-big, .home-stats dd, .home-mine-score) {
+  color: var(--bz-ink);
+  font-family: var(--bz-jersey);
+}
+
+[data-theme="buzz"] .home-big-label {
+  color: var(--bz-muted);
+}
+
+[data-theme="buzz"] .home-mine {
+  border: 2px solid var(--bz-ink);
+  background: linear-gradient(rgb(18 163 177 / 0.14), transparent 70%), var(--bz-paper);
+  box-shadow: inset 4px 0 var(--bz-teal);
+}
+
+[data-theme="buzz"] .home-countdown {
+  border: 2px solid var(--bz-ink);
+  color: var(--bz-ink);
+  background: var(--bz-amber);
+}
+
+[data-theme="buzz"] :is(.home-stats div, .home-mine-game, .home-mine-next, .home-news-item) {
+  border: 2px solid var(--bz-paper-3);
+  border-radius: 10px;
+}
+
+[data-theme="buzz"] .home-news-item[data-priority="critical"] {
+  border-color: var(--bz-ink);
+  background: rgb(255 181 46 / 0.18);
+  box-shadow: inset 4px 0 var(--bz-amber);
+}
+
+[data-theme="buzz"] .home-live {
+  border-color: #c11f3a;
+  color: var(--bz-paper);
+  background: #c11f3a;
+}
+
+/* Stat cards: XP's little dialogs become arena boards. */
+
+[data-theme="buzz"] .xp-dialog {
+  overflow: hidden;
+  border: 2px solid var(--bz-ink);
+  border-radius: 12px;
+  background: var(--bz-paper);
+  box-shadow: 4px 4px 0 var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-dialog-title {
+  padding: 0.375rem 0.875rem;
+  border-radius: 0;
+  color: var(--bz-teal-light);
+  background: var(--bz-ink);
+  font: italic 800 0.8125rem var(--bz-jersey);
+  letter-spacing: 0.12em;
+  text-shadow: none;
+  text-transform: uppercase;
+}
+
+/* Modals and message boxes: an ink scrim behind a sticker card. */
+
+[data-theme="buzz"] .xp-backdrop {
+  background: rgb(23 13 49 / 0.62);
+}
+
+[data-theme="buzz"] .xp-backdrop .xp-window {
+  overflow: hidden;
+  border: 3px solid var(--bz-ink);
+  border-radius: 16px;
+  color: var(--bz-text);
+  background: var(--bz-paper);
+  box-shadow: 8px 8px 0 var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-backdrop .xp-titlebar {
+  padding: 0.625rem 0.75rem 0.625rem 1.25rem;
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-backdrop .xp-titlebar-text {
+  font: italic 400 1.125rem var(--bz-display);
+  text-shadow: 2px 2px 0 var(--bz-ink);
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .xp-control {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  color: var(--bz-ink);
+  background: var(--bz-paper);
+}
+
+[data-theme="buzz"] button.xp-control:hover {
+  background: var(--bz-amber);
+  filter: none;
+}
+
+[data-theme="buzz"] .xp-control svg {
+  --xp-text-inverse: var(--bz-ink);
+}
+
+[data-theme="buzz"] .xp-message-body {
+  padding: 1rem 1.25rem;
+  font-size: 0.9375rem;
+}
+
+[data-theme="buzz"] .xp-message-buttons {
+  padding: 0.25rem 1.25rem 1.25rem;
+}
+
+/* The balloon hangs under the header as a sticker, not over a taskbar tray. */
+
+[data-theme="buzz"] .xp-balloon {
+  top: 8.25rem;
+  right: 1.25rem;
+  bottom: auto;
+  padding: 0.75rem 0.875rem 0.875rem;
+  border: 3px solid var(--bz-ink);
+  border-radius: 12px;
+  color: var(--bz-text);
+  font-size: 0.875rem;
+  background: var(--bz-paper);
+  box-shadow: 5px 5px 0 var(--bz-teal);
+  transform: rotate(-1deg);
+}
+
+[data-theme="buzz"] .xp-balloon::after {
+  display: none;
+}
+
+[data-theme="buzz"] .xp-balloon-close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+}
+
+[data-theme="buzz"] .xp-balloon-close svg {
+  --xp-text: var(--bz-ink);
+}
+
+[data-theme="buzz"] .xp-balloon-close:hover {
+  background: var(--bz-teal-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="buzz"] :is(.xp-tab, .xp-button, .xp-select, .xp-log-off, .xp-matchup) {
+    transition: none;
+  }
+}

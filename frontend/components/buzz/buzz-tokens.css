@@ -1,0 +1,77 @@
+/* Buzz City: Charlotte in the 90s. Arena teal and royal purple on a pinstriped
+   home jersey, amber dot-matrix scoreboards, chunky italic lettering. */
+
+:root[data-theme="buzz"] {
+  --bz-display: "Bowlby One", Impact, sans-serif;
+  --bz-jersey: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --bz-body: Barlow, system-ui, sans-serif;
+  --bz-dot: Doto, "Courier New", monospace;
+
+  --bz-teal: #12a3b1;
+  --bz-teal-light: #7fdde2;
+  --bz-teal-deep: #08707c;
+  --bz-purple: #4b2a8f;
+  --bz-purple-light: #8c6fd6;
+  --bz-purple-deep: #2b1661;
+  --bz-ink: #170d31;
+  --bz-ink-2: #22144a;
+  --bz-ink-3: #2f1f5e;
+  --bz-paper: #f6f2e7;
+  --bz-paper-2: #ebe4d2;
+  --bz-paper-3: #ddd3bb;
+  --bz-text: #1d1238;
+  --bz-muted: #5b4d78;
+  --bz-pin: rgb(75 42 143 / 0.11);
+  --bz-amber: #ffb52e;
+  --bz-amber-light: #ffd98a;
+  --bz-led-red: #ff6b7d;
+  --bz-red-text: #b3203c;
+  --bz-led-green: #8ff0c4;
+  --bz-focus: #ff9f1c;
+
+  /* A trading card's foil edge and the airbrushed swoosh behind the hero. */
+  --bz-foil: linear-gradient(135deg, var(--bz-teal-light), var(--bz-teal) 22%, var(--bz-purple) 52%, var(--bz-purple-light) 70%, var(--bz-teal) 88%, var(--bz-teal-light));
+  --bz-airbrush: linear-gradient(115deg, var(--bz-teal) 10%, var(--bz-purple) 75%);
+  --bz-halftone: radial-gradient(circle, currentColor 0 30%, transparent 34%) 0 0 / 9px 9px;
+  --bz-led-dots: radial-gradient(circle, rgb(255 255 255 / 0.05) 0 1px, transparent 1.5px) 0 0 / 4px 4px;
+  --bz-shadow: 0 2px 0 var(--bz-ink), 0 10px 24px rgb(23 13 49 / 0.25);
+}
+
+.bz-hornet {
+  overflow: visible;
+}
+
+.bz-h-outline {
+  fill: var(--bz-paper);
+  stroke: var(--bz-paper);
+  stroke-width: 9;
+  stroke-linejoin: round;
+}
+
+.bz-h-line {
+  stroke: var(--bz-ink);
+}
+
+.bz-h-teal {
+  fill: var(--bz-teal);
+}
+
+.bz-h-purple {
+  fill: var(--bz-purple);
+}
+
+.bz-h-deep {
+  fill: var(--bz-purple-deep);
+}
+
+.bz-h-ink {
+  fill: var(--bz-ink);
+}
+
+.bz-h-eye {
+  fill: var(--bz-paper);
+}
+
+.bz-h-wing {
+  fill: rgb(214 246 250 / 0.82);
+}

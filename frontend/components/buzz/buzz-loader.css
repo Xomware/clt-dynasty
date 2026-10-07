@@ -1,0 +1,387 @@
+@import "./buzz-tokens.css";
+
+/* Power-on 0-560ms, the hornet zips in 520-1620ms, the word slaps on at
+   1180ms and 1300ms, then the screen idles: wings, bob, tracking bar. */
+.bz-loader {
+  display: none;
+}
+
+[data-theme="buzz"] .brand-loader {
+  display: none;
+}
+
+[data-theme="buzz"] .bz-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  overflow: hidden;
+  color: var(--bz-paper);
+  font-family: var(--bz-body);
+  background:
+    radial-gradient(60% 50% at 50% 42%, rgb(75 42 143 / 0.55), transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 27px, rgb(127 221 226 / 0.06) 27px 28px),
+    var(--bz-ink);
+}
+
+.bz-crt {
+  position: relative;
+  width: min(34rem, 88vw);
+  aspect-ratio: 4 / 3;
+  padding: 0.875rem;
+  border-radius: 2rem;
+  background: linear-gradient(160deg, #3a2b62, #1b1038 60%, #120a28);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.12),
+    inset 0 -3px 0 rgb(0 0 0 / 0.4),
+    0 0 0 3px var(--bz-ink),
+    0 0 0 6px var(--bz-teal),
+    0 24px 60px rgb(5 2 15 / 0.6);
+}
+
+.bz-crt-screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 1.25rem / 1.5rem;
+  background:
+    radial-gradient(70% 60% at 50% 45%, rgb(18 163 177 / 0.32), transparent 75%),
+    linear-gradient(var(--bz-ink-2), var(--bz-ink));
+  box-shadow: inset 0 0 40px rgb(0 0 0 / 0.7);
+  transform-origin: 50% 50%;
+  animation: bz-power 560ms cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+
+/* The flash of a tube warming up, over the opening line. */
+.bz-crt-screen::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: radial-gradient(closest-side, #f4fbff, rgb(127 221 226 / 0.5) 60%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: bz-flash 700ms ease-out both;
+}
+
+.bz-crt-court {
+  position: absolute;
+  inset: 0;
+  color: rgb(127 221 226 / 0.22);
+  background: var(--bz-halftone);
+  -webkit-mask: linear-gradient(transparent 45%, #000);
+  mask: linear-gradient(transparent 45%, #000);
+}
+
+/* A half court's centre circle, drawn faintly behind the word. */
+.bz-crt-court::before {
+  position: absolute;
+  top: 54%;
+  left: 50%;
+  width: 46%;
+  aspect-ratio: 1;
+  border: 2px solid rgb(127 221 226 / 0.16);
+  border-radius: 50%;
+  content: "";
+  transform: translate(-50%, -50%);
+}
+
+.bz-trail {
+  position: absolute;
+  top: 8%;
+  left: 0;
+  width: 50%;
+  height: 22%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--bz-amber);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.004 0.022;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.85;
+  animation: bz-trail 1100ms linear 520ms both;
+}
+
+.bz-trail path {
+  vector-effect: non-scaling-stroke;
+}
+
+.bz-loader-hornet {
+  position: absolute;
+  top: 8%;
+  left: 0;
+  width: 50%;
+  height: 22%;
+  animation: bz-zip-x 1100ms linear 520ms both;
+}
+
+.bz-loader-hornet .bz-hornet {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: clamp(5.5rem, 28%, 8.5rem);
+  height: auto;
+  margin: -2.6rem -4rem 0 0;
+  animation:
+    bz-zip-y 1100ms linear 520ms both,
+    bz-bob 1.3s ease-in-out 1620ms infinite alternate;
+}
+
+.bz-loader-word {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  font: italic 400 clamp(2.5rem, 11vw, 4.25rem) / 1 var(--bz-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.bz-loader-word span {
+  display: block;
+  color: var(--bz-paper);
+  text-shadow:
+    2px 2px 0 var(--bz-teal),
+    4px 4px 0 var(--bz-teal-deep),
+    6px 6px 0 var(--bz-ink);
+  transform: rotate(-4deg);
+  animation: bz-slap 420ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 1180ms both;
+}
+
+.bz-loader-word span + span {
+  color: var(--bz-ink);
+  padding: 0 0.15em 0 0.05em;
+  background: var(--bz-teal-light);
+  text-shadow: none;
+  box-shadow: 4px 4px 0 var(--bz-purple);
+  animation-delay: 1300ms;
+}
+
+.bz-loader-kicker {
+  position: absolute;
+  top: 68%;
+  left: 0;
+  right: 0;
+  color: var(--bz-amber);
+  font: 800 0.875rem var(--bz-jersey);
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-transform: uppercase;
+  animation: bz-fade 300ms ease-out 1500ms both;
+}
+
+/* A VHS tracking bar crossing the bottom of the screen. */
+.bz-loader-bar {
+  position: absolute;
+  bottom: 13%;
+  left: 18%;
+  right: 18%;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 0 0 1px rgb(127 221 226 / 0.25);
+}
+
+.bz-loader-bar i {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--bz-teal-light), var(--bz-amber), transparent);
+  animation: bz-track 1.5s cubic-bezier(0.5, 0, 0.5, 1) 1200ms infinite both;
+}
+
+.bz-loader-label {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  right: 0;
+  color: rgb(246 242 231 / 0.75);
+  font: 600 0.8125rem var(--bz-body);
+  text-align: center;
+}
+
+.bz-crt-lines {
+  position: absolute;
+  inset: 0.875rem;
+  border-radius: 1.25rem / 1.5rem;
+  background: repeating-linear-gradient(rgb(0 0 0 / 0.18) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+/* A brighter band rolling down the tube, like a 90s TV. */
+.bz-crt-lines::after {
+  position: absolute;
+  inset: 0;
+  height: 30%;
+  content: "";
+  background: linear-gradient(transparent, rgb(127 221 226 / 0.06), transparent);
+  animation: bz-roll 4s linear 600ms infinite both;
+}
+
+.bz-fact {
+  position: relative;
+  width: min(32rem, 88vw);
+  padding: 1.375rem 1.25rem 1rem;
+  border: 3px solid var(--bz-ink);
+  border-radius: 0.75rem;
+  color: var(--bz-text);
+  background: var(--bz-paper);
+  box-shadow: 5px 5px 0 var(--bz-teal);
+  transform: rotate(-1.2deg);
+  animation: bz-peel 520ms cubic-bezier(0.2, 0.8, 0.3, 1.15) both;
+}
+
+.bz-fact figcaption {
+  position: absolute;
+  top: -0.85rem;
+  left: 1rem;
+  padding: 0.15rem 0.6rem;
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+  font: italic 800 0.8125rem var(--bz-jersey);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+}
+
+.bz-fact p {
+  font: 600 1rem / 1.45 var(--bz-body);
+}
+
+.bz-flap .bz-wings {
+  transform-box: fill-box;
+  transform-origin: 35% 100%;
+  animation: bz-wing 90ms steps(2, jump-none) infinite alternate;
+}
+
+@keyframes bz-power {
+  0% {
+    transform: scale(0, 0.006);
+  }
+  35% {
+    transform: scale(1, 0.006);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes bz-flash {
+  20% {
+    opacity: 1;
+  }
+}
+
+@keyframes bz-trail {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes bz-zip-x {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes bz-zip-y {
+  0% {
+    transform: translateY(70%);
+  }
+  16% {
+    transform: translateY(-70%) rotate(-10deg);
+  }
+  32% {
+    transform: translateY(70%) rotate(8deg);
+  }
+  48% {
+    transform: translateY(-70%) rotate(-10deg);
+  }
+  64% {
+    transform: translateY(70%) rotate(8deg);
+  }
+  80% {
+    transform: translateY(-30%) rotate(-6deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes bz-bob {
+  to {
+    transform: translateY(-8%) rotate(-3deg);
+  }
+}
+
+@keyframes bz-wing {
+  to {
+    transform: scaleY(0.35);
+  }
+}
+
+@keyframes bz-slap {
+  from {
+    opacity: 0;
+    transform: scale(2.4) rotate(-16deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-2deg);
+  }
+}
+
+@keyframes bz-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes bz-track {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+@keyframes bz-roll {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(340%);
+  }
+}
+
+@keyframes bz-peel {
+  from {
+    opacity: 0.3;
+    transform: rotate(-9deg) translateY(1.25rem) scale(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bz-loader *,
+  .bz-loader *::before,
+  .bz-loader *::after {
+    animation: none !important;
+  }
+
+  .bz-loader-bar i {
+    left: 30%;
+  }
+}

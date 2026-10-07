@@ -21,7 +21,7 @@
 }
 
 [data-theme="buzz"] .xp-face {
-  border-color: var(--u-edge);
+  border-color: var(--bz-ink);
   border-radius: 999px;
 }
 

@@ -55,50 +55,43 @@
   outline-color: var(--xp-text-inverse);
 }
 
-/* Uptown: a pill segmented control; the picked side is crown gold. */
+/* Buzz City: two stickers on an ink rail; the picked one is teal. */
 [data-theme="buzz"] .theme-toggle {
-  gap: 0;
+  gap: 0.25rem;
   padding: 3px;
-  border: 1px solid var(--u-edge);
-  border-radius: 999px;
-  background: rgb(4 10 24 / 0.4);
-  font: 700 0.875rem var(--u-body);
-  letter-spacing: 0;
-  text-transform: none;
+  border: 2px solid var(--bz-ink);
+  border-radius: 12px;
+  background: var(--bz-ink);
+  font: italic 800 0.875rem var(--bz-jersey);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 [data-theme="buzz"] .theme-toggle button {
   min-height: 2.5rem;
-  padding: 0 0.875rem;
-  border-radius: 999px;
-  color: var(--u-text);
+  padding: 0 0.75rem;
+  border-radius: 8px;
+  color: var(--bz-paper);
   background: transparent;
   box-shadow: none;
-  transition: background-color 0.15s;
 }
 
 [data-theme="buzz"] .theme-toggle button:hover:enabled {
-  background: var(--u-hover);
+  background: rgb(127 221 226 / 0.2);
   box-shadow: none;
 }
 
 [data-theme="buzz"] .theme-toggle button:active:enabled {
-  background: var(--u-press);
+  background: rgb(127 221 226 / 0.32);
 }
 
 [data-theme="buzz"] .theme-toggle button[aria-pressed="true"] {
-  color: var(--u-night);
-  background: var(--u-gold);
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
   box-shadow: none;
 }
 
 [data-theme="buzz"] .theme-toggle button:focus-visible {
-  outline: 3px solid var(--u-focus);
+  outline: 3px solid var(--bz-focus);
   outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-theme="buzz"] .theme-toggle button {
-    transition: none;
-  }
 }

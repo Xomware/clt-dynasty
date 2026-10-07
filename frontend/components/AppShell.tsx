@@ -1,10 +1,10 @@
 "use client";
 
+import { BuzzPhone } from "@/components/buzz/BuzzPhone";
+import { BuzzShell } from "@/components/buzz/BuzzShell";
 import { Desktop } from "@/components/desktop/Desktop";
 import { XpCursor } from "@/components/desktop/XpCursor";
 import { PhoneShell } from "@/components/phone/PhoneShell";
-import { UptownPhone } from "@/components/uptown/UptownPhone";
-import { UptownShell } from "@/components/uptown/UptownShell";
 import { SignInGreeting } from "@/components/xp/SignInGreeting";
 import { Taskbar } from "@/components/xp/Taskbar";
 import { DesktopProvider } from "@/lib/desktop/desktop-context";
@@ -13,17 +13,17 @@ import { PHONE, useMediaQuery } from "@/lib/use-media-query";
 
 export function AppShell() {
   const phone = useMediaQuery(PHONE);
-  const { theme } = useTheme();
+  const buzz = useTheme().theme === "buzz";
   return (
     <>
       {phone ? (
-        theme === "buzz" ? (
-          <UptownPhone />
+        buzz ? (
+          <BuzzPhone />
         ) : (
           <PhoneShell />
         )
-      ) : theme === "buzz" ? (
-        <UptownShell />
+      ) : buzz ? (
+        <BuzzShell />
       ) : (
         <DesktopProvider>
           <Desktop />

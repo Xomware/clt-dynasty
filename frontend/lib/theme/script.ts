@@ -12,10 +12,15 @@ export const LEGACY: Record<string, Theme> = { uptown: "buzz" };
 
 // Safari tints its toolbars and the overscroll bounce from the page background
 // and theme-color, never from the app's own boxes. XP has never set either, so
-// only Uptown does.
-export const UPTOWN_CHROME = "#0a1838";
+// only Buzz City does, in its header's ink.
+export const BUZZ_CHROME = "#170d31";
+
+// Bowlby One for the chunky display, Barlow Condensed for 90s jersey lettering,
+// Barlow for reading and Doto for the arena's dot-matrix boards.
+export const BUZZ_FONTS =
+  "https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&family=Bowlby+One&family=Doto:wght@700;900&display=swap";
 
 export const UPTOWN_FONTS = "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap";
 
 /** Runs before first paint, so the loaders and the landing are already in the stored theme. */
-export const THEME_SCRIPT = `try{var k=${JSON.stringify(THEME_KEY)},v=localStorage.getItem(k);if(v==="uptown"){v="buzz";localStorage.setItem(k,v)}if(v==="buzz"){var h=document.documentElement,m=document.createElement("meta");h.dataset.theme="buzz";h.style.backgroundColor="${UPTOWN_CHROME}";m.name="theme-color";m.content="${UPTOWN_CHROME}";document.head.append(m)}}catch(e){}`;
+export const THEME_SCRIPT = `try{var k=${JSON.stringify(THEME_KEY)},v=localStorage.getItem(k);if(v==="uptown"){v="buzz";localStorage.setItem(k,v)}if(v==="buzz"){var h=document.documentElement,m=document.createElement("meta");h.dataset.theme="buzz";h.style.backgroundColor="${BUZZ_CHROME}";m.name="theme-color";m.content="${BUZZ_CHROME}";document.head.append(m);var f=document.createElement("link");f.rel="stylesheet";f.href="${BUZZ_FONTS}";document.head.append(f)}}catch(e){}`;
