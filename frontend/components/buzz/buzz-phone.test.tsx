@@ -12,6 +12,22 @@ vi.mock("@/lib/api/clt", () => ({
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
+// The hub's real cards fetch half the API, and the bespoke bodies read the
+// league; these tests are about the shell, so the stand-in windows render.
+vi.mock("./BuzzHome", () => ({
+  BuzzHome: ({ ref, phone }: { ref?: React.Ref<HTMLHeadingElement>; phone?: boolean }) => {
+    const Title = phone ? "h2" : "h1";
+    return (
+      <div>
+        <Title ref={ref} tabIndex={-1}>
+          Buzz City&rsquo;s Dynasty League
+        </Title>
+        <p>home body</p>
+      </div>
+    );
+  },
+}));
+vi.mock("./bodies", async () => ({ BODIES: { folder: (await import("@/components/uptown/GroupPage")).GroupPage } }));
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
   useLeague: () => ({ data: null, myRosterId: null, teamFor: () => ({ name: "", avatarUrl: null }) }),
@@ -79,9 +95,10 @@ const bar = () => screen.getByRole("heading", { level: 1 });
 const drawer = () => within(screen.getByRole("dialog", { name: "Menu" }));
 
 describe("Buzz City phone", () => {
-  it("opens on Home under the bar", async () => {
+  it("opens on Home under the bar, its hero a step below the bar's title", async () => {
     await renderPhone();
     expect(bar().textContent).toBe("CLT Dynasty");
+    expect(screen.getByRole("heading", { level: 2, name: /Dynasty League/ })).toBeTruthy();
     expect(screen.getByText("home body")).toBeTruthy();
     expect(screen.queryByRole("navigation", { name: "Programs" })).toBeNull();
   });

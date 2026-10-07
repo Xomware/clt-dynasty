@@ -15,7 +15,8 @@ import { REGISTRY, useLaunchers, useWindowTitle } from "@/lib/desktop/registry";
 import { viewKey } from "@/lib/desktop/windows";
 import { usePhoneStack } from "@/lib/phone/use-phone-stack";
 import { ViewParamsContext } from "@/lib/view-params";
-import { BODIES, HOME_PAGE } from "./bodies";
+import { BODIES } from "./bodies";
+import { BuzzHome } from "./BuzzHome";
 import { BuzzTicker } from "./BuzzTicker";
 import { Hornet } from "./Hornet";
 
@@ -126,13 +127,7 @@ export function BuzzPhone() {
             ) : (
               <div key={0} className="bz-route" data-dir={depth.dir}>
                 <WindowBoundary>
-                  {HOME_PAGE ? (
-                    <HOME_PAGE phone />
-                  ) : (
-                    <section aria-label="Home" className="bz-panel" data-kind="home">
-                      <REGISTRY.home.component params={{}} />
-                    </section>
-                  )}
+                  <BuzzHome phone />
                 </WindowBoundary>
               </div>
             )}
