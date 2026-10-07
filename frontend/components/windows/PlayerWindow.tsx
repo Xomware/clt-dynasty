@@ -24,14 +24,14 @@ export const readPlayerLink = (value: string) => (ID.test(value) ? { playerId: v
 
 export const playerTitle = (p: SleeperPlayer | null | undefined) => (p ? `${p.first_name} ${p.last_name}` : "Player");
 
-interface Week {
+export interface Week {
   week: number;
   fantasy: FantasyWeek | null;
   game: NflGame | null;
   stats: SleeperWeekStats | null;
 }
 
-interface Page {
+export interface Page {
   player: SleeperPlayer;
   data: LeagueData;
   weeks: Week[];
@@ -40,7 +40,7 @@ interface Page {
   bye: number | null;
 }
 
-async function loadPage(id: string): Promise<Page | null> {
+export async function loadPage(id: string): Promise<Page | null> {
   const [player, data, nfl] = await Promise.all([getPlayer(id), loadLeagueData(LEAGUE_ID), nflState()]);
   if (!player) return null;
   const { league } = data;
@@ -141,7 +141,7 @@ function Bio({ player, bye }: { player: SleeperPlayer; bye: number | null }) {
   );
 }
 
-function InClt({ page }: { page: Page }) {
+export function InClt({ page }: { page: Page }) {
   const { data, weeks, player } = page;
   const me = useMySleeperId();
   const myRoster = me ? rosterOf(data.rosters, me) : null;
@@ -184,9 +184,9 @@ function InClt({ page }: { page: Page }) {
   );
 }
 
-const gameLabel = (g: NflGame | null) => (g === null ? "" : g === "bye" ? "BYE" : `${g.home ? "vs" : "@"} ${g.opponent}`);
+export const gameLabel = (g: NflGame | null) => (g === null ? "" : g === "bye" ? "BYE" : `${g.home ? "vs" : "@"} ${g.opponent}`);
 
-function Weeks({ page }: { page: Page }) {
+export function Weeks({ page }: { page: Page }) {
   const { data, weeks, player, nflError } = page;
   if (weeks.length === 0) return <p className="xp-note">No {data.league.season} games yet.</p>;
   const name = (rosterId: number) => teamOf(data.users, data.rosters.find((r) => r.roster_id === rosterId), rosterId).name;
