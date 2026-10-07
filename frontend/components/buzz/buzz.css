@@ -841,7 +841,7 @@
   width: 0.3em;
 }
 
-/* Jersey lettering: Home's and the landing's title. */
+/* Home's title, the lockup. */
 .bz-hero-title {
   display: flex;
   flex-direction: column;
@@ -851,47 +851,6 @@
 
 .bz-hero-title:focus {
   outline: none;
-}
-
-.bz-hero-small {
-  color: var(--bz-teal-light);
-  font: italic 900 2rem / 1 var(--bz-jersey);
-  letter-spacing: 0.08em;
-}
-
-.bz-hero-big {
-  width: fit-content;
-  padding-right: 0.15em;
-  color: transparent;
-  background: var(--bz-airbrush-light);
-  -webkit-background-clip: text;
-  background-clip: text;
-  filter: drop-shadow(5px 5px 0 var(--bz-ink));
-  font: italic 400 clamp(3.5rem, 8.5vw, 6.75rem) / 0.92 var(--bz-display);
-}
-
-.bz-hero-outline {
-  color: var(--bz-paper);
-  background: none;
-  filter: none;
-  -webkit-text-stroke: 3px var(--bz-ink);
-  paint-order: stroke fill;
-  text-shadow: 7px 7px 0 var(--bz-teal);
-}
-
-@media (max-width: 767.98px) {
-  .bz-hero-small {
-    font-size: 1.5rem;
-  }
-
-  .bz-hero-big {
-    font-size: clamp(3rem, 16vw, 4.25rem);
-  }
-
-  .bz-hero-outline {
-    -webkit-text-stroke-width: 2px;
-    text-shadow: 5px 5px 0 var(--bz-teal);
-  }
 }
 
 /* The strip across the top of every trading card. */
