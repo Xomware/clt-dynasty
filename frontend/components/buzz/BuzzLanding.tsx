@@ -8,6 +8,7 @@ import { Champions, Seeds, Skeleton, Status } from "@/components/landing/LeagueL
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { LoadError } from "@/components/xp/LoadError";
 import { refreshOverview, useOverview } from "@/lib/landing/overview";
+import { BrandMark } from "./BrandMark";
 import { Hornet } from "./Hornet";
 import { TRIVIA } from "./trivia";
 
@@ -74,12 +75,7 @@ export function BuzzLanding({ onSignIn }: LandingProps) {
     <div className="buzz bz-landing">
       <i className="bz-backdrop" aria-hidden />
       <header className="bz-header bz-landing-header">
-        <span className="bz-brand">
-          <Hornet size={58} />
-          <span className="bz-brand-word">
-            CLT Dynasty<small>Buzz City</small>
-          </span>
-        </span>
+        <BrandMark mark="seal" alt="CLT Dynasty Fantasy Football" className="bz-landing-seal" priority />
         <ThemeToggle />
       </header>
 

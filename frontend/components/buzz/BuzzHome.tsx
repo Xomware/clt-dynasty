@@ -21,6 +21,7 @@ import { type Game, useWeekGames } from "@/lib/league/use-week-games";
 import { useMember } from "@/lib/member/use-member";
 import { teamLink } from "@/lib/team/links";
 import { ordinal } from "@/lib/team/team";
+import { BrandMark } from "./BrandMark";
 import { Flip } from "./Flip";
 import { Led } from "./Led";
 import { TRIVIA } from "./trivia";
@@ -35,7 +36,7 @@ interface BuzzHomeProps {
 
 const record = (w: number, l: number, t: number) => `${w}-${l}${t > 0 ? `-${t}` : ""}`;
 
-// Home in Buzz City: the league's lettering beside the member's own trading
+// Home in Buzz City: the league's lockup beside the member's own trading
 // card, then the hub. The cards are the Home window's own where they exist,
 // so XP and Buzz City say the same things.
 export function BuzzHome({ ref, phone = false }: BuzzHomeProps) {
@@ -57,9 +58,7 @@ export function BuzzHome({ ref, phone = false }: BuzzHomeProps) {
         <div className="bz-hero-copy">
           <p className="bz-tape">{kicker}</p>
           <Title ref={ref} tabIndex={-1} className="bz-hero-title">
-            <span className="bz-hero-small">Buzz City&rsquo;s</span>{" "}
-            <span className="bz-hero-big">Dynasty</span>{" "}
-            <span className="bz-hero-big bz-hero-outline">League</span>
+            <BrandMark mark="lockup" alt="CLT Dynasty Fantasy Football" className="bz-hero-lockup" priority />
           </Title>
           <QuickActions className="bz-actions" />
         </div>
@@ -70,6 +69,7 @@ export function BuzzHome({ ref, phone = false }: BuzzHomeProps) {
             </div>
           ) : myRosterId === null ? (
             <div className="bz-tcard bz-tcard-empty">
+              <BrandMark mark="football-hornet" alt="" className="bz-empty-mark" />
               <p>Your Sleeper account isn&rsquo;t linked to a CLT roster yet.</p>
               <DrillLink to={{ kind: "settings", params: {} }} className="bz-sticker-btn">
                 Link it in Settings

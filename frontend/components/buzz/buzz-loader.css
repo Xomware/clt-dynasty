@@ -1,7 +1,8 @@
 @import "./buzz-tokens.css";
 
-/* Power-on 0-560ms, the hornet zips in 520-1620ms, the word slaps on at
-   1180ms and 1300ms, then the screen idles: wings, bob, tracking bar. */
+/* The hornet buzzes in 0-900ms, the crown drops 950-1330ms, CLT DYNASTY slaps
+   on at 1300ms and the ribbon slides in at 1500ms. Then it idles: the hornet
+   hovers and the tracking bar runs. */
 .bz-loader {
   display: none;
 }
@@ -17,177 +18,123 @@
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   padding: 1.5rem;
   overflow: hidden;
   color: var(--bz-paper);
   font-family: var(--bz-body);
   background:
-    radial-gradient(60% 50% at 50% 42%, rgb(75 42 143 / 0.55), transparent 70%),
-    repeating-linear-gradient(90deg, transparent 0 27px, rgb(127 221 226 / 0.06) 27px 28px),
-    var(--bz-ink);
+    radial-gradient(60% 45% at 50% 38%, rgb(127 221 226 / 0.16), transparent 70%),
+    radial-gradient(130% 90% at 50% 40%, transparent 50%, rgb(12 6 36 / 0.6)),
+    var(--bz-jersey-road);
 }
 
-.bz-crt {
+.bz-ld-stage {
   position: relative;
-  width: min(34rem, 88vw);
-  aspect-ratio: 4 / 3;
-  padding: 0.875rem;
-  border-radius: 2rem;
-  background: linear-gradient(160deg, #3a2b62, #1b1038 60%, #120a28);
-  box-shadow:
-    inset 0 2px 0 rgb(255 255 255 / 0.12),
-    inset 0 -3px 0 rgb(0 0 0 / 0.4),
-    0 0 0 3px var(--bz-ink),
-    0 0 0 6px var(--bz-teal),
-    0 24px 60px rgb(5 2 15 / 0.6);
+  display: grid;
+  justify-items: center;
+  width: min(24rem, 86vw);
+  padding-top: 2.75rem;
 }
 
-.bz-crt-screen {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 1.25rem / 1.5rem;
-  background:
-    radial-gradient(70% 60% at 50% 45%, rgb(18 163 177 / 0.32), transparent 75%),
-    linear-gradient(var(--bz-ink-2), var(--bz-ink));
-  box-shadow: inset 0 0 40px rgb(0 0 0 / 0.7);
-  transform-origin: 50% 50%;
-  animation: bz-power 560ms cubic-bezier(0.3, 0.7, 0.2, 1) both;
-}
-
-/* The flash of a tube warming up, over the opening line. */
-.bz-crt-screen::after {
+/* The flight path, drawn in behind the hornet as it comes. */
+.bz-ld-trail {
   position: absolute;
-  inset: 0;
-  content: "";
-  background: radial-gradient(closest-side, #f4fbff, rgb(127 221 226 / 0.5) 60%, transparent);
-  opacity: 0;
-  pointer-events: none;
-  animation: bz-flash 700ms ease-out both;
-}
-
-.bz-crt-court {
-  position: absolute;
-  inset: 0;
-  color: rgb(127 221 226 / 0.22);
-  background: var(--bz-halftone);
-  -webkit-mask: linear-gradient(transparent 45%, #000);
-  mask: linear-gradient(transparent 45%, #000);
-}
-
-/* A half court's centre circle, drawn faintly behind the word. */
-.bz-crt-court::before {
-  position: absolute;
-  top: 54%;
-  left: 50%;
-  width: 46%;
-  aspect-ratio: 1;
-  border: 2px solid rgb(127 221 226 / 0.16);
-  border-radius: 50%;
-  content: "";
-  transform: translate(-50%, -50%);
-}
-
-.bz-trail {
-  position: absolute;
-  top: 8%;
-  left: 0;
-  width: 50%;
-  height: 22%;
+  top: 3.5rem;
+  left: -40%;
+  width: 90%;
+  height: 7rem;
   overflow: visible;
   fill: none;
   stroke: var(--bz-amber);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-dasharray: 0.004 0.022;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.85;
-  animation: bz-trail 1100ms linear 520ms both;
-}
-
-.bz-trail path {
-  vector-effect: non-scaling-stroke;
-}
-
-.bz-loader-hornet {
-  position: absolute;
-  top: 8%;
-  left: 0;
-  width: 50%;
-  height: 22%;
-  animation: bz-zip-x 1100ms linear 520ms both;
-}
-
-.bz-loader-hornet .bz-hornet {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  width: clamp(5.5rem, 28%, 8.5rem);
-  height: auto;
-  margin: -2.6rem -4rem 0 0;
+  opacity: 0.7;
   animation:
-    bz-zip-y 1100ms linear 520ms both,
-    bz-bob 1.3s ease-in-out 1620ms infinite alternate;
+    bz-trail 900ms linear both,
+    bz-fade-out 400ms ease-in 1000ms forwards;
 }
 
-.bz-loader-word {
-  position: absolute;
-  top: 40%;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 0.6rem;
-  font: italic 400 clamp(2.5rem, 11vw, 4.25rem) / 1 var(--bz-display);
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
+.bz-ld-trail path {
+  vector-effect: non-scaling-stroke;
 }
 
-.bz-loader-word span {
+.bz-ld-fly {
+  animation: bz-zip-x 900ms cubic-bezier(0.25, 0.6, 0.3, 1) both;
+}
+
+.bz-ld-buzz {
+  animation: bz-zip-y 900ms linear both;
+}
+
+/* The crown sits where the head mark wears it: 27.9% in, 44% wide, its top
+   18.7% of the head's height above it. */
+.bz-ld-mark {
+  position: relative;
+  width: clamp(8.5rem, 34vw, 12.5rem);
+  transform-origin: 50% 100%;
+  animation:
+    bz-squash 260ms ease-out 1300ms both,
+    bz-hover 1.6s ease-in-out 1700ms infinite alternate;
+}
+
+.bz-ld-head {
   display: block;
-  color: var(--bz-paper);
-  text-shadow:
-    2px 2px 0 var(--bz-teal),
-    4px 4px 0 var(--bz-teal-deep),
-    6px 6px 0 var(--bz-ink);
-  transform: rotate(-4deg);
-  animation: bz-slap 420ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 1180ms both;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 8px 10px rgb(8 4 24 / 0.5));
 }
 
-.bz-loader-word span + span {
-  color: var(--bz-ink);
-  padding: 0 0.15em 0 0.05em;
-  background: var(--bz-teal-light);
-  text-shadow: none;
-  box-shadow: 4px 4px 0 var(--bz-purple);
-  animation-delay: 1300ms;
-}
-
-.bz-loader-kicker {
+.bz-ld-crown {
   position: absolute;
-  top: 68%;
-  left: 0;
-  right: 0;
-  color: var(--bz-amber);
-  font: 800 0.875rem var(--bz-jersey);
-  letter-spacing: 0.4em;
-  text-align: center;
+  top: -18.7%;
+  left: 27.9%;
+  width: 44%;
+  height: auto;
+  animation: bz-crown 380ms cubic-bezier(0.5, 0, 0.75, 0) 950ms both;
+}
+
+.bz-ld-word {
+  margin-top: 0.75rem;
+  color: var(--bz-teal);
+  font: 800 clamp(2.5rem, 12vw, 4.25rem) / 0.95 var(--bz-jersey);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  animation: bz-fade 300ms ease-out 1500ms both;
+  -webkit-text-stroke: 0.14em var(--bz-paper);
+  paint-order: stroke fill;
+  filter: drop-shadow(0.06em 0.06em 0 var(--bz-purple-deep));
+  animation: bz-slap 420ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 1300ms both;
 }
 
-/* A VHS tracking bar crossing the bottom of the screen. */
+/* The lockup's ribbon: purple, notched at both ends, sliding in from the left. */
+.bz-ld-ribbon {
+  margin-top: 0.5rem;
+  padding: 0.3rem 2.25rem;
+  color: var(--bz-paper);
+  background: linear-gradient(var(--bz-purple), var(--bz-purple-deep));
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.9rem) 50%, 100% 100%, 0 100%, 0.9rem 50%);
+  font: 700 clamp(0.9375rem, 4vw, 1.125rem) / 1.2 var(--bz-jersey);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  animation: bz-ribbon 460ms cubic-bezier(0.3, 0.7, 0.2, 1) 1500ms both;
+}
+
+.bz-ld-ribbon span {
+  display: block;
+  margin-right: -0.32em;
+}
+
+/* A VHS tracking bar under the mark. */
 .bz-loader-bar {
-  position: absolute;
-  bottom: 13%;
-  left: 18%;
-  right: 18%;
+  position: relative;
+  width: min(16rem, 64vw);
   height: 0.5rem;
   overflow: hidden;
   border-radius: 1rem;
-  background: rgb(255 255 255 / 0.08);
-  box-shadow: inset 0 0 0 1px rgb(127 221 226 / 0.25);
+  background: rgb(14 8 44 / 0.55);
+  box-shadow: inset 0 0 0 1px rgb(127 221 226 / 0.3);
+  animation: bz-fade 300ms ease-out 1700ms both;
 }
 
 .bz-loader-bar i {
@@ -196,35 +143,15 @@
   width: 40%;
   border-radius: inherit;
   background: linear-gradient(90deg, transparent, var(--bz-teal-light), var(--bz-amber), transparent);
-  animation: bz-track 1.5s cubic-bezier(0.5, 0, 0.5, 1) 1200ms infinite both;
+  animation: bz-track 1.5s cubic-bezier(0.5, 0, 0.5, 1) 1700ms infinite both;
 }
 
 .bz-loader-label {
-  position: absolute;
-  bottom: 4%;
-  left: 0;
-  right: 0;
-  color: rgb(246 242 231 / 0.75);
+  margin-top: -0.5rem;
+  color: rgb(246 242 231 / 0.85);
   font: 600 0.8125rem var(--bz-body);
   text-align: center;
-}
-
-.bz-crt-lines {
-  position: absolute;
-  inset: 0.875rem;
-  border-radius: 1.25rem / 1.5rem;
-  background: repeating-linear-gradient(rgb(0 0 0 / 0.18) 0 1px, transparent 1px 3px);
-  pointer-events: none;
-}
-
-/* A brighter band rolling down the tube, like a 90s TV. */
-.bz-crt-lines::after {
-  position: absolute;
-  inset: 0;
-  height: 30%;
-  content: "";
-  background: linear-gradient(transparent, rgb(127 221 226 / 0.06), transparent);
-  animation: bz-roll 4s linear 600ms infinite both;
+  animation: bz-fade 300ms ease-out 1700ms both;
 }
 
 .bz-fact {
@@ -257,30 +184,6 @@
   font: 600 1rem / 1.45 var(--bz-body);
 }
 
-.bz-flap .bz-wings {
-  transform-box: fill-box;
-  transform-origin: 35% 100%;
-  animation: bz-wing 90ms steps(2, jump-none) infinite alternate;
-}
-
-@keyframes bz-power {
-  0% {
-    transform: scale(0, 0.006);
-  }
-  35% {
-    transform: scale(1, 0.006);
-  }
-  100% {
-    transform: none;
-  }
-}
-
-@keyframes bz-flash {
-  20% {
-    opacity: 1;
-  }
-}
-
 @keyframes bz-trail {
   from {
     clip-path: inset(0 100% 0 0);
@@ -292,43 +195,65 @@
 
 @keyframes bz-zip-x {
   from {
-    transform: translateX(-100%);
+    transform: translateX(-70vw);
   }
 }
 
 @keyframes bz-zip-y {
   0% {
-    transform: translateY(70%);
+    transform: translateY(2.5rem) rotate(8deg);
   }
   16% {
-    transform: translateY(-70%) rotate(-10deg);
+    transform: translateY(-2rem) rotate(-10deg);
   }
   32% {
-    transform: translateY(70%) rotate(8deg);
+    transform: translateY(2rem) rotate(8deg);
   }
   48% {
-    transform: translateY(-70%) rotate(-10deg);
+    transform: translateY(-1.5rem) rotate(-8deg);
   }
   64% {
-    transform: translateY(70%) rotate(8deg);
+    transform: translateY(1rem) rotate(6deg);
   }
   80% {
-    transform: translateY(-30%) rotate(-6deg);
+    transform: translateY(-0.4rem) rotate(-3deg);
   }
   100% {
     transform: none;
   }
 }
 
-@keyframes bz-bob {
-  to {
-    transform: translateY(-8%) rotate(-3deg);
+@keyframes bz-crown {
+  from {
+    opacity: 0;
+    transform: translateY(-7rem) rotate(-14deg);
+  }
+  40% {
+    opacity: 1;
   }
 }
 
-@keyframes bz-wing {
+@keyframes bz-squash {
+  40% {
+    scale: 1.04 0.92;
+  }
+}
+
+@keyframes bz-hover {
   to {
-    transform: scaleY(0.35);
+    translate: 0 -0.5rem;
+  }
+}
+
+@keyframes bz-ribbon {
+  from {
+    clip-path: polygon(0 0, 0 0, 0 50%, 0 100%, 0 100%, 0 50%);
+  }
+}
+
+@keyframes bz-fade-out {
+  to {
+    opacity: 0;
   }
 }
 
@@ -355,15 +280,6 @@
   }
   to {
     transform: translateX(250%);
-  }
-}
-
-@keyframes bz-roll {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(340%);
   }
 }
 

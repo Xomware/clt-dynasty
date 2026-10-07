@@ -76,6 +76,12 @@ describe("Buzz City Home", () => {
     expect(within(stats).getByText(/^W\d$/)).toBeTruthy();
   });
 
+  it("titles the page with the league's lockup", () => {
+    renderHub();
+    const title = screen.getByRole("heading", { level: 1, name: "CLT Dynasty Fantasy Football" });
+    expect(title.querySelector("img")?.getAttribute("srcset")).toMatch(/lockup.* 1x, .*lockup@2x.* 2x/);
+  });
+
   it("offers the weekly quick actions, lineups out to Sleeper", async () => {
     renderHub();
     const actions = within(screen.getByRole("list", { name: "Quick actions" }));

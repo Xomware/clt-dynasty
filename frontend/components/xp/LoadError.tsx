@@ -6,7 +6,7 @@ interface LoadErrorProps {
 
 export function LoadError({ what, message, onRetry }: LoadErrorProps) {
   return (
-    <div className="flex flex-col items-start gap-2">
+    <div className="load-error flex flex-col items-start gap-2">
       <p role="alert">
         Couldn&rsquo;t load {what}: {message}
       </p>

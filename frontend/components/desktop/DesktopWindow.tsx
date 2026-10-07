@@ -45,7 +45,11 @@ export class WindowBoundary extends Component<{ children: ReactNode }, { failed:
 
   render() {
     if (!this.state.failed) return this.props.children;
-    return <p role="alert">This window hit an error. Close it and open it again.</p>;
+    return (
+      <p role="alert" className="window-error">
+        This window hit an error. Close it and open it again.
+      </p>
+    );
   }
 }
 
