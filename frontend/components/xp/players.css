@@ -20,7 +20,7 @@
   object-fit: contain;
 }
 
-[data-theme="uptown"] .xp-face {
+[data-theme="buzz"] .xp-face {
   border-color: var(--u-edge);
   border-radius: 999px;
 }

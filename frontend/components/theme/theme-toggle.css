@@ -56,7 +56,7 @@
 }
 
 /* Uptown: a pill segmented control; the picked side is crown gold. */
-[data-theme="uptown"] .theme-toggle {
+[data-theme="buzz"] .theme-toggle {
   gap: 0;
   padding: 3px;
   border: 1px solid var(--u-edge);
@@ -67,7 +67,7 @@
   text-transform: none;
 }
 
-[data-theme="uptown"] .theme-toggle button {
+[data-theme="buzz"] .theme-toggle button {
   min-height: 2.5rem;
   padding: 0 0.875rem;
   border-radius: 999px;
@@ -77,28 +77,28 @@
   transition: background-color 0.15s;
 }
 
-[data-theme="uptown"] .theme-toggle button:hover:enabled {
+[data-theme="buzz"] .theme-toggle button:hover:enabled {
   background: var(--u-hover);
   box-shadow: none;
 }
 
-[data-theme="uptown"] .theme-toggle button:active:enabled {
+[data-theme="buzz"] .theme-toggle button:active:enabled {
   background: var(--u-press);
 }
 
-[data-theme="uptown"] .theme-toggle button[aria-pressed="true"] {
+[data-theme="buzz"] .theme-toggle button[aria-pressed="true"] {
   color: var(--u-night);
   background: var(--u-gold);
   box-shadow: none;
 }
 
-[data-theme="uptown"] .theme-toggle button:focus-visible {
+[data-theme="buzz"] .theme-toggle button:focus-visible {
   outline: 3px solid var(--u-focus);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="uptown"] .theme-toggle button {
+  [data-theme="buzz"] .theme-toggle button {
     transition: none;
   }
 }

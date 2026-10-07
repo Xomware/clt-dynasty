@@ -8,7 +8,7 @@ import "./transition.css";
 // screen and the theme swaps under it; `total` is when it is removed. The
 // keyframe delays in transition.css are written against these.
 export const TIMING: Record<Theme, { covered: number; total: number }> = {
-  uptown: { covered: 640, total: 1500 },
+  buzz: { covered: 640, total: 1500 },
   xp: { covered: 540, total: 1450 },
 };
 
@@ -66,7 +66,7 @@ function WelcomeBack() {
 export function ThemeTransition({ to }: { to: Theme }) {
   return (
     <div className="theme-transition skyline-palette" data-to={to} aria-hidden="true">
-      {to === "uptown" ? <NightFalls /> : <WelcomeBack />}
+      {to === "buzz" ? <NightFalls /> : <WelcomeBack />}
     </div>
   );
 }

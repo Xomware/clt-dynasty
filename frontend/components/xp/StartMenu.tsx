@@ -12,7 +12,7 @@ import { ADMIN, START_PINNED, START_PLACES } from "@/lib/desktop/groups";
 import { readRecent } from "@/lib/desktop/recent";
 import { type Launcher, useLauncherGroups, useLaunchers, type WindowKind } from "@/lib/desktop/registry";
 import { TASKBAR_HEIGHT } from "@/lib/desktop/windows";
-import { CrownIcon, DesktopIcon, FolderIcon, UptownIcon } from "./icons";
+import { CrownIcon, DesktopIcon, FolderIcon, BuzzIcon } from "./icons";
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -213,7 +213,7 @@ interface StartMenuProps {
   autoFocus: boolean;
   onOpen: (kind: WindowKind) => void;
   onReset: () => void;
-  onUptown: () => void;
+  onBuzz: () => void;
   onSignOut: () => void;
 }
 
@@ -238,7 +238,7 @@ function AdminPlaces({ onOpen }: { onOpen: (kind: WindowKind) => void }) {
   );
 }
 
-export function StartMenu({ id, name, autoFocus, onOpen, onReset, onUptown, onSignOut }: StartMenuProps) {
+export function StartMenu({ id, name, autoFocus, onOpen, onReset, onBuzz, onSignOut }: StartMenuProps) {
   const launchers = useLaunchers();
   const [recentKinds] = useState(readRecent);
   const ref = useRef<HTMLElement>(null);
@@ -291,9 +291,9 @@ export function StartMenu({ id, name, autoFocus, onOpen, onReset, onUptown, onSi
             </button>
           </li>
           <li>
-            <button type="button" className="xp-start-menu-link w-full" onClick={onUptown}>
-              <UptownIcon width={24} height={24} className="flex-none" />
-              Uptown theme
+            <button type="button" className="xp-start-menu-link w-full" onClick={onBuzz}>
+              <BuzzIcon width={24} height={24} className="flex-none" />
+              Buzz City
             </button>
           </li>
         </ul>

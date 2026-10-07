@@ -19,7 +19,7 @@ export interface LandingProps {
 }
 
 export function Landing(props: LandingProps) {
-  return useTheme().theme === "uptown" ? <UptownLanding {...props} /> : <XpLanding {...props} />;
+  return useTheme().theme === "buzz" ? <UptownLanding {...props} /> : <XpLanding {...props} />;
 }
 
 function XpLanding({ onSignIn }: LandingProps) {

@@ -17,12 +17,12 @@ export function AppShell() {
   return (
     <>
       {phone ? (
-        theme === "uptown" ? (
+        theme === "buzz" ? (
           <UptownPhone />
         ) : (
           <PhoneShell />
         )
-      ) : theme === "uptown" ? (
+      ) : theme === "buzz" ? (
         <UptownShell />
       ) : (
         <DesktopProvider>

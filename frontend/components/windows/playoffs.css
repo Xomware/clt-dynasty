@@ -376,12 +376,12 @@
 
 /* Uptown: navy cards, gold for the path the winners took, teal seeds. */
 
-[data-theme="uptown"] .pb-grid {
+[data-theme="buzz"] .pb-grid {
   --pb-off: var(--u-edge);
   --pb-on: var(--u-gold);
 }
 
-[data-theme="uptown"] .pb-round-title {
+[data-theme="buzz"] .pb-round-title {
   border-bottom-color: var(--u-line);
   color: var(--u-label);
   font: 800 0.75rem/1.25 var(--u-body);
@@ -389,65 +389,65 @@
   text-transform: uppercase;
 }
 
-[data-theme="uptown"] .pb-week {
+[data-theme="buzz"] .pb-week {
   color: var(--u-muted);
   letter-spacing: 0.02em;
   text-transform: none;
 }
 
-[data-theme="uptown"] :is(.pb-match, .pb-champ) {
+[data-theme="buzz"] :is(.pb-match, .pb-champ) {
   border-color: var(--u-line);
   border-radius: 12px;
   background: var(--u-card);
   box-shadow: 0 6px 18px rgb(2 8 20 / 0.35);
 }
 
-[data-theme="uptown"] .pb-match {
+[data-theme="buzz"] .pb-match {
   overflow: hidden;
 }
 
-[data-theme="uptown"] .pb-slot + .pb-slot {
+[data-theme="buzz"] .pb-slot + .pb-slot {
   border-top-color: var(--u-line);
 }
 
-[data-theme="uptown"] .pb-seed {
+[data-theme="buzz"] .pb-seed {
   color: var(--u-link);
 }
 
-[data-theme="uptown"] :is(.pb-tbd, .pb-record) {
+[data-theme="buzz"] :is(.pb-tbd, .pb-record) {
   color: var(--u-muted);
 }
 
-[data-theme="uptown"] .pb-score {
+[data-theme="buzz"] .pb-score {
   border-left-color: var(--u-line);
   color: var(--u-text-strong);
   font-family: var(--u-display);
   font-weight: 600;
 }
 
-[data-theme="uptown"] .pb-score:hover {
+[data-theme="buzz"] .pb-score:hover {
   text-decoration: none;
   background: var(--u-hover);
 }
 
-[data-theme="uptown"] .pb-score:active {
+[data-theme="buzz"] .pb-score:active {
   background: var(--u-press);
 }
 
-[data-theme="uptown"] .pb-score:focus-visible {
+[data-theme="buzz"] .pb-score:focus-visible {
   outline: 2px solid var(--u-focus);
   outline-offset: -2px;
 }
 
-[data-theme="uptown"] .pb-slot[data-result="won"] {
+[data-theme="buzz"] .pb-slot[data-result="won"] {
   background: linear-gradient(90deg, rgb(227 178 60 / 0.12), transparent 70%);
 }
 
-[data-theme="uptown"] .pb-slot[data-result="won"] .xp-team-name {
+[data-theme="buzz"] .pb-slot[data-result="won"] .xp-team-name {
   color: var(--u-text-strong);
 }
 
-[data-theme="uptown"] .pb-champ[data-crowned] {
+[data-theme="buzz"] .pb-champ[data-crowned] {
   border: 1px solid rgb(227 178 60 / 0.7);
   background:
     radial-gradient(120% 140% at 0% 0%, rgb(227 178 60 / 0.28), transparent 60%),
@@ -457,22 +457,22 @@
     0 8px 24px rgb(227 178 60 / 0.16);
 }
 
-[data-theme="uptown"] .pb-champ:not([data-crowned]) {
+[data-theme="buzz"] .pb-champ:not([data-crowned]) {
   border-style: dashed;
   border-color: var(--u-edge);
 }
 
-[data-theme="uptown"] .pb-champ-label {
+[data-theme="buzz"] .pb-champ-label {
   color: var(--u-gold-light);
 }
 
-[data-theme="uptown"] .pb-banner {
+[data-theme="buzz"] .pb-banner {
   border-color: rgb(227 178 60 / 0.45);
   border-radius: 12px;
   color: var(--u-text);
   background: rgb(227 178 60 / 0.08);
 }
 
-[data-theme="uptown"] .pb-lineups:focus-visible {
+[data-theme="buzz"] .pb-lineups:focus-visible {
   outline: 2px solid var(--u-focus);
 }

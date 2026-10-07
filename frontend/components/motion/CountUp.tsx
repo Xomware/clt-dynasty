@@ -29,7 +29,7 @@ export function CountUp({ value, decimals = 0, empty, className = "tabular-nums"
     const start = from.current;
     from.current = value;
     if (!node || start === value || (empty !== undefined && value <= 0)) return;
-    if (document.documentElement.dataset.theme !== "uptown" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (document.documentElement.dataset.theme !== "buzz" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const show = (n: number) => (node.nodeValue = n.toFixed(decimals));
     const t0 = performance.now();
     let frame = 0;

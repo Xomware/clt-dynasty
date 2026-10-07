@@ -3,7 +3,7 @@
    components) and Tailwind's utilities at any specificity. A property set
    here overrides a view's utility class too; only do that on purpose. */
 
-:root[data-theme="uptown"] {
+:root[data-theme="buzz"] {
   color-scheme: dark;
 
   /* The XP tokens the views read, pointed at Uptown. :root as well, so it
@@ -37,7 +37,7 @@
 }
 
 /* The pixel icons keep XP's palette: they are pictures, not text. */
-[data-theme="uptown"] svg:not(.hex-chart) {
+[data-theme="buzz"] svg:not(.hex-chart) {
   --xp-text: #1b1b17;
   --xp-text-inverse: #fbfbf6;
   --xp-cream: #fbf8ec;
@@ -59,56 +59,56 @@
   --xp-bronze: #c07a3e;
 }
 
-[data-theme="uptown"] body {
+[data-theme="buzz"] body {
   color: var(--u-text);
   background: var(--u-night);
 }
 
-[data-theme="uptown"] :focus-visible {
+[data-theme="buzz"] :focus-visible {
   outline: 3px solid var(--u-focus);
   outline-offset: 2px;
 }
 
-:where([data-theme="uptown"]) a {
+:where([data-theme="buzz"]) a {
   color: var(--u-link);
 }
 
-:where([data-theme="uptown"]) a:hover {
+:where([data-theme="buzz"]) a:hover {
   color: var(--u-link-hover);
 }
 
 /* Headings */
 
-[data-theme="uptown"] :is(.xp-group-title, .xp-round-title) {
+[data-theme="buzz"] :is(.xp-group-title, .xp-round-title) {
   color: var(--u-text-strong);
   font: 700 1.0625rem/1.25 var(--u-display);
 }
 
-[data-theme="uptown"] .xp-group {
+[data-theme="buzz"] .xp-group {
   padding: 1rem 1.125rem;
   border: 1px solid var(--u-line);
   border-radius: 16px;
   background: var(--u-row);
 }
 
-[data-theme="uptown"] .xp-group-title {
+[data-theme="buzz"] .xp-group-title {
   margin-bottom: 0.625rem;
 }
 
 /* Tables */
 
-[data-theme="uptown"] .xp-table {
+[data-theme="buzz"] .xp-table {
   background: none;
 }
 
-[data-theme="uptown"] .xp-table th {
+[data-theme="buzz"] .xp-table th {
   padding: 0.625rem 0.5rem;
   border: 0;
   border-bottom: 1px solid var(--u-line);
   background: none;
 }
 
-[data-theme="uptown"] .xp-table thead :is(th, th button) {
+[data-theme="buzz"] .xp-table thead :is(th, th button) {
   color: var(--u-label);
   font-size: 0.75rem;
   font-weight: 800;
@@ -116,48 +116,48 @@
   text-transform: uppercase;
 }
 
-[data-theme="uptown"] .xp-table td {
+[data-theme="buzz"] .xp-table td {
   padding: 0.625rem 0.5rem;
   border-bottom: 1px solid var(--u-line);
   font-variant-numeric: tabular-nums;
 }
 
-[data-theme="uptown"] .xp-table tbody tr:last-child :is(td, th) {
+[data-theme="buzz"] .xp-table tbody tr:last-child :is(td, th) {
   border-bottom: 0;
 }
 
-[data-theme="uptown"] .xp-table tbody tr:hover :is(td, th) {
+[data-theme="buzz"] .xp-table tbody tr:hover :is(td, th) {
   background-color: var(--u-row);
 }
 
-[data-theme="uptown"] .xp-table .xp-group-start td {
+[data-theme="buzz"] .xp-table .xp-group-start td {
   border-top: 2px solid var(--u-edge);
 }
 
-[data-theme="uptown"] .xp-table .xp-in td:first-child {
+[data-theme="buzz"] .xp-table .xp-in td:first-child {
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
 /* Your own rows and picks: a gold wash with the gold edge. :root outranks the
    windows' own .row[data-mine] rules, whichever loads last. */
-:root[data-theme="uptown"] [data-mine] {
+:root[data-theme="buzz"] [data-mine] {
   background: rgb(227 178 60 / 0.1);
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
-[data-theme="uptown"] .xp-board td {
+[data-theme="buzz"] .xp-board td {
   border-left-color: var(--u-line);
 }
 
 /* Tabs: text on a rule, underlined in gold when picked. */
 
-[data-theme="uptown"] .xp-tab-strip {
+[data-theme="buzz"] .xp-tab-strip {
   gap: 0.25rem;
   padding: 0;
   box-shadow: inset 0 -1px 0 var(--u-line);
 }
 
-[data-theme="uptown"] .xp-tab {
+[data-theme="buzz"] .xp-tab {
   min-height: 2.75rem;
   margin: 0;
   padding: 0 0.875rem;
@@ -169,16 +169,16 @@
   transition: color 0.15s, box-shadow 0.15s;
 }
 
-[data-theme="uptown"] .xp-tab:hover {
+[data-theme="buzz"] .xp-tab:hover {
   color: var(--u-text-strong);
   box-shadow: inset 0 -2px 0 var(--u-edge);
 }
 
-[data-theme="uptown"] .xp-tab:active {
+[data-theme="buzz"] .xp-tab:active {
   background: var(--u-hover);
 }
 
-[data-theme="uptown"] .xp-tab[aria-selected="true"] {
+[data-theme="buzz"] .xp-tab[aria-selected="true"] {
   margin: 0;
   padding-bottom: 0;
   color: var(--u-text-strong);
@@ -187,25 +187,25 @@
 }
 
 /* The strip scrolls sideways, which would clip a ring drawn outside it. */
-[data-theme="uptown"] .xp-tab:focus-visible {
+[data-theme="buzz"] .xp-tab:focus-visible {
   outline: 2px solid var(--u-focus);
   outline-offset: -4px;
 }
 
-[data-theme="uptown"] .xp-tab-panel {
+[data-theme="buzz"] .xp-tab-panel {
   padding: 1rem 0 0;
   border: 0;
   background: none;
 }
 
-[data-theme="uptown"] .xp-tab-panel:focus-visible {
+[data-theme="buzz"] .xp-tab-panel:focus-visible {
   border-radius: 8px;
   outline-offset: 4px;
 }
 
 /* Buttons and fields */
 
-[data-theme="uptown"] :is(.xp-button, .xp-select, .xp-log-off) {
+[data-theme="buzz"] :is(.xp-button, .xp-select, .xp-log-off) {
   min-height: 2.75rem;
   padding: 0 1.125rem;
   border: 1px solid var(--u-edge);
@@ -216,17 +216,17 @@
   transition: background-color 0.15s, border-color 0.15s;
 }
 
-[data-theme="uptown"] :is(.xp-button, .xp-select, .xp-log-off):hover {
+[data-theme="buzz"] :is(.xp-button, .xp-select, .xp-log-off):hover {
   border-color: rgb(227 178 60 / 0.6);
   background: var(--u-hover);
   box-shadow: none;
 }
 
-[data-theme="uptown"] :is(.xp-button, .xp-log-off):active {
+[data-theme="buzz"] :is(.xp-button, .xp-log-off):active {
   background: var(--u-press);
 }
 
-[data-theme="uptown"] .xp-button:disabled {
+[data-theme="buzz"] .xp-button:disabled {
   border-color: var(--u-line);
   color: var(--u-muted);
   background: none;
@@ -234,54 +234,54 @@
   cursor: default;
 }
 
-[data-theme="uptown"] .xp-button[type="submit"]:not(:disabled) {
+[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled) {
   border-color: var(--u-gold);
   color: var(--u-night);
   background: linear-gradient(var(--u-gold-light), var(--u-gold) 70%);
   box-shadow: 0 3px 0 var(--u-gold-deep);
 }
 
-[data-theme="uptown"] .xp-button[type="submit"]:not(:disabled):hover {
+[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled):hover {
   background: var(--u-gold-light);
 }
 
-[data-theme="uptown"] .xp-button[type="submit"]:not(:disabled):active {
+[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled):active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 var(--u-gold-deep);
 }
 
 /* Paired on/off buttons read as one segmented control. */
-[data-theme="uptown"] .xp-toggle {
+[data-theme="buzz"] .xp-toggle {
   border-radius: 0;
 }
 
-[data-theme="uptown"] .xp-toggle:first-child {
+[data-theme="buzz"] .xp-toggle:first-child {
   border-radius: 999px 0 0 999px;
 }
 
-[data-theme="uptown"] .xp-toggle:last-child {
+[data-theme="buzz"] .xp-toggle:last-child {
   border-radius: 0 999px 999px 0;
 }
 
-[data-theme="uptown"] .xp-toggle[aria-pressed="true"] {
+[data-theme="buzz"] .xp-toggle[aria-pressed="true"] {
   border-color: var(--u-gold);
   color: var(--u-night);
   background: var(--u-gold);
 }
 
-[data-theme="uptown"] .xp-step {
+[data-theme="buzz"] .xp-step {
   min-width: 2.75rem;
   padding: 0;
 }
 
-[data-theme="uptown"] .xp-step:disabled {
+[data-theme="buzz"] .xp-step:disabled {
   color: var(--u-label);
   background: none;
   opacity: 0.5;
 }
 
 /* Selects draw their own chevron: the native one is black on the navy. */
-[data-theme="uptown"] .xp-select {
+[data-theme="buzz"] .xp-select {
   appearance: none;
   padding-right: 2.25rem;
   background:
@@ -290,19 +290,19 @@
     rgb(255 255 255 / 0.06);
 }
 
-[data-theme="uptown"] .xp-select:hover {
+[data-theme="buzz"] .xp-select:hover {
   background:
     linear-gradient(45deg, transparent 50%, var(--u-text) 50%) right 1rem center / 0.375rem 0.375rem no-repeat,
     linear-gradient(135deg, var(--u-text) 50%, transparent 50%) right 0.625rem center / 0.375rem 0.375rem no-repeat,
     var(--u-hover);
 }
 
-[data-theme="uptown"] .xp-select option {
+[data-theme="buzz"] .xp-select option {
   color: var(--u-text);
   background: var(--u-surface);
 }
 
-[data-theme="uptown"] :is(.xp-input, .proposal-textarea, textarea) {
+[data-theme="buzz"] :is(.xp-input, .proposal-textarea, textarea) {
   min-height: 2.75rem;
   padding: 0.5rem 0.875rem;
   border: 1px solid var(--u-edge);
@@ -313,36 +313,36 @@
   box-shadow: none;
 }
 
-[data-theme="uptown"] :is(.xp-input, .proposal-textarea, textarea):focus-visible {
+[data-theme="buzz"] :is(.xp-input, .proposal-textarea, textarea):focus-visible {
   border-color: var(--u-gold);
   outline: 3px solid rgb(255 231 161 / 0.5);
   outline-offset: 1px;
 }
 
-[data-theme="uptown"] :is(.xp-input, textarea)::placeholder {
+[data-theme="buzz"] :is(.xp-input, textarea)::placeholder {
   color: var(--u-label);
 }
 
-[data-theme="uptown"] .xp-input[aria-invalid="true"] {
+[data-theme="buzz"] .xp-input[aria-invalid="true"] {
   border-color: var(--u-red-text);
 }
 
-[data-theme="uptown"] :is(input[type="checkbox"], input[type="radio"]) {
+[data-theme="buzz"] :is(input[type="checkbox"], input[type="radio"]) {
   accent-color: var(--u-gold);
 }
 
 /* Links. Drill links stay text-coloured, like XP's, and light up on hover. */
 
-[data-theme="uptown"] .xp-drill:hover,
-[data-theme="uptown"] .xp-drill:hover .xp-team-name {
+[data-theme="buzz"] .xp-drill:hover,
+[data-theme="buzz"] .xp-drill:hover .xp-team-name {
   color: var(--u-link-hover);
 }
 
-[data-theme="uptown"] .xp-drill:active {
+[data-theme="buzz"] .xp-drill:active {
   color: var(--u-link);
 }
 
-[data-theme="uptown"] .xp-drill:focus-visible {
+[data-theme="buzz"] .xp-drill:focus-visible {
   border-radius: 6px;
   outline: 2px solid var(--u-focus);
   outline-offset: 2px;
@@ -350,7 +350,7 @@
 
 /* Tags, badges, avatars */
 
-[data-theme="uptown"] .xp-tag {
+[data-theme="buzz"] .xp-tag {
   display: inline-flex;
   align-items: center;
   padding: 0.0625rem 0.5rem;
@@ -362,19 +362,19 @@
   background: rgb(116 212 230 / 0.1);
 }
 
-[data-theme="uptown"] .world-cup-status[data-status="clinched"] {
+[data-theme="buzz"] .world-cup-status[data-status="clinched"] {
   border-color: var(--u-gold);
   color: var(--u-night);
   background: var(--u-gold);
 }
 
-[data-theme="uptown"] .world-cup-status[data-status="eliminated"] {
+[data-theme="buzz"] .world-cup-status[data-status="eliminated"] {
   border-color: var(--u-line);
   color: var(--u-muted);
   background: none;
 }
 
-[data-theme="uptown"] .xp-avatar {
+[data-theme="buzz"] .xp-avatar {
   border-color: var(--u-edge);
   border-radius: 999px;
   color: var(--u-text-strong);
@@ -383,55 +383,55 @@
 
 /* Grouped surfaces */
 
-[data-theme="uptown"] :is(.xp-matchup, .xp-bracket-match) {
+[data-theme="buzz"] :is(.xp-matchup, .xp-bracket-match) {
   padding: 0.75rem 0.875rem;
   border-color: var(--u-line);
   border-radius: 14px;
   background: var(--u-row);
 }
 
-[data-theme="uptown"] .xp-matchup {
+[data-theme="buzz"] .xp-matchup {
   transition: background-color 0.15s, border-color 0.15s;
 }
 
-[data-theme="uptown"] .xp-matchup:hover {
+[data-theme="buzz"] .xp-matchup:hover {
   border-color: rgb(227 178 60 / 0.55);
   background: var(--u-hover);
   box-shadow: none;
 }
 
-[data-theme="uptown"] .xp-matchup:active {
+[data-theme="buzz"] .xp-matchup:active {
   background: var(--u-press);
 }
 
-[data-theme="uptown"] .xp-matchup-hint {
+[data-theme="buzz"] .xp-matchup-hint {
   color: var(--u-link);
   text-decoration: none;
 }
 
-[data-theme="uptown"] .xp-score {
+[data-theme="buzz"] .xp-score {
   color: var(--u-text-strong);
   font-weight: 700;
 }
 
-[data-theme="uptown"] .xp-player-row {
+[data-theme="buzz"] .xp-player-row {
   min-height: 2.75rem;
   padding: 0.375rem 0.5rem;
   border-bottom-color: var(--u-line);
 }
 
-[data-theme="uptown"] :is(.xp-player-pos, .xp-player-team, .xp-slot-from) {
+[data-theme="buzz"] :is(.xp-player-pos, .xp-player-team, .xp-slot-from) {
   color: var(--u-label);
 }
 
-[data-theme="uptown"] .xp-summary-toggle {
+[data-theme="buzz"] .xp-summary-toggle {
   color: var(--u-text-strong);
 }
 
 /* Notes, insets, summaries */
 
 /* No border, so a note never reads as a text field. */
-[data-theme="uptown"] :is(.xp-note, .xp-inset) {
+[data-theme="buzz"] :is(.xp-note, .xp-inset) {
   border: 0;
   border-radius: 12px;
   color: var(--u-muted);
@@ -439,16 +439,16 @@
   box-shadow: none;
 }
 
-[data-theme="uptown"] .xp-note {
+[data-theme="buzz"] .xp-note {
   padding: 0.5rem 0.875rem;
   font-size: 0.875rem;
 }
 
-[data-theme="uptown"] .xp-summary dt {
+[data-theme="buzz"] .xp-summary dt {
   color: var(--u-label);
 }
 
-[data-theme="uptown"] .xp-summary dd {
+[data-theme="buzz"] .xp-summary dd {
   color: var(--u-text-strong);
 }
 
@@ -461,7 +461,7 @@
   background: rgb(196 71 58 / 0.16);
 }
 
-[data-theme="uptown"] .settings-note {
+[data-theme="buzz"] .settings-note {
   padding: 0.5rem 0.875rem;
   border: 0;
   border-radius: 12px;
@@ -469,45 +469,45 @@
   background: var(--u-row);
 }
 
-[data-theme="uptown"] .search-modes {
+[data-theme="buzz"] .search-modes {
   padding: 0.5rem 1rem 0.75rem;
   border-color: var(--u-line);
   border-radius: 14px;
 }
 
 /* Home's numbers are set in navy for XP's cream; on the night they go light. */
-[data-theme="uptown"] :is(.home-big, .home-stats dd, .home-mine-score) {
+[data-theme="buzz"] :is(.home-big, .home-stats dd, .home-mine-score) {
   color: var(--u-text-strong);
 }
 
-[data-theme="uptown"] .home-big-label {
+[data-theme="buzz"] .home-big-label {
   color: var(--u-muted);
 }
 
-[data-theme="uptown"] .home-mine {
+[data-theme="buzz"] .home-mine {
   border-color: rgb(227 178 60 / 0.45);
   background: linear-gradient(rgb(227 178 60 / 0.1), transparent 70%), var(--u-row);
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
-[data-theme="uptown"] .home-countdown {
+[data-theme="buzz"] .home-countdown {
   border-color: rgb(227 178 60 / 0.5);
   color: var(--u-gold-light);
   background: rgb(227 178 60 / 0.12);
 }
 
-[data-theme="uptown"] :is(.home-stats div, .home-mine-game, .home-mine-next, .home-news-item) {
+[data-theme="buzz"] :is(.home-stats div, .home-mine-game, .home-mine-next, .home-news-item) {
   border-color: var(--u-line);
   border-radius: 12px;
 }
 
-[data-theme="uptown"] .home-news-item[data-priority="critical"] {
+[data-theme="buzz"] .home-news-item[data-priority="critical"] {
   border-color: rgb(227 178 60 / 0.5);
   background: rgb(227 178 60 / 0.08);
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
-[data-theme="uptown"] .home-live {
+[data-theme="buzz"] .home-live {
   border-color: var(--xp-close);
   color: var(--u-text-strong);
   background: var(--xp-close);
@@ -515,7 +515,7 @@
 
 /* Stat cards: XP's little dialogs become glass cards. */
 
-[data-theme="uptown"] .xp-dialog {
+[data-theme="buzz"] .xp-dialog {
   border: 1px solid var(--u-edge);
   border-radius: 18px;
   overflow: hidden;
@@ -523,7 +523,7 @@
   box-shadow: var(--u-card-shadow);
 }
 
-[data-theme="uptown"] .xp-dialog-title {
+[data-theme="buzz"] .xp-dialog-title {
   padding: 0.875rem 1rem 0;
   border-radius: 0;
   color: var(--u-label);
@@ -536,13 +536,13 @@
 
 /* Modals and message boxes: a dimmed night behind a solid card. */
 
-[data-theme="uptown"] .xp-backdrop {
+[data-theme="buzz"] .xp-backdrop {
   background: rgb(4 10 24 / 0.62);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
-[data-theme="uptown"] .xp-backdrop .xp-window {
+[data-theme="buzz"] .xp-backdrop .xp-window {
   overflow: hidden;
   border: 1px solid var(--u-edge);
   border-radius: 22px;
@@ -551,18 +551,18 @@
   box-shadow: 0 24px 60px rgb(2 8 20 / 0.6);
 }
 
-[data-theme="uptown"] .xp-backdrop .xp-titlebar {
+[data-theme="buzz"] .xp-backdrop .xp-titlebar {
   padding: 1rem 0.75rem 0.25rem 1.25rem;
   color: var(--u-text-strong);
   background: none;
 }
 
-[data-theme="uptown"] .xp-backdrop .xp-titlebar-text {
+[data-theme="buzz"] .xp-backdrop .xp-titlebar-text {
   font: 700 1.125rem var(--u-display);
   text-shadow: none;
 }
 
-[data-theme="uptown"] .xp-control {
+[data-theme="buzz"] .xp-control {
   width: 2.25rem;
   height: 2.25rem;
   border: 1px solid var(--u-edge);
@@ -571,28 +571,28 @@
   background: rgb(255 255 255 / 0.06);
 }
 
-[data-theme="uptown"] button.xp-control:hover {
+[data-theme="buzz"] button.xp-control:hover {
   border-color: var(--xp-close);
   background: var(--xp-close);
   filter: none;
 }
 
-[data-theme="uptown"] .xp-control svg {
+[data-theme="buzz"] .xp-control svg {
   --xp-text-inverse: var(--u-text-strong);
 }
 
-[data-theme="uptown"] .xp-message-body {
+[data-theme="buzz"] .xp-message-body {
   padding: 1rem 1.25rem;
   font-size: 0.9375rem;
 }
 
-[data-theme="uptown"] .xp-message-buttons {
+[data-theme="buzz"] .xp-message-buttons {
   padding: 0.25rem 1.25rem 1.25rem;
 }
 
 /* The balloon hangs under the header, not over a taskbar tray. */
 
-[data-theme="uptown"] .xp-balloon {
+[data-theme="buzz"] .xp-balloon {
   top: calc(var(--u-header) + 0.75rem);
   right: 1.25rem;
   bottom: auto;
@@ -605,27 +605,27 @@
   box-shadow: 0 14px 40px rgb(2 8 20 / 0.55);
 }
 
-[data-theme="uptown"] .xp-balloon::after {
+[data-theme="buzz"] .xp-balloon::after {
   display: none;
 }
 
-[data-theme="uptown"] .xp-balloon-close {
+[data-theme="buzz"] .xp-balloon-close {
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
 }
 
-[data-theme="uptown"] .xp-balloon-close svg {
+[data-theme="buzz"] .xp-balloon-close svg {
   --xp-text: var(--u-text);
 }
 
-[data-theme="uptown"] .xp-balloon-close:hover {
+[data-theme="buzz"] .xp-balloon-close:hover {
   border-color: var(--u-edge);
   background: var(--u-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="uptown"] :is(.xp-tab, .xp-button, .xp-select, .xp-log-off, .xp-matchup) {
+  [data-theme="buzz"] :is(.xp-tab, .xp-button, .xp-select, .xp-log-off, .xp-matchup) {
     transition: none;
   }
 }

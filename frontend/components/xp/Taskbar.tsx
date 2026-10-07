@@ -8,7 +8,7 @@ import { REGISTRY, useWindowTitle } from "@/lib/desktop/registry";
 import { defaultLayout } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { useTheme } from "@/lib/theme/theme";
-import { CrownIcon, UptownIcon } from "./icons";
+import { BuzzIcon, CrownIcon } from "./icons";
 import { SpeakerToggle } from "./SpeakerToggle";
 import { StartMenu } from "./StartMenu";
 
@@ -74,9 +74,9 @@ export function Taskbar() {
             setOpen(false);
             dispatch({ type: "restore", windows: defaultLayout(window.innerWidth, window.innerHeight) });
           }}
-          onUptown={() => {
+          onBuzz={() => {
             setOpen(false);
-            setTheme("uptown");
+            setTheme("buzz");
           }}
           onSignOut={() => void signOut()}
         />
@@ -119,12 +119,12 @@ export function Taskbar() {
           <button
             type="button"
             className="xp-tray-button"
-            aria-label="Switch to the Uptown theme"
-            title="Uptown theme"
+            aria-label="Switch to the Buzz City theme"
+            title="Buzz City theme"
             disabled={switching}
-            onClick={() => setTheme("uptown")}
+            onClick={() => setTheme("buzz")}
           >
-            <UptownIcon width={18} height={18} />
+            <BuzzIcon width={18} height={18} />
           </button>
           <SpeakerToggle />
           <time>{time}</time>

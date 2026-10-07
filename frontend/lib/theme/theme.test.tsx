@@ -62,24 +62,24 @@ describe("ThemeProvider", () => {
 
   it("covers the screen, swaps under the cover, then uncovers", () => {
     renderToggle();
-    fireEvent.click(screen.getByRole("button", { name: "Uptown" }));
+    fireEvent.click(screen.getByRole("button", { name: "Buzz City" }));
 
-    expect(overlay()?.getAttribute("data-to")).toBe("uptown");
-    expect(screen.getByRole<HTMLButtonElement>("button", { name: "Uptown" }).disabled).toBe(true);
-    act(() => vi.advanceTimersByTime(TIMING.uptown.covered - 1));
+    expect(overlay()?.getAttribute("data-to")).toBe("buzz");
+    expect(screen.getByRole<HTMLButtonElement>("button", { name: "Buzz City" }).disabled).toBe(true);
+    act(() => vi.advanceTimersByTime(TIMING.buzz.covered - 1));
     expect(screen.getByTestId("theme").textContent).toBe("xp");
 
     act(() => vi.advanceTimersByTime(1));
-    expect(screen.getByTestId("theme").textContent).toBe("uptown");
-    expect(html.dataset.theme).toBe("uptown");
+    expect(screen.getByTestId("theme").textContent).toBe("buzz");
+    expect(html.dataset.theme).toBe("buzz");
     expect(themeColor()).toBe("#0a1838");
-    expect(localStorage.getItem(THEME_KEY)).toBe("uptown");
+    expect(localStorage.getItem(THEME_KEY)).toBe("buzz");
     expect(overlay()).not.toBeNull();
-    expect(screen.getByRole("status").textContent).toBe("Uptown theme on");
+    expect(screen.getByRole("status").textContent).toBe("Buzz City theme on");
 
-    act(() => vi.advanceTimersByTime(TIMING.uptown.total - TIMING.uptown.covered));
+    act(() => vi.advanceTimersByTime(TIMING.buzz.total - TIMING.buzz.covered));
     expect(overlay()).toBeNull();
-    expect(pressed("Uptown")).toBe("true");
+    expect(pressed("Buzz City")).toBe("true");
     expect(screen.getByRole<HTMLButtonElement>("button", { name: "Classic XP" }).disabled).toBe(false);
   });
 
@@ -87,7 +87,7 @@ describe("ThemeProvider", () => {
     function Both() {
       const { setTheme } = useTheme();
       return (
-        <button type="button" onClick={() => (setTheme("uptown"), setTheme("xp"))}>
+        <button type="button" onClick={() => (setTheme("buzz"), setTheme("xp"))}>
           both
         </button>
       );
@@ -99,15 +99,15 @@ describe("ThemeProvider", () => {
       </ThemeProvider>,
     );
     fireEvent.click(screen.getByRole("button", { name: "both" }));
-    act(() => vi.advanceTimersByTime(TIMING.uptown.total));
-    expect(screen.getByTestId("theme").textContent).toBe("uptown");
+    act(() => vi.advanceTimersByTime(TIMING.buzz.total));
+    expect(screen.getByTestId("theme").textContent).toBe("buzz");
     expect(overlay()).toBeNull();
   });
 
-  it("switches back to XP and clears what Uptown put on <html>", () => {
-    localStorage.setItem(THEME_KEY, "uptown");
+  it("switches back to XP and clears what Buzz City put on <html>", () => {
+    localStorage.setItem(THEME_KEY, "buzz");
     renderToggle();
-    expect(html.dataset.theme).toBe("uptown");
+    expect(html.dataset.theme).toBe("buzz");
 
     fireEvent.click(screen.getByRole("button", { name: "Classic XP" }));
     expect(overlay()?.getAttribute("data-to")).toBe("xp");
@@ -118,12 +118,19 @@ describe("ThemeProvider", () => {
     expect(localStorage.getItem(THEME_KEY)).toBe("xp");
   });
 
+  it("reads a stored Uptown choice as Buzz City", () => {
+    localStorage.setItem(THEME_KEY, "uptown");
+    renderToggle();
+    expect(screen.getByTestId("theme").textContent).toBe("buzz");
+    expect(pressed("Buzz City")).toBe("true");
+  });
+
   it("swaps at once with no overlay under reduced motion", () => {
     motion(true);
     renderToggle();
-    fireEvent.click(screen.getByRole("button", { name: "Uptown" }));
+    fireEvent.click(screen.getByRole("button", { name: "Buzz City" }));
     expect(overlay()).toBeNull();
-    expect(screen.getByTestId("theme").textContent).toBe("uptown");
+    expect(screen.getByTestId("theme").textContent).toBe("buzz");
   });
 
   it("holds the choice for the visit when storage refuses it", () => {
@@ -131,9 +138,9 @@ describe("ThemeProvider", () => {
       throw new DOMException("quota", "QuotaExceededError");
     });
     renderToggle();
-    fireEvent.click(screen.getByRole("button", { name: "Uptown" }));
-    act(() => vi.advanceTimersByTime(TIMING.uptown.total));
-    expect(screen.getByTestId("theme").textContent).toBe("uptown");
+    fireEvent.click(screen.getByRole("button", { name: "Buzz City" }));
+    act(() => vi.advanceTimersByTime(TIMING.buzz.total));
+    expect(screen.getByTestId("theme").textContent).toBe("buzz");
 
     // A later save that works hands the choice back to storage.
     vi.mocked(Storage.prototype.setItem).mockRestore();
@@ -146,11 +153,18 @@ describe("ThemeProvider", () => {
 describe("THEME_SCRIPT", () => {
   const run = () => new Function(THEME_SCRIPT)();
 
-  it("paints Uptown before hydration when it is stored", () => {
+  it("paints Buzz City before hydration when it is stored", () => {
+    localStorage.setItem(THEME_KEY, "buzz");
+    run();
+    expect(html.dataset.theme).toBe("buzz");
+    expect(themeColor()).toBe("#0a1838");
+  });
+
+  it("moves a stored Uptown choice over to Buzz City", () => {
     localStorage.setItem(THEME_KEY, "uptown");
     run();
-    expect(html.dataset.theme).toBe("uptown");
-    expect(themeColor()).toBe("#0a1838");
+    expect(localStorage.getItem(THEME_KEY)).toBe("buzz");
+    expect(html.dataset.theme).toBe("buzz");
   });
 
   it("leaves XP and unknown values alone", () => {
