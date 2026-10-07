@@ -15,7 +15,8 @@ import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY, settledTeam, useLauncherGroups, useWindowTitle } from "@/lib/desktop/registry";
 import { patchParams, viewKey, windowId, type WindowParams } from "@/lib/desktop/windows";
 import { ViewParamsContext } from "@/lib/view-params";
-import { BODIES, HOME_PAGE } from "./bodies";
+import { BODIES } from "./bodies";
+import { BuzzHome } from "./BuzzHome";
 import { BuzzTicker } from "./BuzzTicker";
 import { Hornet } from "./Hornet";
 import { PageHead } from "./PageHead";
@@ -171,9 +172,9 @@ export function BuzzShell() {
         <NavigateContext value={go}>
           <main ref={main} className="bz-page">
             <div key={page} className="bz-route" data-dir={dir}>
-              {view.kind === "home" && HOME_PAGE ? (
+              {view.kind === "home" ? (
                 <WindowBoundary key={id}>
-                  <HOME_PAGE ref={heading} />
+                  <BuzzHome ref={heading} />
                 </WindowBoundary>
               ) : (
                 <>

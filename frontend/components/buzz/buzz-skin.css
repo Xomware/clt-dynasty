@@ -90,6 +90,14 @@
   box-shadow: none;
 }
 
+/* A matchup's group is only a wrapper for its board and lineups. */
+[data-theme="buzz"] .xp-group:has(> .xp-matchup) {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
 [data-theme="buzz"] .xp-group-title {
   margin-bottom: 0.625rem;
 }
@@ -393,7 +401,7 @@
 
 /* Grouped surfaces */
 
-[data-theme="buzz"] :is(.xp-matchup, .xp-bracket-match) {
+[data-theme="buzz"] .xp-bracket-match {
   padding: 0.75rem 0.875rem;
   border: 2px solid var(--bz-ink);
   border-radius: 12px;
@@ -401,31 +409,57 @@
   box-shadow: 3px 3px 0 var(--bz-ink);
 }
 
+/* A matchup is a little arena scoreboard: ink, team names in ivory, the
+   points in amber. Its lineups below stay on the jersey. */
 [data-theme="buzz"] .xp-matchup {
+  --xp-text: var(--bz-paper);
+
+  padding: 0.75rem 0.875rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 12px;
+  color: var(--bz-paper);
+  background: var(--bz-led-dots), linear-gradient(var(--bz-ink-2), var(--bz-ink));
+  box-shadow:
+    0 0 0 2px var(--bz-teal) inset,
+    3px 3px 0 var(--bz-purple);
   transition:
     transform 0.15s,
-    box-shadow 0.15s,
-    background-color 0.15s;
+    box-shadow 0.15s;
 }
 
 [data-theme="buzz"] .xp-matchup:hover {
-  background: #fffdf6;
-  box-shadow: 5px 5px 0 var(--bz-purple);
+  box-shadow:
+    0 0 0 2px var(--bz-teal-light) inset,
+    5px 5px 0 var(--bz-purple);
   transform: translate(-2px, -2px);
 }
 
 [data-theme="buzz"] .xp-matchup:active {
-  box-shadow: 1px 1px 0 var(--bz-ink);
+  box-shadow:
+    0 0 0 2px var(--bz-teal-light) inset,
+    1px 1px 0 var(--bz-purple);
   transform: translate(2px, 2px);
 }
 
+[data-theme="buzz"] .xp-matchup .xp-team-name {
+  font: italic 700 1rem var(--bz-jersey);
+  text-transform: uppercase;
+}
+
 [data-theme="buzz"] .xp-matchup-hint {
-  color: var(--bz-teal-deep);
+  color: var(--bz-teal-light);
+  font: 700 0.8125rem var(--bz-jersey);
+  text-transform: uppercase;
 }
 
 [data-theme="buzz"] .xp-score {
-  color: var(--bz-ink);
-  font: 800 1.125rem var(--bz-jersey);
+  color: var(--bz-amber);
+  font: 800 1.25rem var(--bz-jersey);
+  text-shadow: 0 0 8px rgb(255 181 46 / 0.45);
+}
+
+[data-theme="buzz"] .xp-matchup .xp-tag {
+  border-color: var(--bz-teal-light);
 }
 
 [data-theme="buzz"] .xp-player-row {

@@ -538,7 +538,7 @@
 }
 
 /* Pages Buzz City draws itself bring their own surfaces. */
-.bz-panel[data-bare] {
+.bz-panel:is([data-kind="standings"], [data-kind="player"]) {
   padding: 0;
   border: 0;
   background: none;
@@ -1279,8 +1279,8 @@
   height: min(100dvh, 100%);
   content: "";
   background: repeating-linear-gradient(90deg, var(--bz-teal) 0 18px, transparent 18px 26px, var(--bz-purple) 26px 44px, transparent 44px 52px);
+  opacity: 0;
   pointer-events: none;
-  transform: translateX(-120%) skewX(-16deg);
   animation: bz-wipe 520ms cubic-bezier(0.6, 0, 0.3, 1) both;
 }
 
@@ -1317,7 +1317,8 @@
 }
 
 .bz-led[data-live] .bz-live-dot,
-.bz-live {
+.bz-live,
+.buzz .home-live {
   animation: bz-blink 1s steps(1, end) infinite;
 }
 
@@ -1342,21 +1343,33 @@
   }
 }
 
+/* Visible only while it crosses: its skewed corners would poke into the
+   page at either end. */
 @keyframes bz-wipe {
   from {
-    transform: translateX(-120%) skewX(-16deg);
+    opacity: 1;
+    transform: translateX(-170%) skewX(-16deg);
+  }
+  99% {
+    opacity: 1;
   }
   to {
-    transform: translateX(260%) skewX(-16deg);
+    opacity: 0;
+    transform: translateX(280%) skewX(-16deg);
   }
 }
 
 @keyframes bz-wipe-back {
   from {
-    transform: translateX(260%) skewX(-16deg);
+    opacity: 1;
+    transform: translateX(280%) skewX(-16deg);
+  }
+  99% {
+    opacity: 1;
   }
   to {
-    transform: translateX(-120%) skewX(-16deg);
+    opacity: 0;
+    transform: translateX(-170%) skewX(-16deg);
   }
 }
 
