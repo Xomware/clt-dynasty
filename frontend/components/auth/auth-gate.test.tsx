@@ -90,7 +90,7 @@ describe("AuthGate", () => {
     vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}));
     render(<AuthGate>league content</AuthGate>);
 
-    expect(await screen.findByText(/checking the roster/i)).toBeTruthy();
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/checking the roster/i));
     expect(screen.queryByText("league content")).toBeNull();
   });
 

@@ -12,20 +12,6 @@ vi.mock("@/lib/api/clt", () => ({
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
-// The hub's real cards fetch half the API; these tests are about the shell.
-vi.mock("./UptownHome", () => ({
-  UptownHome: ({ ref, phone }: { ref?: React.Ref<HTMLHeadingElement>; phone?: boolean }) => {
-    const Title = phone ? "h2" : "h1";
-    return (
-      <div>
-        <Title ref={ref} tabIndex={-1}>
-          The Queen City&rsquo;s dynasty league
-        </Title>
-        <p>home body</p>
-      </div>
-    );
-  },
-}));
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
   useLeague: () => ({ data: null, myRosterId: null, teamFor: () => ({ name: "", avatarUrl: null }) }),
@@ -92,11 +78,10 @@ async function renderPhone() {
 const bar = () => screen.getByRole("heading", { level: 1 });
 const drawer = () => within(screen.getByRole("dialog", { name: "Menu" }));
 
-describe("Uptown phone", () => {
-  it("opens on Home under the bar, its hero a step below the bar's title", async () => {
+describe("Buzz City phone", () => {
+  it("opens on Home under the bar", async () => {
     await renderPhone();
     expect(bar().textContent).toBe("CLT Dynasty");
-    expect(screen.getByRole("heading", { level: 2, name: /dynasty league/ })).toBeTruthy();
     expect(screen.getByText("home body")).toBeTruthy();
     expect(screen.queryByRole("navigation", { name: "Programs" })).toBeNull();
   });

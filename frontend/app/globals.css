@@ -1057,7 +1057,7 @@
   }
 }
 
-/* A stored Uptown theme is on <html> before any shell loads, so the loader matches it. */
+/* A stored Buzz City theme is on <html> before any shell loads, so the loader matches it. */
 [data-theme="buzz"] .brand-loader-page {
-  background: linear-gradient(#070f22, #0a1838 55%, #122b55);
+  background: #170d31;
 }

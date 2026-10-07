@@ -2,7 +2,7 @@
    from the league mark, under the intro's skyline. This file is the shell;
    uptown-skin.css re-skins the XP window bodies that render inside it. */
 
-[data-theme="buzz"] {
+:root[data-theme="buzz"]:has(.uptown) {
   --u-display: Sora, "Trebuchet MS", sans-serif;
   --u-body: Figtree, system-ui, sans-serif;
 

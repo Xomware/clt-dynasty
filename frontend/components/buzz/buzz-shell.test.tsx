@@ -13,20 +13,6 @@ vi.mock("@/lib/api/clt", () => ({
 }));
 vi.mock("aws-amplify/auth", () => ({ signOut: vi.fn(), getCurrentUser: vi.fn(), fetchAuthSession: vi.fn() }));
 vi.mock("aws-amplify/utils", () => ({ Hub: { listen: vi.fn(() => () => {}) } }));
-// The hub's real cards fetch half the API; these tests are about the shell.
-vi.mock("./UptownHome", () => ({
-  UptownHome: ({ ref, phone }: { ref?: React.Ref<HTMLHeadingElement>; phone?: boolean }) => {
-    const Title = phone ? "h2" : "h1";
-    return (
-      <div>
-        <Title ref={ref} tabIndex={-1}>
-          The Queen City&rsquo;s dynasty league
-        </Title>
-        <p>home body</p>
-      </div>
-    );
-  },
-}));
 // The Home hero reads the league; these tests are about the shell.
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
@@ -37,16 +23,19 @@ vi.mock("@/lib/league/use-league", async (orig) => ({
   }),
 }));
 
+import { AppShell } from "@/components/AppShell";
+import { TIMING } from "@/components/theme/ThemeTransition";
 import { MembersIcon } from "@/components/xp/icons";
 import { AlertsProvider } from "@/lib/alerts/alerts";
 import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
-import { ABOUT, RELATED } from "./pages";
+import { ThemeProvider } from "@/lib/theme/theme";
+import { ABOUT, RELATED } from "@/components/uptown/pages";
 
 const RELATED_TEST = RELATED as Record<string, string[]>;
 const standingsNext = RELATED_TEST.standings;
-import { UptownShell } from "./UptownShell";
+import { BuzzShell } from "./BuzzShell";
 
 registerTestWindows();
 
@@ -73,7 +62,7 @@ afterEach(() => {
   window.history.replaceState(null, "", "/");
 });
 
-async function renderShell(ui = <UptownShell />) {
+async function renderShell(ui = <BuzzShell />) {
   render(
     <MemberProvider>
       <AlertsProvider>{ui}</AlertsProvider>
@@ -85,12 +74,12 @@ async function renderShell(ui = <UptownShell />) {
 const nav = (name: string) => within(screen.getByRole("navigation", { name }));
 const title = () => screen.getByRole("heading", { level: 1 });
 
-describe("UptownShell", () => {
+describe("BuzzShell", () => {
   it("files the header nav by group and starts on Home", async () => {
     await renderShell();
     expect(nav("Main").getAllByRole("link").map((a) => a.textContent)).toEqual(["Home", "League"]);
     expect(nav("Main").getByRole("link", { name: "Home" }).getAttribute("aria-current")).toBe("page");
-    expect(title().textContent).toBe("The Queen City\u2019s dynasty league");
+    expect(title().textContent).toBe("CLT Dynasty League");
     expect(screen.getByText("home body")).toBeTruthy();
     expect(screen.queryByRole("navigation", { name: "League pages" })).toBeNull();
   });
@@ -247,5 +236,32 @@ describe("Spotlight", () => {
     fireEvent.keyDown(box, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.activeElement).toBe(opener);
+  });
+});
+
+describe("AppShell themes", () => {
+  it("swaps the XP desktop for Buzz City from the tray, and back from the account menu", async () => {
+    render(
+      <ThemeProvider>
+        <MemberProvider>
+          <AlertsProvider>
+            <AppShell />
+          </AlertsProvider>
+        </MemberProvider>
+      </ThemeProvider>,
+    );
+    await screen.findByText("Welcome back, Roster 4");
+
+    vi.useFakeTimers();
+    fireEvent.click(screen.getByRole("button", { name: "Switch to the Buzz City theme" }));
+    act(() => vi.advanceTimersByTime(TIMING.buzz.total));
+    expect(screen.getByRole("navigation", { name: "Main" })).toBeTruthy();
+    expect(screen.queryByRole("list", { name: "Desktop" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Roster 4, account menu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Classic XP" }));
+    act(() => vi.advanceTimersByTime(TIMING.xp.total));
+    expect(screen.getByRole("list", { name: "Desktop" })).toBeTruthy();
+    expect(localStorage.getItem("clt.theme")).toBe("xp");
   });
 });

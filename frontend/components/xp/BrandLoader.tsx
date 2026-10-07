@@ -1,5 +1,6 @@
 "use client";
 
+import { BuzzLoader } from "@/components/buzz/BuzzLoader";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 import { CrownIcon } from "./icons";
@@ -14,6 +15,7 @@ interface BrandLoaderProps {
 export function BrandLoader({ label }: BrandLoaderProps) {
   const still = useReducedMotion();
   return (
+    <>
     <div className="brand-loader">
       <CrownIcon width={64} height={64} />
       <p className="brand-loader-name" aria-hidden="true">
@@ -24,9 +26,15 @@ export function BrandLoader({ label }: BrandLoaderProps) {
         <span />
         <span />
       </div>
-      <p role="status" className="brand-loader-label">
+      <p className="brand-loader-label" aria-hidden="true">
         {label}
       </p>
     </div>
+    <BuzzLoader label={label} />
+    {/* One announcement for both themes' art, only one of which CSS shows. */}
+    <p role="status" className="sr-only">
+      {label}
+    </p>
+    </>
   );
 }

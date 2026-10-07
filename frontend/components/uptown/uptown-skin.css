@@ -3,7 +3,7 @@
    components) and Tailwind's utilities at any specificity. A property set
    here overrides a view's utility class too; only do that on purpose. */
 
-:root[data-theme="buzz"] {
+:root[data-theme="buzz"]:has(.uptown) {
   color-scheme: dark;
 
   /* The XP tokens the views read, pointed at Uptown. :root as well, so it
@@ -37,7 +37,7 @@
 }
 
 /* The pixel icons keep XP's palette: they are pictures, not text. */
-[data-theme="buzz"] svg:not(.hex-chart) {
+:root[data-theme="buzz"]:has(.uptown) svg:not(.hex-chart) {
   --xp-text: #1b1b17;
   --xp-text-inverse: #fbfbf6;
   --xp-cream: #fbf8ec;
@@ -59,56 +59,56 @@
   --xp-bronze: #c07a3e;
 }
 
-[data-theme="buzz"] body {
+:root[data-theme="buzz"]:has(.uptown) body {
   color: var(--u-text);
   background: var(--u-night);
 }
 
-[data-theme="buzz"] :focus-visible {
+:root[data-theme="buzz"]:has(.uptown) :focus-visible {
   outline: 3px solid var(--u-focus);
   outline-offset: 2px;
 }
 
-:where([data-theme="buzz"]) a {
+:where([data-theme="buzz"]:has(.uptown)) a {
   color: var(--u-link);
 }
 
-:where([data-theme="buzz"]) a:hover {
+:where([data-theme="buzz"]:has(.uptown)) a:hover {
   color: var(--u-link-hover);
 }
 
 /* Headings */
 
-[data-theme="buzz"] :is(.xp-group-title, .xp-round-title) {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-group-title, .xp-round-title) {
   color: var(--u-text-strong);
   font: 700 1.0625rem/1.25 var(--u-display);
 }
 
-[data-theme="buzz"] .xp-group {
+:root[data-theme="buzz"]:has(.uptown) .xp-group {
   padding: 1rem 1.125rem;
   border: 1px solid var(--u-line);
   border-radius: 16px;
   background: var(--u-row);
 }
 
-[data-theme="buzz"] .xp-group-title {
+:root[data-theme="buzz"]:has(.uptown) .xp-group-title {
   margin-bottom: 0.625rem;
 }
 
 /* Tables */
 
-[data-theme="buzz"] .xp-table {
+:root[data-theme="buzz"]:has(.uptown) .xp-table {
   background: none;
 }
 
-[data-theme="buzz"] .xp-table th {
+:root[data-theme="buzz"]:has(.uptown) .xp-table th {
   padding: 0.625rem 0.5rem;
   border: 0;
   border-bottom: 1px solid var(--u-line);
   background: none;
 }
 
-[data-theme="buzz"] .xp-table thead :is(th, th button) {
+:root[data-theme="buzz"]:has(.uptown) .xp-table thead :is(th, th button) {
   color: var(--u-label);
   font-size: 0.75rem;
   font-weight: 800;
@@ -116,48 +116,48 @@
   text-transform: uppercase;
 }
 
-[data-theme="buzz"] .xp-table td {
+:root[data-theme="buzz"]:has(.uptown) .xp-table td {
   padding: 0.625rem 0.5rem;
   border-bottom: 1px solid var(--u-line);
   font-variant-numeric: tabular-nums;
 }
 
-[data-theme="buzz"] .xp-table tbody tr:last-child :is(td, th) {
+:root[data-theme="buzz"]:has(.uptown) .xp-table tbody tr:last-child :is(td, th) {
   border-bottom: 0;
 }
 
-[data-theme="buzz"] .xp-table tbody tr:hover :is(td, th) {
+:root[data-theme="buzz"]:has(.uptown) .xp-table tbody tr:hover :is(td, th) {
   background-color: var(--u-row);
 }
 
-[data-theme="buzz"] .xp-table .xp-group-start td {
+:root[data-theme="buzz"]:has(.uptown) .xp-table .xp-group-start td {
   border-top: 2px solid var(--u-edge);
 }
 
-[data-theme="buzz"] .xp-table .xp-in td:first-child {
+:root[data-theme="buzz"]:has(.uptown) .xp-table .xp-in td:first-child {
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
 /* Your own rows and picks: a gold wash with the gold edge. :root outranks the
    windows' own .row[data-mine] rules, whichever loads last. */
-:root[data-theme="buzz"] [data-mine] {
+:root[data-theme="buzz"]:has(.uptown) [data-mine] {
   background: rgb(227 178 60 / 0.1);
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
-[data-theme="buzz"] .xp-board td {
+:root[data-theme="buzz"]:has(.uptown) .xp-board td {
   border-left-color: var(--u-line);
 }
 
 /* Tabs: text on a rule, underlined in gold when picked. */
 
-[data-theme="buzz"] .xp-tab-strip {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab-strip {
   gap: 0.25rem;
   padding: 0;
   box-shadow: inset 0 -1px 0 var(--u-line);
 }
 
-[data-theme="buzz"] .xp-tab {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab {
   min-height: 2.75rem;
   margin: 0;
   padding: 0 0.875rem;
@@ -169,16 +169,16 @@
   transition: color 0.15s, box-shadow 0.15s;
 }
 
-[data-theme="buzz"] .xp-tab:hover {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab:hover {
   color: var(--u-text-strong);
   box-shadow: inset 0 -2px 0 var(--u-edge);
 }
 
-[data-theme="buzz"] .xp-tab:active {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab:active {
   background: var(--u-hover);
 }
 
-[data-theme="buzz"] .xp-tab[aria-selected="true"] {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab[aria-selected="true"] {
   margin: 0;
   padding-bottom: 0;
   color: var(--u-text-strong);
@@ -187,25 +187,25 @@
 }
 
 /* The strip scrolls sideways, which would clip a ring drawn outside it. */
-[data-theme="buzz"] .xp-tab:focus-visible {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab:focus-visible {
   outline: 2px solid var(--u-focus);
   outline-offset: -4px;
 }
 
-[data-theme="buzz"] .xp-tab-panel {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab-panel {
   padding: 1rem 0 0;
   border: 0;
   background: none;
 }
 
-[data-theme="buzz"] .xp-tab-panel:focus-visible {
+:root[data-theme="buzz"]:has(.uptown) .xp-tab-panel:focus-visible {
   border-radius: 8px;
   outline-offset: 4px;
 }
 
 /* Buttons and fields */
 
-[data-theme="buzz"] :is(.xp-button, .xp-select, .xp-log-off) {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-button, .xp-select, .xp-log-off) {
   min-height: 2.75rem;
   padding: 0 1.125rem;
   border: 1px solid var(--u-edge);
@@ -216,17 +216,17 @@
   transition: background-color 0.15s, border-color 0.15s;
 }
 
-[data-theme="buzz"] :is(.xp-button, .xp-select, .xp-log-off):hover {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-button, .xp-select, .xp-log-off):hover {
   border-color: rgb(227 178 60 / 0.6);
   background: var(--u-hover);
   box-shadow: none;
 }
 
-[data-theme="buzz"] :is(.xp-button, .xp-log-off):active {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-button, .xp-log-off):active {
   background: var(--u-press);
 }
 
-[data-theme="buzz"] .xp-button:disabled {
+:root[data-theme="buzz"]:has(.uptown) .xp-button:disabled {
   border-color: var(--u-line);
   color: var(--u-muted);
   background: none;
@@ -234,54 +234,54 @@
   cursor: default;
 }
 
-[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled) {
+:root[data-theme="buzz"]:has(.uptown) .xp-button[type="submit"]:not(:disabled) {
   border-color: var(--u-gold);
   color: var(--u-night);
   background: linear-gradient(var(--u-gold-light), var(--u-gold) 70%);
   box-shadow: 0 3px 0 var(--u-gold-deep);
 }
 
-[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled):hover {
+:root[data-theme="buzz"]:has(.uptown) .xp-button[type="submit"]:not(:disabled):hover {
   background: var(--u-gold-light);
 }
 
-[data-theme="buzz"] .xp-button[type="submit"]:not(:disabled):active {
+:root[data-theme="buzz"]:has(.uptown) .xp-button[type="submit"]:not(:disabled):active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 var(--u-gold-deep);
 }
 
 /* Paired on/off buttons read as one segmented control. */
-[data-theme="buzz"] .xp-toggle {
+:root[data-theme="buzz"]:has(.uptown) .xp-toggle {
   border-radius: 0;
 }
 
-[data-theme="buzz"] .xp-toggle:first-child {
+:root[data-theme="buzz"]:has(.uptown) .xp-toggle:first-child {
   border-radius: 999px 0 0 999px;
 }
 
-[data-theme="buzz"] .xp-toggle:last-child {
+:root[data-theme="buzz"]:has(.uptown) .xp-toggle:last-child {
   border-radius: 0 999px 999px 0;
 }
 
-[data-theme="buzz"] .xp-toggle[aria-pressed="true"] {
+:root[data-theme="buzz"]:has(.uptown) .xp-toggle[aria-pressed="true"] {
   border-color: var(--u-gold);
   color: var(--u-night);
   background: var(--u-gold);
 }
 
-[data-theme="buzz"] .xp-step {
+:root[data-theme="buzz"]:has(.uptown) .xp-step {
   min-width: 2.75rem;
   padding: 0;
 }
 
-[data-theme="buzz"] .xp-step:disabled {
+:root[data-theme="buzz"]:has(.uptown) .xp-step:disabled {
   color: var(--u-label);
   background: none;
   opacity: 0.5;
 }
 
 /* Selects draw their own chevron: the native one is black on the navy. */
-[data-theme="buzz"] .xp-select {
+:root[data-theme="buzz"]:has(.uptown) .xp-select {
   appearance: none;
   padding-right: 2.25rem;
   background:
@@ -290,19 +290,19 @@
     rgb(255 255 255 / 0.06);
 }
 
-[data-theme="buzz"] .xp-select:hover {
+:root[data-theme="buzz"]:has(.uptown) .xp-select:hover {
   background:
     linear-gradient(45deg, transparent 50%, var(--u-text) 50%) right 1rem center / 0.375rem 0.375rem no-repeat,
     linear-gradient(135deg, var(--u-text) 50%, transparent 50%) right 0.625rem center / 0.375rem 0.375rem no-repeat,
     var(--u-hover);
 }
 
-[data-theme="buzz"] .xp-select option {
+:root[data-theme="buzz"]:has(.uptown) .xp-select option {
   color: var(--u-text);
   background: var(--u-surface);
 }
 
-[data-theme="buzz"] :is(.xp-input, .proposal-textarea, textarea) {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-input, .proposal-textarea, textarea) {
   min-height: 2.75rem;
   padding: 0.5rem 0.875rem;
   border: 1px solid var(--u-edge);
@@ -313,36 +313,36 @@
   box-shadow: none;
 }
 
-[data-theme="buzz"] :is(.xp-input, .proposal-textarea, textarea):focus-visible {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-input, .proposal-textarea, textarea):focus-visible {
   border-color: var(--u-gold);
   outline: 3px solid rgb(255 231 161 / 0.5);
   outline-offset: 1px;
 }
 
-[data-theme="buzz"] :is(.xp-input, textarea)::placeholder {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-input, textarea)::placeholder {
   color: var(--u-label);
 }
 
-[data-theme="buzz"] .xp-input[aria-invalid="true"] {
+:root[data-theme="buzz"]:has(.uptown) .xp-input[aria-invalid="true"] {
   border-color: var(--u-red-text);
 }
 
-[data-theme="buzz"] :is(input[type="checkbox"], input[type="radio"]) {
+:root[data-theme="buzz"]:has(.uptown) :is(input[type="checkbox"], input[type="radio"]) {
   accent-color: var(--u-gold);
 }
 
 /* Links. Drill links stay text-coloured, like XP's, and light up on hover. */
 
-[data-theme="buzz"] .xp-drill:hover,
-[data-theme="buzz"] .xp-drill:hover .xp-team-name {
+:root[data-theme="buzz"]:has(.uptown) .xp-drill:hover,
+:root[data-theme="buzz"]:has(.uptown) .xp-drill:hover .xp-team-name {
   color: var(--u-link-hover);
 }
 
-[data-theme="buzz"] .xp-drill:active {
+:root[data-theme="buzz"]:has(.uptown) .xp-drill:active {
   color: var(--u-link);
 }
 
-[data-theme="buzz"] .xp-drill:focus-visible {
+:root[data-theme="buzz"]:has(.uptown) .xp-drill:focus-visible {
   border-radius: 6px;
   outline: 2px solid var(--u-focus);
   outline-offset: 2px;
@@ -350,7 +350,7 @@
 
 /* Tags, badges, avatars */
 
-[data-theme="buzz"] .xp-tag {
+:root[data-theme="buzz"]:has(.uptown) .xp-tag {
   display: inline-flex;
   align-items: center;
   padding: 0.0625rem 0.5rem;
@@ -362,19 +362,19 @@
   background: rgb(116 212 230 / 0.1);
 }
 
-[data-theme="buzz"] .world-cup-status[data-status="clinched"] {
+:root[data-theme="buzz"]:has(.uptown) .world-cup-status[data-status="clinched"] {
   border-color: var(--u-gold);
   color: var(--u-night);
   background: var(--u-gold);
 }
 
-[data-theme="buzz"] .world-cup-status[data-status="eliminated"] {
+:root[data-theme="buzz"]:has(.uptown) .world-cup-status[data-status="eliminated"] {
   border-color: var(--u-line);
   color: var(--u-muted);
   background: none;
 }
 
-[data-theme="buzz"] .xp-avatar {
+:root[data-theme="buzz"]:has(.uptown) .xp-avatar {
   border-color: var(--u-edge);
   border-radius: 999px;
   color: var(--u-text-strong);
@@ -383,55 +383,55 @@
 
 /* Grouped surfaces */
 
-[data-theme="buzz"] :is(.xp-matchup, .xp-bracket-match) {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-matchup, .xp-bracket-match) {
   padding: 0.75rem 0.875rem;
   border-color: var(--u-line);
   border-radius: 14px;
   background: var(--u-row);
 }
 
-[data-theme="buzz"] .xp-matchup {
+:root[data-theme="buzz"]:has(.uptown) .xp-matchup {
   transition: background-color 0.15s, border-color 0.15s;
 }
 
-[data-theme="buzz"] .xp-matchup:hover {
+:root[data-theme="buzz"]:has(.uptown) .xp-matchup:hover {
   border-color: rgb(227 178 60 / 0.55);
   background: var(--u-hover);
   box-shadow: none;
 }
 
-[data-theme="buzz"] .xp-matchup:active {
+:root[data-theme="buzz"]:has(.uptown) .xp-matchup:active {
   background: var(--u-press);
 }
 
-[data-theme="buzz"] .xp-matchup-hint {
+:root[data-theme="buzz"]:has(.uptown) .xp-matchup-hint {
   color: var(--u-link);
   text-decoration: none;
 }
 
-[data-theme="buzz"] .xp-score {
+:root[data-theme="buzz"]:has(.uptown) .xp-score {
   color: var(--u-text-strong);
   font-weight: 700;
 }
 
-[data-theme="buzz"] .xp-player-row {
+:root[data-theme="buzz"]:has(.uptown) .xp-player-row {
   min-height: 2.75rem;
   padding: 0.375rem 0.5rem;
   border-bottom-color: var(--u-line);
 }
 
-[data-theme="buzz"] :is(.xp-player-pos, .xp-player-team, .xp-slot-from) {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-player-pos, .xp-player-team, .xp-slot-from) {
   color: var(--u-label);
 }
 
-[data-theme="buzz"] .xp-summary-toggle {
+:root[data-theme="buzz"]:has(.uptown) .xp-summary-toggle {
   color: var(--u-text-strong);
 }
 
 /* Notes, insets, summaries */
 
 /* No border, so a note never reads as a text field. */
-[data-theme="buzz"] :is(.xp-note, .xp-inset) {
+:root[data-theme="buzz"]:has(.uptown) :is(.xp-note, .xp-inset) {
   border: 0;
   border-radius: 12px;
   color: var(--u-muted);
@@ -439,16 +439,16 @@
   box-shadow: none;
 }
 
-[data-theme="buzz"] .xp-note {
+:root[data-theme="buzz"]:has(.uptown) .xp-note {
   padding: 0.5rem 0.875rem;
   font-size: 0.875rem;
 }
 
-[data-theme="buzz"] .xp-summary dt {
+:root[data-theme="buzz"]:has(.uptown) .xp-summary dt {
   color: var(--u-label);
 }
 
-[data-theme="buzz"] .xp-summary dd {
+:root[data-theme="buzz"]:has(.uptown) .xp-summary dd {
   color: var(--u-text-strong);
 }
 
@@ -461,7 +461,7 @@
   background: rgb(196 71 58 / 0.16);
 }
 
-[data-theme="buzz"] .settings-note {
+:root[data-theme="buzz"]:has(.uptown) .settings-note {
   padding: 0.5rem 0.875rem;
   border: 0;
   border-radius: 12px;
@@ -469,45 +469,45 @@
   background: var(--u-row);
 }
 
-[data-theme="buzz"] .search-modes {
+:root[data-theme="buzz"]:has(.uptown) .search-modes {
   padding: 0.5rem 1rem 0.75rem;
   border-color: var(--u-line);
   border-radius: 14px;
 }
 
 /* Home's numbers are set in navy for XP's cream; on the night they go light. */
-[data-theme="buzz"] :is(.home-big, .home-stats dd, .home-mine-score) {
+:root[data-theme="buzz"]:has(.uptown) :is(.home-big, .home-stats dd, .home-mine-score) {
   color: var(--u-text-strong);
 }
 
-[data-theme="buzz"] .home-big-label {
+:root[data-theme="buzz"]:has(.uptown) .home-big-label {
   color: var(--u-muted);
 }
 
-[data-theme="buzz"] .home-mine {
+:root[data-theme="buzz"]:has(.uptown) .home-mine {
   border-color: rgb(227 178 60 / 0.45);
   background: linear-gradient(rgb(227 178 60 / 0.1), transparent 70%), var(--u-row);
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
-[data-theme="buzz"] .home-countdown {
+:root[data-theme="buzz"]:has(.uptown) .home-countdown {
   border-color: rgb(227 178 60 / 0.5);
   color: var(--u-gold-light);
   background: rgb(227 178 60 / 0.12);
 }
 
-[data-theme="buzz"] :is(.home-stats div, .home-mine-game, .home-mine-next, .home-news-item) {
+:root[data-theme="buzz"]:has(.uptown) :is(.home-stats div, .home-mine-game, .home-mine-next, .home-news-item) {
   border-color: var(--u-line);
   border-radius: 12px;
 }
 
-[data-theme="buzz"] .home-news-item[data-priority="critical"] {
+:root[data-theme="buzz"]:has(.uptown) .home-news-item[data-priority="critical"] {
   border-color: rgb(227 178 60 / 0.5);
   background: rgb(227 178 60 / 0.08);
   box-shadow: inset 3px 0 var(--u-gold);
 }
 
-[data-theme="buzz"] .home-live {
+:root[data-theme="buzz"]:has(.uptown) .home-live {
   border-color: var(--xp-close);
   color: var(--u-text-strong);
   background: var(--xp-close);
@@ -515,7 +515,7 @@
 
 /* Stat cards: XP's little dialogs become glass cards. */
 
-[data-theme="buzz"] .xp-dialog {
+:root[data-theme="buzz"]:has(.uptown) .xp-dialog {
   border: 1px solid var(--u-edge);
   border-radius: 18px;
   overflow: hidden;
@@ -523,7 +523,7 @@
   box-shadow: var(--u-card-shadow);
 }
 
-[data-theme="buzz"] .xp-dialog-title {
+:root[data-theme="buzz"]:has(.uptown) .xp-dialog-title {
   padding: 0.875rem 1rem 0;
   border-radius: 0;
   color: var(--u-label);
@@ -536,13 +536,13 @@
 
 /* Modals and message boxes: a dimmed night behind a solid card. */
 
-[data-theme="buzz"] .xp-backdrop {
+:root[data-theme="buzz"]:has(.uptown) .xp-backdrop {
   background: rgb(4 10 24 / 0.62);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 
-[data-theme="buzz"] .xp-backdrop .xp-window {
+:root[data-theme="buzz"]:has(.uptown) .xp-backdrop .xp-window {
   overflow: hidden;
   border: 1px solid var(--u-edge);
   border-radius: 22px;
@@ -551,18 +551,18 @@
   box-shadow: 0 24px 60px rgb(2 8 20 / 0.6);
 }
 
-[data-theme="buzz"] .xp-backdrop .xp-titlebar {
+:root[data-theme="buzz"]:has(.uptown) .xp-backdrop .xp-titlebar {
   padding: 1rem 0.75rem 0.25rem 1.25rem;
   color: var(--u-text-strong);
   background: none;
 }
 
-[data-theme="buzz"] .xp-backdrop .xp-titlebar-text {
+:root[data-theme="buzz"]:has(.uptown) .xp-backdrop .xp-titlebar-text {
   font: 700 1.125rem var(--u-display);
   text-shadow: none;
 }
 
-[data-theme="buzz"] .xp-control {
+:root[data-theme="buzz"]:has(.uptown) .xp-control {
   width: 2.25rem;
   height: 2.25rem;
   border: 1px solid var(--u-edge);
@@ -571,28 +571,28 @@
   background: rgb(255 255 255 / 0.06);
 }
 
-[data-theme="buzz"] button.xp-control:hover {
+:root[data-theme="buzz"]:has(.uptown) button.xp-control:hover {
   border-color: var(--xp-close);
   background: var(--xp-close);
   filter: none;
 }
 
-[data-theme="buzz"] .xp-control svg {
+:root[data-theme="buzz"]:has(.uptown) .xp-control svg {
   --xp-text-inverse: var(--u-text-strong);
 }
 
-[data-theme="buzz"] .xp-message-body {
+:root[data-theme="buzz"]:has(.uptown) .xp-message-body {
   padding: 1rem 1.25rem;
   font-size: 0.9375rem;
 }
 
-[data-theme="buzz"] .xp-message-buttons {
+:root[data-theme="buzz"]:has(.uptown) .xp-message-buttons {
   padding: 0.25rem 1.25rem 1.25rem;
 }
 
 /* The balloon hangs under the header, not over a taskbar tray. */
 
-[data-theme="buzz"] .xp-balloon {
+:root[data-theme="buzz"]:has(.uptown) .xp-balloon {
   top: calc(var(--u-header) + 0.75rem);
   right: 1.25rem;
   bottom: auto;
@@ -605,27 +605,27 @@
   box-shadow: 0 14px 40px rgb(2 8 20 / 0.55);
 }
 
-[data-theme="buzz"] .xp-balloon::after {
+:root[data-theme="buzz"]:has(.uptown) .xp-balloon::after {
   display: none;
 }
 
-[data-theme="buzz"] .xp-balloon-close {
+:root[data-theme="buzz"]:has(.uptown) .xp-balloon-close {
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
 }
 
-[data-theme="buzz"] .xp-balloon-close svg {
+:root[data-theme="buzz"]:has(.uptown) .xp-balloon-close svg {
   --xp-text: var(--u-text);
 }
 
-[data-theme="buzz"] .xp-balloon-close:hover {
+:root[data-theme="buzz"]:has(.uptown) .xp-balloon-close:hover {
   border-color: var(--u-edge);
   background: var(--u-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="buzz"] :is(.xp-tab, .xp-button, .xp-select, .xp-log-off, .xp-matchup) {
+  :root[data-theme="buzz"]:has(.uptown) :is(.xp-tab, .xp-button, .xp-select, .xp-log-off, .xp-matchup) {
     transition: none;
   }
 }
