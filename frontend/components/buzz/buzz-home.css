@@ -13,6 +13,13 @@
   position: relative;
 }
 
+.bz-hero-lockup {
+  display: block;
+  width: min(100%, 33rem);
+  height: auto;
+  filter: drop-shadow(0 10px 14px rgb(8 4 24 / 0.5));
+}
+
 .bz-actions {
   display: flex;
   flex-wrap: wrap;
@@ -85,6 +92,12 @@
   gap: 1rem;
   justify-items: start;
   font-weight: 600;
+}
+
+.bz-empty-mark {
+  width: 6rem;
+  height: auto;
+  justify-self: center;
 }
 
 .bz-tcard-photo {

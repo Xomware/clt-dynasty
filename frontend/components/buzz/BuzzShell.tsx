@@ -5,6 +5,7 @@ import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { REVEAL, useReveal } from "@/components/motion/use-reveal";
 import { AccountMenu } from "./AccountMenu";
+import { BrandMark } from "./BrandMark";
 import { LINE, LineIcon } from "./line-icons";
 import { groupOf, HOME, urlOf } from "./pages";
 import { Related } from "./Related";
@@ -18,7 +19,6 @@ import { ViewParamsContext } from "@/lib/view-params";
 import { BODIES } from "./bodies";
 import { BuzzHome } from "./BuzzHome";
 import { BuzzTicker } from "./BuzzTicker";
-import { Hornet } from "./Hornet";
 import { PageHead } from "./PageHead";
 
 import "./buzz.css";
@@ -118,10 +118,7 @@ export function BuzzShell() {
       <div className="bz-top">
         <header className="bz-header">
           <a href={urlOf(HOME)} className="bz-brand" onClick={(e) => onNav(e, HOME)}>
-            <Hornet size={58} />
-            <span className="bz-brand-word">
-              CLT Dynasty<small>Buzz City</small>
-            </span>
+            <BrandMark mark="lockup" alt="CLT Dynasty Fantasy Football, home" className="bz-brand-lockup" priority />
           </a>
           <nav aria-label="Main" className="bz-nav">
             <a href={urlOf(HOME)} aria-current={view.kind === "home" ? "page" : undefined} onClick={(e) => onNav(e, HOME)}>

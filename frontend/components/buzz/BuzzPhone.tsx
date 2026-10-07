@@ -16,9 +16,9 @@ import { viewKey } from "@/lib/desktop/windows";
 import { usePhoneStack } from "@/lib/phone/use-phone-stack";
 import { ViewParamsContext } from "@/lib/view-params";
 import { BODIES } from "./bodies";
+import { BrandMark } from "./BrandMark";
 import { BuzzHome } from "./BuzzHome";
 import { BuzzTicker } from "./BuzzTicker";
-import { Hornet } from "./Hornet";
 
 import "./buzz.css";
 import "./buzz-skin.css";
@@ -83,7 +83,7 @@ export function BuzzPhone() {
             <LineIcon d={LINE.back} size={26} />
           </button>
         ) : (
-          <Hornet size={46} className="bz-bar-mark" />
+          <BrandMark mark="monogram" alt="" className="bz-bar-mark" priority />
         )}
         <h1 ref={heading} tabIndex={-1} className="bz-bar-title">
           {title}

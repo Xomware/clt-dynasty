@@ -18,8 +18,8 @@
   position: absolute;
 }
 
-/* XP to Buzz City: the desktop rolls like a VHS tape losing tracking,
-   pinstripe slats drop over it, the hornet zips across and BUZZ CITY slaps
+/* XP to Buzz City: the desktop rolls like a VHS tape losing tracking, slats
+   of the road jersey drop over it, the hornet zips across and the lockup slaps
    on like a sticker, then the slats roll up off the new page. */
 
 .tt-vhs {
@@ -59,9 +59,13 @@
   grid-template-columns: repeat(8, 1fr);
 }
 
+/* Each slat shows its own eighth of one jersey, so together they read as one cloth. */
 .tt-slats i {
-  background: var(--bz-ink);
-  box-shadow: inset -6px 0 0 var(--bz-teal), inset -12px 0 0 var(--bz-ink), inset -16px 0 0 var(--bz-purple);
+  background:
+    url("../buzz/jersey-road.svg") calc(var(--n) * -12.5vw) 0 / 384px 480px,
+    var(--bz-mesh),
+    var(--bz-road);
+  box-shadow: inset 0 -6px 0 rgb(12 6 36 / 0.45);
   transform-origin: 50% 0;
   animation:
     tt-slat-in 360ms cubic-bezier(0.6, 0, 0.3, 1) calc(140ms + var(--n) * 28ms) both,
@@ -78,13 +82,14 @@
     tt-fade-out 160ms ease-in 1000ms forwards;
 }
 
-.tt-fly .bz-hornet {
+.tt-head {
   position: absolute;
   top: 50%;
   right: 0;
   width: clamp(5rem, 14vmin, 8rem);
   height: auto;
   margin: -2.5rem -4rem 0 0;
+  filter: drop-shadow(0 6px 8px rgb(8 4 24 / 0.5));
   animation: tt-fly-y 520ms linear 420ms both;
 }
 
@@ -99,39 +104,11 @@
   animation: tt-fade-out 160ms ease-in 1000ms forwards;
 }
 
-.tt-word {
-  display: flex;
-  gap: 0.5rem;
-  font: italic 400 clamp(2.75rem, 10vmin, 5rem) / 1 var(--bz-display);
-  text-transform: uppercase;
-}
-
-.tt-word span {
-  display: block;
-  color: var(--bz-paper);
-  text-shadow:
-    2px 2px 0 var(--bz-teal),
-    4px 4px 0 var(--bz-teal-deep),
-    6px 6px 0 #000c;
-  transform: rotate(-4deg);
+.tt-lockup {
+  width: min(30rem, 78vw);
+  height: auto;
+  filter: drop-shadow(0 10px 14px rgb(8 4 24 / 0.55));
   animation: tt-slap 380ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 600ms both;
-}
-
-.tt-word span + span {
-  padding: 0 0.15em 0 0.05em;
-  color: var(--bz-ink);
-  background: var(--bz-teal-light);
-  box-shadow: 5px 5px 0 var(--bz-purple);
-  text-shadow: none;
-  animation-delay: 700ms;
-}
-
-.tt-kicker {
-  color: var(--bz-amber);
-  font: 800 0.9375rem var(--bz-jersey);
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  animation: tt-fade-in 200ms ease-out 760ms both;
 }
 
 /* Buzz City to XP */

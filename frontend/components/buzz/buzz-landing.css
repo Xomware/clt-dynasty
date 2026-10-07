@@ -5,6 +5,12 @@
   justify-content: space-between;
 }
 
+.bz-landing-seal {
+  width: auto;
+  height: 3.75rem;
+  filter: drop-shadow(0 3px 4px rgb(8 4 24 / 0.5));
+}
+
 .bz-landing-main {
   display: grid;
   gap: 3.5rem;
@@ -356,13 +362,8 @@
     padding: 0 0.75rem;
   }
 
-  .bz-landing-header .bz-brand-word {
-    font-size: 1.125rem;
-  }
-
-  .bz-landing-header .bz-hornet {
-    width: 2.75rem;
-    height: auto;
+  .bz-landing-seal {
+    height: 3rem;
   }
 
   .bz-landing-header .theme-toggle button {

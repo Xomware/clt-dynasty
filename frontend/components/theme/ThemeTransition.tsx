@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-import { Hornet } from "@/components/buzz/Hornet";
+import { BrandMark } from "@/components/buzz/BrandMark";
 import type { Theme } from "@/lib/theme/script";
 
 import "@/components/intro/intro.css";
@@ -16,9 +16,9 @@ export const TIMING: Record<Theme, { covered: number; total: number }> = {
   xp: { covered: 540, total: 1450 },
 };
 
-// XP to Buzz City: the desktop loses tracking like a VHS tape, pinstripe
-// slats drop over it, the hornet zips in and BUZZ CITY slaps on, then the
-// slats roll up off the new page.
+// XP to Buzz City: the desktop loses tracking like a VHS tape, slats of the
+// road jersey drop over it, the hornet zips across and the league's lockup
+// slaps on like a sticker, then the slats roll up off the new page.
 function TapeIn() {
   return (
     <>
@@ -33,14 +33,10 @@ function TapeIn() {
         ))}
       </div>
       <div className="tt-fly">
-        <Hornet size={128} className="bz-flap" />
+        <BrandMark mark="head" alt="" className="tt-head" priority />
       </div>
       <div className="tt-mark">
-        <p className="tt-word">
-          <span>Buzz</span>
-          <span>City</span>
-        </p>
-        <p className="tt-kicker">CLT Dynasty</p>
+        <BrandMark mark="lockup" alt="" className="tt-lockup" priority />
       </div>
     </>
   );
