@@ -10,8 +10,9 @@ import "./buzz-loader.css";
 
 const EVERY = 3600;
 
-// The hornet buzzes in along a zig-zag, the crown drops onto its head, CLT
-// DYNASTY slaps on and the ribbon slides in under it, all on the road jersey.
+// The hornet buzzes in along a zig-zag, the crown drops onto its head and the
+// wordmark slaps on under it, a glint running over it now and then, all on the
+// road jersey.
 // Charlotte trivia rotates underneath while the app loads. BrandLoader draws it
 // beside XP's, and CSS shows the one for the theme on <html>, so the
 // prerendered page is already right before hydration.
@@ -37,10 +38,10 @@ export function BuzzLoader({ label }: { label: string }) {
             </div>
           </div>
         </div>
-        <p className="bz-ld-word">CLT Dynasty</p>
-        <p className="bz-ld-ribbon">
-          <span>Fantasy Football</span>
-        </p>
+        <div className="bz-ld-word">
+          <BrandMark mark="wordmark" alt="" className="bz-ld-wordmark" priority />
+          <i className="bz-ld-glint" />
+        </div>
       </div>
       <div className="bz-loader-bar" aria-hidden="true">
         <i />

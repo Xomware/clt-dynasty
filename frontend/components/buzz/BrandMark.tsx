@@ -6,6 +6,8 @@ import crown from "@/public/brand/crown.webp";
 import crown2 from "@/public/brand/crown@2x.webp";
 import footballHornet from "@/public/brand/football-hornet.webp";
 import footballHornet2 from "@/public/brand/football-hornet@2x.webp";
+import headCrowned from "@/public/brand/head-crowned.webp";
+import headCrowned2 from "@/public/brand/head-crowned@2x.webp";
 import head from "@/public/brand/head.webp";
 import head2 from "@/public/brand/head@2x.webp";
 import helmet from "@/public/brand/helmet.webp";
@@ -18,6 +20,8 @@ import pennant from "@/public/brand/pennant.webp";
 import pennant2 from "@/public/brand/pennant@2x.webp";
 import seal from "@/public/brand/seal.webp";
 import seal2 from "@/public/brand/seal@2x.webp";
+import wordmark from "@/public/brand/wordmark.webp";
+import wordmark2 from "@/public/brand/wordmark@2x.webp";
 
 // Imported rather than linked from /brand/ so the URLs are content-hashed: the
 // deploy caches everything outside _next/static for good. Each 1x file is the
@@ -27,11 +31,13 @@ const MARKS = {
   crown: [crown, crown2],
   "football-hornet": [footballHornet, footballHornet2],
   head: [head, head2],
+  "head-crowned": [headCrowned, headCrowned2],
   helmet: [helmet, helmet2],
   lockup: [lockup, lockup2],
   monogram: [monogram, monogram2],
   pennant: [pennant, pennant2],
   seal: [seal, seal2],
+  wordmark: [wordmark, wordmark2],
 } satisfies Record<string, [StaticImageData, StaticImageData]>;
 
 export type Mark = keyof typeof MARKS;
@@ -44,19 +50,23 @@ interface BrandMarkProps {
   /** Empty for a mark beside text that already names it. */
   alt: string;
   className?: string;
+  /** Draws it this many px tall without CSS, for icon-sized uses. */
+  height?: number;
   priority?: boolean;
 }
 
-/** One of the league's marks, cut from Dom's brand sheet. Size it in CSS. */
-export function BrandMark({ mark, alt, className, priority = false }: BrandMarkProps) {
+/** One of the league's marks, cut from Dom's brand sheet. Size it in CSS, or with `height`. */
+export function BrandMark({ mark, alt, className, height, priority = false }: BrandMarkProps) {
   const [one, two] = MARKS[mark];
+  const h = height ?? one.height;
   return (
     // eslint-disable-next-line @next/next/no-img-element -- a static export has no image optimizer; the 1x/2x files are the sizes.
     <img
       src={url(one)}
       srcSet={`${url(one)} 1x, ${url(two)} 2x`}
-      width={one.width}
-      height={one.height}
+      // Under vitest the import is a bare URL with no size.
+      width={one.width && Math.round((one.width * h) / one.height)}
+      height={h}
       alt={alt}
       className={className}
       decoding="async"

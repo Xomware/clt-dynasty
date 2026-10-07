@@ -8,11 +8,12 @@ import {
   useState,
 } from "react";
 
+import { BrandMark } from "@/components/buzz/BrandMark";
 import { ADMIN, START_PINNED, START_PLACES } from "@/lib/desktop/groups";
 import { readRecent } from "@/lib/desktop/recent";
 import { type Launcher, useLauncherGroups, useLaunchers, type WindowKind } from "@/lib/desktop/registry";
 import { TASKBAR_HEIGHT } from "@/lib/desktop/windows";
-import { CrownIcon, DesktopIcon, FolderIcon, BuzzIcon } from "./icons";
+import { DesktopIcon, FolderIcon } from "./icons";
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -259,7 +260,7 @@ export function StartMenu({ id, name, autoFocus, onOpen, onReset, onBuzz, onSign
     >
       <div className="xp-start-menu-header">
         <span className="xp-start-menu-avatar">
-          <CrownIcon width={36} height={36} />
+          <BrandMark mark="head-crowned" alt="" height={34} />
         </span>
         <span className="truncate">{name}</span>
       </div>
@@ -292,7 +293,7 @@ export function StartMenu({ id, name, autoFocus, onOpen, onReset, onBuzz, onSign
           </li>
           <li>
             <button type="button" className="xp-start-menu-link w-full" onClick={onBuzz}>
-              <BuzzIcon width={24} height={24} className="flex-none" />
+              <BrandMark mark="head" alt="" height={22} className="w-6 flex-none object-contain" />
               Buzz City
             </button>
           </li>

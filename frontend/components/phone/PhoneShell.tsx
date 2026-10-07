@@ -2,7 +2,8 @@
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { BackArrowIcon, CrownIcon, FolderIcon } from "@/components/xp/icons";
+import { BrandMark } from "@/components/buzz/BrandMark";
+import { BackArrowIcon, FolderIcon } from "@/components/xp/icons";
 import { SpeakerToggle } from "@/components/xp/SpeakerToggle";
 import { useAuth } from "@/lib/auth/use-auth";
 import type { WindowLink } from "@/lib/desktop/deep-link";
@@ -29,7 +30,7 @@ export function PhoneShell() {
       ) : (
         <main className="m-home">
           <header className="m-bar">
-            <CrownIcon width={28} height={28} />
+            <BrandMark mark="monogram" alt="" height={36} className="flex-none" priority />
             <h1 className="m-bar-title">CLT Dynasty League</h1>
           </header>
           <Programs onOpen={open} />
@@ -53,7 +54,7 @@ export function PhoneShell() {
           aria-label="Start: all programs"
           onClick={() => (top ? home() : window.scrollTo(0, 0))}
         >
-          <CrownIcon width={22} height={22} />
+          <BrandMark mark="crown" alt="" height={18} className="flex-none" />
           start
         </button>
         <span className="xp-tray">

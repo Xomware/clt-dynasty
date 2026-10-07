@@ -2,10 +2,11 @@
 
 import { Fragment } from "react";
 
+import { BrandMark } from "@/components/buzz/BrandMark";
 import { BuzzLanding } from "@/components/buzz/BuzzLanding";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Window } from "@/components/xp/Window";
-import { CrownIcon, FolderIcon, InfoIcon } from "@/components/xp/icons";
+import { FolderIcon, InfoIcon } from "@/components/xp/icons";
 import { useTheme } from "@/lib/theme/theme";
 import { FEATURES, FORMAT, GoogleMark } from "./landing-content";
 import { LeagueLive } from "./LeagueLive";
@@ -29,7 +30,7 @@ function XpLanding({ onSignIn }: LandingProps) {
         <section aria-label="Welcome" className="xp-logon landing-hero">
           <div className="xp-logon-band landing-hero-top">
             <span className="landing-hero-badge">
-              <CrownIcon width={20} height={20} />
+              <BrandMark mark="crown" alt="" height={18} />
               Charlotte, NC
             </span>
             <span className="landing-hero-end">
@@ -39,7 +40,7 @@ function XpLanding({ onSignIn }: LandingProps) {
           </div>
           <div className="xp-logon-body">
             <div className="xp-logon-brand">
-              <CrownIcon width={96} height={96} />
+              <BrandMark mark="seal" alt="" height={112} className="xp-logon-seal" priority />
               <h1 className="xp-logon-name">CLT Dynasty</h1>
               <p className="xp-logon-tagline">The Queen City&rsquo;s dynasty league</p>
               <p className="landing-hero-format">12 teams &middot; Superflex &middot; Full PPR</p>
@@ -117,7 +118,7 @@ function XpLanding({ onSignIn }: LandingProps) {
 
       <footer className="landing-taskbar">
         <span className="landing-taskbar-start">
-          <CrownIcon width={18} height={18} />
+          <BrandMark mark="crown" alt="" height={16} />
           CLT Dynasty
         </span>
         <span className="landing-taskbar-tray">

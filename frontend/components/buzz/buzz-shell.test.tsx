@@ -100,6 +100,13 @@ describe("BuzzShell", () => {
     expect(screen.queryByRole("navigation", { name: "League pages" })).toBeNull();
   });
 
+  // Home's hero carries the lockup, so the header wears the seal instead.
+  it("brands the header with the league seal, linked home", async () => {
+    await renderShell();
+    const brand = screen.getByRole("link", { name: "CLT Dynasty Fantasy Football, home" });
+    expect(brand.querySelector("img")?.getAttribute("srcset")).toMatch(/seal.* 1x, .*seal@2x.* 2x/);
+  });
+
   it("opens a group on its first page, with the group's pages as a sub-nav", async () => {
     await renderShell();
     fireEvent.click(nav("Main").getByRole("link", { name: "League" }));
