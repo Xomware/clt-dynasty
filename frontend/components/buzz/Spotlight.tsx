@@ -8,7 +8,7 @@ import type { WindowLink } from "@/lib/desktop/deep-link";
 import { type Launcher, useLauncherGroups } from "@/lib/desktop/registry";
 import { useLeague } from "@/lib/league/use-league";
 import { teamLink } from "@/lib/team/links";
-import { LINE, LineIcon } from "./icons";
+import { LINE, LineIcon } from "./line-icons";
 import { ABOUT } from "./pages";
 
 // A page, or a team, as one row of results.

@@ -1,4 +1,4 @@
-// Uptown's line icons, drawn on a 24-unit grid in the text colour.
+// The shell's line icons, drawn on a 24-unit grid in the text colour.
 export const LINE = {
   search: "M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M20 20l-3.5-3.5",
   menu: "M4 7h16M4 12h16M4 17h16",

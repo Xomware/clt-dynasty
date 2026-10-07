@@ -747,6 +747,21 @@
   text-transform: uppercase;
 }
 
+@media (max-width: 767.98px) {
+  [data-theme="buzz"] .team-head {
+    padding: 0.875rem;
+  }
+
+  [data-theme="buzz"] .team-head :is(.team-avatar, .xp-face) {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  [data-theme="buzz"] .team-name {
+    font-size: 1.125rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-theme="buzz"] :is(.xp-tab, .xp-button, .xp-select, .xp-log-off, .xp-matchup) {
     transition: none;

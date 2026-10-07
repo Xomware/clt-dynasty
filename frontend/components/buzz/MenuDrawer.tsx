@@ -2,7 +2,7 @@
 
 import { type KeyboardEvent, type ReactNode, useEffect, useRef } from "react";
 
-import { LINE, LineIcon } from "./icons";
+import { LINE, LineIcon } from "./line-icons";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 

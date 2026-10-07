@@ -2,7 +2,7 @@
 
 import type { ComponentType, MouseEvent, Ref, SVGProps } from "react";
 
-import { HOME, urlOf } from "@/components/uptown/pages";
+import { HOME, urlOf } from "./pages";
 import { TeamAvatar } from "@/components/xp/TeamAvatar";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import type { Team } from "@/lib/league/use-league";

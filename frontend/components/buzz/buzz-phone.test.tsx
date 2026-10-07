@@ -27,7 +27,7 @@ vi.mock("./BuzzHome", () => ({
     );
   },
 }));
-vi.mock("./bodies", async () => ({ BODIES: { folder: (await import("@/components/uptown/GroupPage")).GroupPage } }));
+vi.mock("./bodies", async () => ({ BODIES: { folder: (await import("./GroupPage")).GroupPage } }));
 vi.mock("@/lib/league/use-league", async (orig) => ({
   ...(await orig<typeof import("@/lib/league/use-league")>()),
   useLeague: () => ({ data: null, myRosterId: null, teamFor: () => ({ name: "", avatarUrl: null }) }),

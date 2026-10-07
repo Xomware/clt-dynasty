@@ -1,5 +1,5 @@
 /* Delays are milliseconds from mount, against TIMING in ThemeTransition.tsx:
-   to Uptown the screen is covered at 640 and the overlay goes at 1500; to XP,
+   to Buzz City the screen is covered at 640 and the overlay goes at 1500; to XP,
    covered at 540 and gone at 1450. Every keyframe holds its last frame, so a
    dropped frame shows the cover, never the page mid-swap. Above the balloons,
    dialogs and menus, below the first-load intro. */
@@ -18,87 +18,123 @@
   position: absolute;
 }
 
-/* XP to Uptown */
+/* XP to Buzz City: the desktop rolls like a VHS tape losing tracking,
+   pinstripe slats drop over it, the hornet zips across and BUZZ CITY slaps
+   on like a sticker, then the slats roll up off the new page. */
 
-.tt-grey {
+.tt-vhs {
   inset: 0;
-  background: rgb(7 15 34 / 0.18);
-  -webkit-backdrop-filter: grayscale(1) brightness(0.85);
-  backdrop-filter: grayscale(1) brightness(0.85);
-  animation:
-    tt-fade-in 240ms ease-out both,
-    tt-hide 1ms linear 660ms forwards;
+  pointer-events: none;
+  animation: tt-hide 1ms linear 700ms forwards;
 }
 
-.tt-sky {
+.tt-vhs i {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  height: 9%;
+  background: linear-gradient(90deg, rgb(18 163 177 / 0.55), rgb(246 242 231 / 0.35) 40%, rgb(75 42 143 / 0.55));
+  opacity: 0;
+  animation: tt-track 420ms steps(6, end) both;
+}
+
+.tt-vhs i:nth-child(1) {
+  top: 18%;
+}
+
+.tt-vhs i:nth-child(2) {
+  top: 47%;
+  height: 5%;
+  animation-delay: 60ms;
+}
+
+.tt-vhs i:nth-child(3) {
+  top: 76%;
+  animation-delay: 120ms;
+}
+
+.tt-slats {
   inset: 0;
-  background:
-    radial-gradient(ellipse 80% 30% at 50% 100%, var(--intro-ember), transparent 70%),
-    linear-gradient(var(--intro-night), var(--intro-sky-top) 30%, var(--intro-sky-mid) 62%, var(--intro-dusk) 88%, var(--intro-ember));
-  /* The gold horizon leads the night down, and trails it back up. */
-  box-shadow:
-    0 2px 0 var(--clt-crown),
-    0 0 48px 10px rgb(227 178 60 / 0.45);
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.tt-slats i {
+  background: var(--bz-ink);
+  box-shadow: inset -6px 0 0 var(--bz-teal), inset -12px 0 0 var(--bz-ink), inset -16px 0 0 var(--bz-purple);
+  transform-origin: 50% 0;
   animation:
-    tt-drop 500ms cubic-bezier(0.65, 0, 0.25, 1) 140ms both,
-    tt-lift 420ms cubic-bezier(0.55, 0, 0.2, 1) 1060ms forwards;
+    tt-slat-in 360ms cubic-bezier(0.6, 0, 0.3, 1) calc(140ms + var(--n) * 28ms) both,
+    tt-slat-out 380ms cubic-bezier(0.6, 0, 0.3, 1) calc(1040ms + var(--n) * 24ms) forwards;
 }
 
-.tt-city {
-  /* The intro's skyline unit, a little lower so the mark has the sky. */
-  --u: max(calc(100vw / 2400), calc(36dvh / 500));
-
-  bottom: 0;
-  left: 50%;
-  width: calc(var(--u) * 2400);
-  height: calc(var(--u) * 500);
-  transform: translateX(-50%);
+.tt-fly {
+  top: 22%;
+  left: 0;
+  width: 50%;
+  height: 7rem;
   animation:
-    tt-rise 480ms cubic-bezier(0.2, 0.7, 0.2, 1) 300ms both,
-    tt-sink 400ms cubic-bezier(0.5, 0, 0.75, 0) 1060ms forwards;
+    tt-fly-x 520ms cubic-bezier(0.3, 0.6, 0.35, 1) 420ms both,
+    tt-fade-out 160ms ease-in 1000ms forwards;
 }
 
-.theme-transition .intro-lights-far {
-  animation-delay: 700ms;
-}
-
-.theme-transition :is(.intro-rods, .intro-tower-glow) {
-  animation-delay: 850ms;
+.tt-fly .bz-hornet {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: clamp(5rem, 14vmin, 8rem);
+  height: auto;
+  margin: -2.5rem -4rem 0 0;
+  animation: tt-fly-y 520ms linear 420ms both;
 }
 
 .tt-mark {
-  top: 34%;
+  top: 50%;
   left: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--intro-text);
+  gap: 0.75rem;
   transform: translate(-50%, -50%);
-  animation:
-    tt-pop 300ms cubic-bezier(0.2, 0.8, 0.3, 1.25) 620ms both,
-    tt-fade-out 160ms ease-in 1000ms forwards;
-}
-
-.tt-crown {
-  width: clamp(5rem, 16vmin, 9rem);
-  height: clamp(5rem, 16vmin, 9rem);
-  filter: drop-shadow(0 0 18px rgb(227 178 60 / 0.55));
-}
-
-.tt-kicker {
-  color: var(--clt-crown);
-  font: bold 0.8125rem var(--xp-title-font);
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
+  animation: tt-fade-out 160ms ease-in 1000ms forwards;
 }
 
 .tt-word {
-  font: italic bold clamp(2.25rem, 7vmin, 3.75rem) / 1 var(--xp-title-font);
-  text-shadow: 0 2px 12px rgb(7 15 34 / 0.8);
+  display: flex;
+  gap: 0.5rem;
+  font: italic 400 clamp(2.75rem, 10vmin, 5rem) / 1 var(--bz-display);
+  text-transform: uppercase;
 }
 
-/* Uptown to XP */
+.tt-word span {
+  display: block;
+  color: var(--bz-paper);
+  text-shadow:
+    2px 2px 0 var(--bz-teal),
+    4px 4px 0 var(--bz-teal-deep),
+    6px 6px 0 #000c;
+  transform: rotate(-4deg);
+  animation: tt-slap 380ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 600ms both;
+}
+
+.tt-word span + span {
+  padding: 0 0.15em 0 0.05em;
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
+  box-shadow: 5px 5px 0 var(--bz-purple);
+  text-shadow: none;
+  animation-delay: 700ms;
+}
+
+.tt-kicker {
+  color: var(--bz-amber);
+  font: 800 0.9375rem var(--bz-jersey);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  animation: tt-fade-in 200ms ease-out 760ms both;
+}
+
+/* Buzz City to XP */
 
 /* Fixed to the screen and revealed upward, so the ember stays on the horizon
    and the blue only reaches the top at the end. */
@@ -170,43 +206,6 @@ html.theme-fade::view-transition-new(root) {
   }
 }
 
-@keyframes tt-drop {
-  from {
-    transform: translateY(-100%);
-  }
-}
-
-@keyframes tt-lift {
-  from {
-    transform: none;
-  }
-  to {
-    transform: translateY(calc(-100% - 60px));
-  }
-}
-
-@keyframes tt-rise {
-  from {
-    transform: translate(-50%, 100%);
-  }
-}
-
-@keyframes tt-sink {
-  from {
-    transform: translateX(-50%);
-  }
-  to {
-    transform: translate(-50%, 105%);
-  }
-}
-
-@keyframes tt-pop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.7);
-  }
-}
-
 @keyframes tt-flood {
   from {
     clip-path: inset(100% 0 0 0);
@@ -221,5 +220,71 @@ html.theme-fade::view-transition-new(root) {
     opacity: 0;
     letter-spacing: 0.3em;
     transform: translateX(-1.5rem);
+  }
+}
+
+@keyframes tt-track {
+  0% {
+    opacity: 0.9;
+    transform: translateX(-6%);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(5%) scaleY(1.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-3%);
+  }
+}
+
+@keyframes tt-slat-in {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes tt-slat-out {
+  from {
+    transform: none;
+  }
+  to {
+    transform: scaleY(0);
+    transform-origin: 50% 0;
+  }
+}
+
+@keyframes tt-fly-x {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes tt-fly-y {
+  0% {
+    transform: translateY(60%) rotate(8deg);
+  }
+  25% {
+    transform: translateY(-60%) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(50%) rotate(8deg);
+  }
+  75% {
+    transform: translateY(-30%) rotate(-6deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes tt-slap {
+  from {
+    opacity: 0;
+    transform: scale(2.4) rotate(-16deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-2deg);
   }
 }

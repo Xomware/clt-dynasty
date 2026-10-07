@@ -4,11 +4,11 @@ import { type MouseEvent, useEffect, useRef, useState } from "react";
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { REVEAL, useReveal } from "@/components/motion/use-reveal";
-import { AccountMenu } from "@/components/uptown/AccountMenu";
-import { LINE, LineIcon } from "@/components/uptown/icons";
-import { groupOf, HOME, urlOf } from "@/components/uptown/pages";
-import { Related } from "@/components/uptown/Related";
-import { Spotlight } from "@/components/uptown/Spotlight";
+import { AccountMenu } from "./AccountMenu";
+import { LINE, LineIcon } from "./line-icons";
+import { groupOf, HOME, urlOf } from "./pages";
+import { Related } from "./Related";
+import { Spotlight } from "./Spotlight";
 import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
 import { ADMIN, type GroupId } from "@/lib/desktop/groups";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";

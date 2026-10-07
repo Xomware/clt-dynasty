@@ -4,11 +4,11 @@ import { type MouseEvent, useEffect, useId, useRef, useState } from "react";
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { REVEAL, useReveal } from "@/components/motion/use-reveal";
-import { DrawerNav } from "@/components/uptown/DrawerNav";
-import { LINE, LineIcon } from "@/components/uptown/icons";
-import { MenuDrawer } from "@/components/uptown/MenuDrawer";
-import { Related } from "@/components/uptown/Related";
-import { Spotlight } from "@/components/uptown/Spotlight";
+import { DrawerNav } from "./DrawerNav";
+import { LINE, LineIcon } from "./line-icons";
+import { MenuDrawer } from "./MenuDrawer";
+import { Related } from "./Related";
+import { Spotlight } from "./Spotlight";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY, useLaunchers, useWindowTitle } from "@/lib/desktop/registry";

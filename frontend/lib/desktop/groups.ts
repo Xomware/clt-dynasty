@@ -10,7 +10,7 @@ export const GROUPS = [
 ] as const;
 
 // Filed but kept out of GROUPS: admins open these from their account menu
-// (Uptown's name button, XP's Start places), never from the top-level nav.
+// (Buzz City's account menu, XP's Start places), never from the top-level nav.
 export const ADMIN = { id: "admin", label: "Admin" } as const;
 
 export type GroupId = (typeof GROUPS)[number]["id"] | typeof ADMIN.id;

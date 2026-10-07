@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth/use-auth";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { useLauncherGroups } from "@/lib/desktop/registry";
 import { useMember } from "@/lib/member/use-member";
-import { LINE, LineIcon } from "./icons";
+import { LINE, LineIcon } from "./line-icons";
 
 interface DrawerNavProps {
   current: WindowLink | undefined;

@@ -5,10 +5,10 @@ import { useContext, useId } from "react";
 import { DrillContext } from "@/lib/desktop/navigation";
 import { useLauncherGroups } from "@/lib/desktop/registry";
 import type { WindowParams } from "@/lib/desktop/windows";
-import { LINE, LineIcon } from "./icons";
+import { LINE, LineIcon } from "./line-icons";
 import { ABOUT } from "./pages";
 
-// Uptown's take on a folder: each of the group's pages as a card with its one-liner.
+// Buzz City's take on a folder: each of the group's pages as a card with its one-liner.
 export function GroupPage({ params }: { params: WindowParams }) {
   const open = useContext(DrillContext);
   const id = useId();

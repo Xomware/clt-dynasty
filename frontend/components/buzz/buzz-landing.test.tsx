@@ -5,7 +5,7 @@ import { TIMING } from "@/components/theme/ThemeTransition";
 import { stubSleeper } from "@/lib/test/league-mock";
 import { THEME_KEY } from "@/lib/theme/script";
 import { ThemeProvider } from "@/lib/theme/theme";
-import { Landing } from "./Landing";
+import { Landing } from "@/components/landing/Landing";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -21,19 +21,20 @@ const renderLanding = (onSignIn?: () => void) =>
     </ThemeProvider>,
   );
 
-describe("Uptown landing", () => {
-  it("shows the stored Uptown theme with the same live data and two sign-in buttons", async () => {
+describe("Buzz City landing", () => {
+  it("shows the stored Buzz City theme with the same live data and two sign-in buttons", async () => {
     stubSleeper();
     localStorage.setItem(THEME_KEY, "buzz");
     const onSignIn = vi.fn();
     renderLanding(onSignIn);
 
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("The Queen City’s dynasty league");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Buzz City’s Dynasty League");
     const status = screen.getByRole("region", { name: "Tonight in the league" });
     expect(await within(status).findByText("Week 4 of 14")).toBeTruthy();
     expect(screen.getByRole("table", { name: "Playoff seeds as of today" })).toBeTruthy();
     expect(screen.getByRole("list", { name: "Champions by season" })).toBeTruthy();
 
+    expect(within(screen.getByRole("region", { name: "About Charlotte" })).getAllByRole("listitem")).toHaveLength(4);
     const buttons = screen.getAllByRole("button", { name: "Sign in with Google" });
     expect(buttons).toHaveLength(2);
     buttons.forEach((b) => fireEvent.click(b));
