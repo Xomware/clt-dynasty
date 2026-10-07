@@ -3,8 +3,11 @@
 .bz-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 22rem);
-  gap: 2.5rem;
+  /* Sized to the lockup, not the row: a 1fr column left the lockup at its
+     33rem cap with the spare width piled up as a gap before the card. */
+  grid-template-columns: minmax(0, 34rem) minmax(0, 22rem);
+  justify-content: center;
+  gap: 3rem;
   align-items: center;
   margin-bottom: 2.5rem;
 }
