@@ -13,6 +13,23 @@ export const metadata: Metadata = {
   description: "Standings, scores, drafts and rule proposals for the CLT Dynasty League.",
   // A private league's site: keep it out of search results.
   robots: { index: false, follow: false },
+  metadataBase: new URL("https://clt.dynasty.xomware.com"),
+  icons: {
+    icon: [
+      { url: "/brand/favicon.ico", sizes: "any" },
+      { url: "/brand/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/brand/favicon-16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: "/brand/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "CLT Dynasty League",
+    description: "Charlotte's dynasty fantasy football league. Twelve teams, Superflex, full PPR.",
+    siteName: "CLT Dynasty",
+    type: "website",
+    images: [{ url: "/brand/og.jpg", width: 1200, height: 630, alt: "CLT Dynasty Fantasy Football: the hornet lounging on a football" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
