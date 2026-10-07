@@ -1,11 +1,14 @@
 // A plain module, not "use client": the layout (a server component) inlines
 // THEME_SCRIPT, and a constant imported from a client module arrives as a
 // client reference instead of its value.
-export type Theme = "xp" | "uptown";
+export type Theme = "xp" | "buzz";
 
 export const THEME_KEY = "clt.theme";
 
-export const isTheme = (v: unknown): v is Theme => v === "xp" || v === "uptown";
+export const isTheme = (v: unknown): v is Theme => v === "xp" || v === "buzz";
+
+// Buzz City replaced Uptown; a browser that picked Uptown keeps its choice.
+export const LEGACY: Record<string, Theme> = { uptown: "buzz" };
 
 // Safari tints its toolbars and the overscroll bounce from the page background
 // and theme-color, never from the app's own boxes. XP has never set either, so
@@ -15,4 +18,4 @@ export const UPTOWN_CHROME = "#0a1838";
 export const UPTOWN_FONTS = "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap";
 
 /** Runs before first paint, so the loaders and the landing are already in the stored theme. */
-export const THEME_SCRIPT = `try{if(localStorage.getItem(${JSON.stringify(THEME_KEY)})==="uptown"){var h=document.documentElement,m=document.createElement("meta");h.dataset.theme="uptown";h.style.backgroundColor="${UPTOWN_CHROME}";m.name="theme-color";m.content="${UPTOWN_CHROME}";document.head.append(m)}}catch(e){}`;
+export const THEME_SCRIPT = `try{var k=${JSON.stringify(THEME_KEY)},v=localStorage.getItem(k);if(v==="uptown"){v="buzz";localStorage.setItem(k,v)}if(v==="buzz"){var h=document.documentElement,m=document.createElement("meta");h.dataset.theme="buzz";h.style.backgroundColor="${UPTOWN_CHROME}";m.name="theme-color";m.content="${UPTOWN_CHROME}";document.head.append(m)}}catch(e){}`;

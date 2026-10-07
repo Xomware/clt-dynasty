@@ -267,8 +267,8 @@ describe("AppShell themes", () => {
     await screen.findByText("Welcome back, Roster 4");
 
     vi.useFakeTimers();
-    fireEvent.click(screen.getByRole("button", { name: "Switch to the Uptown theme" }));
-    act(() => vi.advanceTimersByTime(TIMING.uptown.total));
+    fireEvent.click(screen.getByRole("button", { name: "Switch to the Buzz City theme" }));
+    act(() => vi.advanceTimersByTime(TIMING.buzz.total));
     expect(screen.getByRole("navigation", { name: "Main" })).toBeTruthy();
     expect(screen.queryByRole("list", { name: "Desktop" })).toBeNull();
 

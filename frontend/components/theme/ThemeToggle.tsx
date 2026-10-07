@@ -22,8 +22,8 @@ export function XpWindowGlyph(props: GlyphProps) {
   );
 }
 
-// Three Uptown towers, the tallest with the Bank of America crown.
-export function SkylineGlyph(props: GlyphProps) {
+// Buzz City's hornet in one line: wing, striped body, head.
+export function HornetGlyph(props: GlyphProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -37,14 +37,14 @@ export function SkylineGlyph(props: GlyphProps) {
       focusable="false"
       {...props}
     >
-      <path d="M3 21h18M5 21V12h4v9M10 21V6l2-3 2 3v15M15 21V9h4v12" />
+      <path d="M12 9.5c1-4 5-6 7-4s-1.5 4.5-5 4.5M4 15.5c0-3 3-5 7-5s6 2 6 5-3 4.5-6 4.5-7-1.5-7-4.5zM9 11v9M13 10.7v9M17 13.5a3 3 0 1 0 5 0M2 15.5h2" />
     </svg>
   );
 }
 
 const OPTIONS: { theme: Theme; label: string; Glyph: ComponentType<GlyphProps> }[] = [
   { theme: "xp", label: "Classic XP", Glyph: XpWindowGlyph },
-  { theme: "uptown", label: "Uptown", Glyph: SkylineGlyph },
+  { theme: "buzz", label: "Buzz City", Glyph: HornetGlyph },
 ];
 
 export function ThemeToggle() {

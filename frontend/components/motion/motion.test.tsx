@@ -15,14 +15,14 @@ describe("CountUp", () => {
   });
 
   it("shows the empty text for a value at zero", () => {
-    document.documentElement.dataset.theme = "uptown";
+    document.documentElement.dataset.theme = "buzz";
     render(<CountUp value={0} decimals={2} empty="-" />);
     expect(screen.getByText("-")).toBeTruthy();
   });
 
   it("rolls up from zero under Uptown, then follows a live change to its new value", () => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"] });
-    document.documentElement.dataset.theme = "uptown";
+    document.documentElement.dataset.theme = "buzz";
     const { container, rerender } = render(<CountUp value={100} />);
     const span = container.querySelector("span")!;
     expect(span.textContent).toBe("0");

@@ -24,7 +24,7 @@ const renderLanding = (onSignIn?: () => void) =>
 describe("Uptown landing", () => {
   it("shows the stored Uptown theme with the same live data and two sign-in buttons", async () => {
     stubSleeper();
-    localStorage.setItem(THEME_KEY, "uptown");
+    localStorage.setItem(THEME_KEY, "buzz");
     const onSignIn = vi.fn();
     renderLanding(onSignIn);
 
@@ -42,7 +42,7 @@ describe("Uptown landing", () => {
 
   it("keeps the page and offers a retry in each live card when Sleeper is down", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response("{}", { status: 503 }));
-    localStorage.setItem(THEME_KEY, "uptown");
+    localStorage.setItem(THEME_KEY, "buzz");
     renderLanding();
     expect((await screen.findAllByRole("button", { name: /try again/i })).length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: "What’s inside" })).toBeTruthy();
@@ -54,8 +54,8 @@ describe("Uptown landing", () => {
     expect(screen.getByText("To begin, sign in")).toBeTruthy();
 
     vi.useFakeTimers();
-    fireEvent.click(screen.getByRole("button", { name: "Uptown" }));
-    act(() => vi.advanceTimersByTime(TIMING.uptown.total));
+    fireEvent.click(screen.getByRole("button", { name: "Buzz City" }));
+    act(() => vi.advanceTimersByTime(TIMING.buzz.total));
     expect(screen.getByRole("region", { name: "Tonight in the league" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Classic XP" }));

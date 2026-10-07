@@ -4,7 +4,7 @@ import { createContext, type ReactNode, useCallback, useContext, useLayoutEffect
 import { flushSync } from "react-dom";
 
 import { ThemeTransition, TIMING } from "@/components/theme/ThemeTransition";
-import { isTheme, type Theme, THEME_KEY, UPTOWN_CHROME, UPTOWN_FONTS } from "./script";
+import { isTheme, LEGACY, type Theme, THEME_KEY, UPTOWN_CHROME, UPTOWN_FONTS } from "./script";
 
 export type { Theme } from "./script";
 
@@ -16,7 +16,7 @@ function read(): Theme {
   if (unsaved) return unsaved;
   try {
     const v = localStorage.getItem(THEME_KEY);
-    return isTheme(v) ? v : "xp";
+    return isTheme(v) ? v : (LEGACY[v ?? ""] ?? "xp");
   } catch {
     return "xp";
   }
@@ -73,7 +73,7 @@ async function crossfade(apply: () => void) {
   }
 }
 
-const LABEL: Record<Theme, string> = { xp: "Classic XP", uptown: "Uptown" };
+const LABEL: Record<Theme, string> = { xp: "Classic XP", buzz: "Buzz City" };
 
 interface ThemeState {
   theme: Theme;
@@ -124,7 +124,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext value={{ theme, setTheme, switching: playing !== null }}>
-      {theme === "uptown" && <link rel="stylesheet" href={UPTOWN_FONTS} precedence="default" />}
+      {theme === "buzz" && <link rel="stylesheet" href={UPTOWN_FONTS} precedence="default" />}
       {children}
       {playing && <ThemeTransition to={playing} />}
       <p role="status" className="sr-only">

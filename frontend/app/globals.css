@@ -56,6 +56,8 @@
   --clt-crown: #e3b23c;
   --clt-crown-dark: #9a6f12;
   --clt-teal: #1590a8;
+  --clt-purple: #4b2a8f;
+  --clt-ink: #170d31;
   --clt-sky: #d6ebf7;
 
   --xp-folder: #f6d774;
@@ -1056,6 +1058,6 @@
 }
 
 /* A stored Uptown theme is on <html> before any shell loads, so the loader matches it. */
-[data-theme="uptown"] .brand-loader-page {
+[data-theme="buzz"] .brand-loader-page {
   background: linear-gradient(#070f22, #0a1838 55%, #122b55);
 }

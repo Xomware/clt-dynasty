@@ -44,14 +44,16 @@ export function HomeIcon(props: IconProps) {
   );
 }
 
-// The Uptown theme: the skyline at night, its tallest tower crowned gold.
-export function UptownIcon(props: IconProps) {
+// The Buzz City theme: its hornet, teal and purple, on the arena's ink.
+export function BuzzIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <rect x="0.5" y="0.5" width="15" height="15" rx="2" className="fill-(--clt-navy) stroke-(--clt-navy-dark)" />
-      <path d="M2 14.5V9h3v5.5zM6 14.5V4.5L7.5 3 9 4.5v10zM10 14.5V7h3.5v7.5z" className="fill-(--clt-teal) stroke-(--clt-navy-dark) stroke-[0.5]" />
-      <path d="M6.5 3.5h2" className="stroke-(--clt-crown)" />
-      <path d="M3 10.5h1M7 6.5h1M7 9h1M7 11.5h1M11 8.5h1M11 11h1" className="stroke-(--clt-crown)" />
+      <rect x="0.5" y="0.5" width="15" height="15" rx="2" className="fill-(--clt-ink) stroke-(--clt-purple)" />
+      <ellipse cx="9" cy="5.5" rx="3" ry="1.75" className="fill-(--clt-sky) stroke-(--clt-ink) stroke-[0.5]" />
+      <ellipse cx="6.5" cy="10" rx="4" ry="2.75" className="fill-(--clt-teal) stroke-(--clt-ink) stroke-[0.5]" />
+      <path d="M5.5 7.5v5M7.5 7.3v5.4" className="stroke-(--clt-purple) stroke-[1.2]" />
+      <circle cx="11.75" cy="8.75" r="2" className="fill-(--clt-purple) stroke-(--clt-ink) stroke-[0.5]" />
+      <path d="M2.5 10 1 10.5" className="stroke-(--clt-crown)" />
     </Icon>
   );
 }

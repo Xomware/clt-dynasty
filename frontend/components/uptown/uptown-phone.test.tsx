@@ -66,7 +66,7 @@ beforeEach(() => {
     removeEventListener: () => {},
   }));
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
-  localStorage.setItem(THEME_KEY, "uptown");
+  localStorage.setItem(THEME_KEY, "buzz");
 });
 afterEach(() => {
   admin.on = false;
