@@ -28,7 +28,7 @@ describe("Buzz City landing", () => {
     const onSignIn = vi.fn();
     renderLanding(onSignIn);
 
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Buzz City’s Dynasty League");
+    expect(screen.getByRole("heading", { level: 1, name: "CLT Dynasty Fantasy Football" })).toBeTruthy();
     const status = screen.getByRole("region", { name: "Tonight in the league" });
     expect(await within(status).findByText("Week 4 of 14")).toBeTruthy();
     expect(screen.getByRole("table", { name: "Playoff seeds as of today" })).toBeTruthy();
