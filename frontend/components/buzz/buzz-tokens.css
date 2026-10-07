@@ -22,7 +22,11 @@
   --bz-paper-3: #ddd3bb;
   --bz-text: #1d1238;
   --bz-muted: #5b4d78;
-  --bz-pin: rgb(75 42 143 / 0.11);
+  --bz-road: #3b3e8b;
+  /* The mesh is a 3px dot grid: whole device pixels at DPR 1, 2 and 3, so it never moirés. */
+  --bz-mesh: radial-gradient(circle, rgb(14 8 44 / 0.16) 0 0.75px, transparent 1.1px) 0 0 / 3px 3px;
+  --bz-jersey-road: url("./jersey-road.svg") 0 0 / 384px 480px, var(--bz-mesh), var(--bz-road);
+  --bz-jersey-home: url("./jersey-home.svg") 0 0 / 384px 480px, var(--bz-paper);
   --bz-amber: #ffb52e;
   --bz-amber-light: #ffd98a;
   --bz-led-red: #ff6b7d;
@@ -33,6 +37,7 @@
   /* A trading card's foil edge and the airbrushed swoosh behind the hero. */
   --bz-foil: linear-gradient(135deg, var(--bz-teal-light), var(--bz-teal) 22%, var(--bz-purple) 52%, var(--bz-purple-light) 70%, var(--bz-teal) 88%, var(--bz-teal-light));
   --bz-airbrush: linear-gradient(115deg, var(--bz-teal) 10%, var(--bz-purple) 75%);
+  --bz-airbrush-light: linear-gradient(115deg, var(--bz-teal-light) 10%, var(--bz-teal) 55%, var(--bz-purple-light) 95%);
   --bz-halftone: radial-gradient(circle, currentColor 0 30%, transparent 34%) 0 0 / 9px 9px;
   --bz-led-dots: radial-gradient(circle, rgb(255 255 255 / 0.05) 0 1px, transparent 1.5px) 0 0 / 4px 4px;
   --bz-shadow: 0 2px 0 var(--bz-ink), 0 10px 24px rgb(23 13 49 / 0.25);

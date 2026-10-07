@@ -137,22 +137,22 @@ def tile(im, size, bg, scale=0.8):
 # The 90s road jersey: deep purple, mostly faint dark pinstripes, a coloured one
 # every few, and a little zig-zag kink in some of them now and then. One tile is
 # 12 lanes wide; each lane is (colour or None for a faint stripe, kink y or None).
-LANE, TILE_H = 34, 480
+LANE, TILE_H = 32, 480
 LANES = [
     ("#2ba3c6", 70),
     (None, None),
     (None, None),
     ("#9fc0f0", 300),
     (None, None),
+    ("#62ab9d", None),
     (None, 220),
     (None, None),
-    ("#62ab9d", 160),
+    ("#a897e2", 160),
     (None, None),
-    (None, None),
-    ("#a897e2", 405),
+    ("#3fb4d8", 405),
     (None, None),
 ]
-ROAD = "#3b3a88"
+ROAD = "#3b3e8b"
 PAPER = "#f6f2e7"
 
 
@@ -167,7 +167,7 @@ def lane_points(i, kink):
 
 def jersey_svg(light):
     """The tile as SVG: the road (purple) jersey, or a faint version for paper panels."""
-    faint = "rgb(75 42 143 / 0.09)" if light else "rgb(16 9 52 / 0.42)"
+    faint = "rgb(75 42 143 / 0.08)" if light else "rgb(16 9 52 / 0.3)"
     edge = "rgb(75 42 143 / 0.12)" if light else "rgb(14 8 44 / 0.55)"
     paths = []
     for i, (color, kink) in enumerate(LANES):
@@ -175,9 +175,9 @@ def jersey_svg(light):
         if color is None:
             paths.append(f'<path d="{d}" stroke="{faint}" stroke-width="1.5"/>')
             continue
-        paths.append(f'<path d="{d}" stroke="{edge}" stroke-width="5"/>')
+        paths.append(f'<path d="{d}" stroke="{edge}" stroke-width="6"/>')
         opacity = ' stroke-opacity="0.45"' if light else ""
-        paths.append(f'<path d="{d}" stroke="{color}" stroke-width="3"{opacity}/>')
+        paths.append(f'<path d="{d}" stroke="{color}" stroke-width="4"{opacity}/>')
     w = LANE * len(LANES)
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{TILE_H}" viewBox="0 0 {w} {TILE_H}">'
@@ -197,10 +197,10 @@ def jersey(width, height, scale=4):
             for i, (color, kink) in enumerate(LANES):
                 pts = [((tx + x) * scale, (ty + y) * scale) for x, y in lane_points(i, kink)]
                 if color is None:
-                    d.line(pts, fill=(16, 9, 52, 107), width=round(1.5 * scale), joint="curve")
+                    d.line(pts, fill=(16, 9, 52, 77), width=round(1.5 * scale), joint="curve")
                     continue
-                d.line(pts, fill=(14, 8, 44, 140), width=5 * scale, joint="curve")
-                d.line(pts, fill=color, width=3 * scale, joint="curve")
+                d.line(pts, fill=(14, 8, 44, 140), width=6 * scale, joint="curve")
+                d.line(pts, fill=color, width=4 * scale, joint="curve")
     return im.resize((width, height), Image.LANCZOS).convert("RGBA")
 
 
