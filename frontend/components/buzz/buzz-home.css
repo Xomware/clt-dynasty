@@ -594,6 +594,39 @@
   text-align: right;
 }
 
+/* What the bars measure, with a sample bar as the key. */
+.buzz .u-race-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: -0.25rem 0 0.75rem;
+  color: var(--bz-paper-2);
+  font-size: 0.875rem;
+}
+
+.buzz .u-cup .u-race-legend {
+  margin: 0;
+  color: var(--bz-text);
+}
+
+.buzz .u-race-key {
+  position: relative;
+  flex: none;
+  width: 2.5rem;
+  height: 0.4375rem;
+  overflow: hidden;
+  border-radius: 2px;
+  --share: 0.75;
+}
+
+.buzz .u-race-key .u-race-fill {
+  animation: none;
+}
+
+.buzz .u-cup .u-race-key .u-race-fill {
+  background: repeating-linear-gradient(90deg, var(--bz-teal) 0 6px, transparent 6px 8px);
+}
+
 /* World Cup race */
 
 .buzz .u-cup-divs {

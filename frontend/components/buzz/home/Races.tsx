@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { type CSSProperties, useId } from "react";
 
 import { HomeCard } from "@/components/home/HomeCard";
 import { CountUp } from "@/components/motion/CountUp";
@@ -24,8 +24,10 @@ interface RaceProps {
 const bar = (share: number, i: number) => ({ "--share": share, "--i": i }) as CSSProperties;
 
 // The whole league as a race: record order, each bar the team's points for
-// against the leader's, the playoff seeds tagged.
+// against the league's most, the playoff seeds tagged. Points for is the
+// standings tiebreaker, so the bars show who wins a tie on record.
 export function StandingsRace({ data, teamFor, myRosterId }: RaceProps) {
+  const legend = useId();
   const more = { to: { kind: "standings" as const, params: {} }, label: "Standings" };
   if (!data) {
     return (
@@ -47,7 +49,13 @@ export function StandingsRace({ data, teamFor, myRosterId }: RaceProps) {
   const top = Math.max(1, ...rows.map((r) => r.pf));
   return (
     <HomeCard title="Standings race" more={more} className="u-race">
-      <ol className="u-race-rows" aria-label="Standings by record, bars by points for">
+      <p id={legend} className="u-race-legend">
+        <span className="u-race-key" aria-hidden>
+          <span className="u-race-fill" />
+        </span>
+        Bars: points for, against the league&rsquo;s most ({top.toFixed(1)}). Points for breaks ties on record.
+      </p>
+      <ol className="u-race-rows" aria-label="Standings by record" aria-describedby={legend}>
         {rows.map((s, i) => {
           const team = teamFor(s.rosterId);
           const seed = seeds.indexOf(s.rosterId) + 1;
@@ -85,6 +93,7 @@ const STATUS = { alive: "Alive", clinched: "In", eliminated: "Out" } as const;
 
 // The World Cup's divisions side by side, each team's bar its divisional win rate.
 export function CupRace({ data, teamFor, myRosterId }: RaceProps) {
+  const legend = useId();
   const [load, retry] = useLoad(getWorldCup, "world-cup");
   return (
     <HomeCard title="World Cup race" more={{ to: { kind: "world-cup", params: {} }, label: "World Cup" }} className="u-cup">
@@ -92,7 +101,13 @@ export function CupRace({ data, teamFor, myRosterId }: RaceProps) {
       {load.status === "error" && <LoadError what="World Cup standings" message={load.message} onRetry={retry} />}
       {load.status === "ok" && load.value.divisions.length === 0 && <p>No divisional games have been played yet.</p>}
       {load.status === "ok" && load.value.divisions.length > 0 && (
-        <div className="u-cup-divs">
+        <div className="u-cup-divs" aria-describedby={legend}>
+          <p id={legend} className="u-race-legend">
+            <span className="u-race-key" aria-hidden>
+              <span className="u-race-fill" />
+            </span>
+            Bars: divisional win rate, ties counting half.
+          </p>
           {load.value.divisions.map((d) => (
             <section key={d.division} aria-label={d.name} className="u-cup-div">
               <h4 className="u-cup-name">
