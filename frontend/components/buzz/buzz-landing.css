@@ -28,15 +28,16 @@
 }
 
 .bz-landing-title {
+  position: relative;
+  width: min(100%, 35rem);
   margin-top: 0.5rem;
 }
 
 .bz-landing-lockup {
   display: block;
-  width: min(100%, 35rem);
+  width: 100%;
   height: auto;
   filter: drop-shadow(0 14px 18px rgb(8 4 24 / 0.55));
-  animation: bz-lockup-in 640ms cubic-bezier(0.2, 0.8, 0.3, 1.15) 120ms both;
 }
 
 .bz-landing-side {
@@ -303,77 +304,6 @@
   left: 1rem;
 }
 
-.bz-landing .landing-champions {
-  display: grid;
-  gap: 1rem;
-}
-
-.bz-landing .landing-champions li {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 0.75rem 0.875rem;
-  border: 3px solid var(--bz-ink);
-  border-radius: 12px;
-  color: var(--bz-text);
-  background: var(--bz-paper);
-  box-shadow: 5px 5px 0 var(--bz-purple-deep);
-}
-
-.bz-landing .landing-champions li:nth-child(even) {
-  transform: rotate(0.8deg);
-}
-
-.bz-landing .landing-champions li:first-child {
-  padding: 1rem;
-  border: 6px solid transparent;
-  background:
-    linear-gradient(var(--bz-paper), var(--bz-paper)) padding-box,
-    var(--bz-foil) border-box;
-  box-shadow:
-    0 0 0 3px var(--bz-ink),
-    6px 6px 0 3px var(--bz-ink);
-  transform: rotate(-1.2deg);
-}
-
-.bz-landing .landing-champions li:first-child::after {
-  position: absolute;
-  top: -0.875rem;
-  right: 0.75rem;
-  padding: 0.125rem 0.625rem;
-  border: 2px solid var(--bz-ink);
-  border-radius: 999px;
-  color: var(--bz-ink);
-  background: var(--bz-amber);
-  content: "Reigning";
-  font: italic 800 0.75rem var(--bz-jersey);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.bz-landing .landing-champion-year {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 3.75rem;
-  height: 2.5rem;
-  border-radius: 6px;
-  color: var(--bz-amber);
-  background: var(--bz-led-dots), var(--bz-ink);
-  font: 900 1.125rem var(--bz-dot);
-  text-shadow: 0 0 6px rgb(255 181 46 / 0.5);
-}
-
-.bz-landing .landing-champions .text-xs {
-  color: var(--bz-muted);
-}
-
-.bz-landing .xp-team-name {
-  font: italic 700 1.0625rem var(--bz-jersey);
-  text-transform: uppercase;
-}
-
 /* What's inside: a set of trading cards, one per page. */
 .bz-landing-features {
   display: grid;
@@ -583,8 +513,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .bz-landing-lockup {
-    margin: 0 auto;
+  .bz-landing-title {
+    margin-inline: auto;
   }
 
   .bz-about {
@@ -660,29 +590,654 @@
   }
 }
 
-/* Motion: the lockup slaps on, then the cards and stickers deal in. */
-.bz-landing-features li,
-.bz-about li {
-  animation: bz-deal 620ms cubic-bezier(0.2, 0.9, 0.3, 1.1) calc(var(--i, 0) * 70ms + 200ms) both;
+.bz-landing .xp-team-name {
+  font: italic 700 1.0625rem var(--bz-jersey);
+  text-transform: uppercase;
 }
 
-@keyframes bz-lockup-in {
+/* Hall of champions: trading cards, the reigning champ's in foil. */
+.bz-champs {
+  display: grid;
+  gap: 1rem;
+}
+
+.bz-champs li {
+  perspective: 900px;
+}
+
+.bz-champ {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  color: var(--bz-text);
+  text-align: left;
+  background: none;
+  cursor: pointer;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.2s ease-out;
+}
+
+.bz-champ:focus-visible {
+  outline: 3px solid var(--bz-focus);
+  outline-offset: 5px;
+}
+
+.bz-champs li:nth-child(even) .bz-champ {
+  rotate: 0.8deg;
+}
+
+.bz-champ[data-reigning] {
+  rotate: -1.2deg;
+}
+
+.bz-champ-flip {
+  display: grid;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  /* WebKit flattens a preserve-3d box whose transform is none, then ignores
+     the faces' backface-visibility, so it always carries one. */
+  transform: rotateY(0deg);
+  transition: transform 0.7s cubic-bezier(0.5, 1.25, 0.45, 1);
+}
+
+.bz-champ[data-back] .bz-champ-flip {
+  transform: rotateY(180deg);
+}
+
+/* Each face also hides once the card turns past edge-on, so a browser that
+   draws backfaces anyway, as WebKit can, never shows one mirrored. */
+.bz-champ-face {
+  position: relative;
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.25rem 0.875rem;
+  min-height: 5.5rem;
+  padding: 0.75rem 0.875rem;
+  overflow: hidden;
+  border: 3px solid var(--bz-ink);
+  border-radius: 12px;
+  background: var(--bz-paper);
+  box-shadow: 5px 5px 0 var(--bz-purple-deep);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: rotateY(0deg) translateZ(1px);
+  transition: visibility 0s linear 190ms;
+}
+
+.bz-champ-back,
+.bz-champ[data-back] .bz-champ-front {
+  visibility: hidden;
+}
+
+.bz-champ[data-back] .bz-champ-back {
+  visibility: visible;
+}
+
+.bz-champ[data-reigning] .bz-champ-front {
+  border: 6px solid transparent;
+  background:
+    linear-gradient(var(--bz-paper), var(--bz-paper)) padding-box,
+    var(--bz-foil) border-box;
+  box-shadow:
+    0 0 0 3px var(--bz-ink),
+    6px 6px 0 3px var(--bz-ink);
+}
+
+/* Light running over the card as the mouse moves across it. */
+.bz-champ-front::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(105deg, transparent calc(var(--shine, 50%) - 22%), rgb(255 255 255 / 0.45) var(--shine, 50%), transparent calc(var(--shine, 50%) + 22%));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.bz-champ:hover .bz-champ-front::after {
+  opacity: 1;
+}
+
+.bz-champ-year {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 2.5rem;
+  border-radius: 6px;
+  color: var(--bz-amber);
+  background: var(--bz-led-dots), var(--bz-ink);
+  font: 900 1.125rem var(--bz-dot);
+  text-shadow: 0 0 6px rgb(255 181 46 / 0.5);
+}
+
+.bz-champ-avatar {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 3px solid var(--bz-ink);
+  border-radius: 50%;
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+  font: 1.5rem var(--bz-display);
+}
+
+.bz-champ-name {
+  align-self: end;
+  min-width: 0;
+  overflow: hidden;
+  font: italic 800 1.1875rem / 1.15 var(--bz-jersey);
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bz-champ-tag {
+  align-self: start;
+  justify-self: start;
+  padding: 0 0.5rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
+  font: italic 800 0.6875rem / 1.5 var(--bz-jersey);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bz-champ[data-reigning] .bz-champ-tag {
+  background: var(--bz-amber);
+}
+
+.bz-champ-back {
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  color: var(--bz-paper);
+  background: var(--bz-mesh), var(--bz-purple);
+  transform: rotateY(180deg) translateZ(1px);
+}
+
+.bz-champ-mark {
+  grid-row: span 2;
+  width: 3.25rem;
+  height: auto;
+}
+
+.bz-champ-stat {
+  display: grid;
+  font: italic 800 1rem / 1.2 var(--bz-jersey);
+  text-transform: uppercase;
+}
+
+.bz-champ-stat span {
+  color: var(--bz-teal-light);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+}
+
+.bz-champ-brand {
+  grid-column: 2 / -1;
+  color: rgb(246 242 231 / 0.6);
+  font: italic 800 0.6875rem var(--bz-jersey);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* The playoff board's marquee: the seeds running across, a column of lit dots at a time. */
+.bz-marquee {
+  margin: -0.25rem 0 0.875rem;
+  overflow: hidden;
+  border-radius: 6px;
+  color: var(--bz-amber);
+  background: var(--bz-led-dots), #0a0519;
+  box-shadow: inset 0 2px 0 rgb(0 0 0 / 0.5);
+  font: 900 1rem / 2.25rem var(--bz-dot);
+  text-shadow: 0 0 6px rgb(255 181 46 / 0.55);
+  text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+  mask: linear-gradient(90deg, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+}
+
+.bz-marquee-run {
+  display: flex;
+  width: max-content;
+  animation: bz-marquee calc(var(--n) * 3.2s) linear infinite;
+}
+
+.bz-marquee p {
+  display: flex;
+  flex: none;
+}
+
+.bz-marquee span {
+  padding: 0 1.25rem;
+}
+
+.bz-marquee span + span::before {
+  margin-right: 2.5rem;
+  color: var(--bz-teal-light);
+  content: "+";
+}
+
+@keyframes bz-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Motion. The hero enters once the first-load intro has gone (data-go on the
+   page); each data-scroll block enters the first time it scrolls into view
+   (data-in). Until then their animations hold on the first frame. Entrances
+   fill backwards only, so hover transforms are free once they finish. Reduced
+   motion turns every animation under .buzz off (buzz.css), which leaves each
+   element at rest. */
+
+.bz-landing:not([data-go]) :is(.bz-landing-hero, .bz-landing-hero *),
+.bz-landing [data-scroll]:not([data-in]),
+.bz-landing [data-scroll]:not([data-in]) * {
+  animation-play-state: paused;
+}
+
+/* The hero: tape, the lockup slams with a thud, the lede, chips pop, the CTA
+   drops and bounces, the board flickers on. */
+.bz-landing-intro .bz-tape {
+  animation: bz-tape-slap 0.34s cubic-bezier(0.2, 0.8, 0.3, 1.3) 0.05s backwards;
+}
+
+.bz-landing-lockup {
+  transform-origin: 50% 70%;
+  animation: bz-slam 0.62s linear 0.12s backwards;
+}
+
+.bz-landing-hero {
+  animation: bz-thud 0.32s linear 0.5s;
+}
+
+.bz-landing-lede {
+  animation: bz-rise 0.45s ease-out 0.5s backwards;
+}
+
+.bz-landing-chips li {
+  animation: bz-pop 0.42s cubic-bezier(0.2, 0.8, 0.3, 1.4) calc(0.62s + var(--i) * 0.08s) backwards;
+}
+
+.bz-landing-side > .bz-signin-wrap {
+  animation: bz-drop 0.7s linear 0.86s backwards;
+}
+
+.bz-landing-board {
+  animation: bz-power-on 0.5s linear 1.1s backwards;
+}
+
+/* A glint across the lockup every eight seconds. */
+.bz-landing-glint {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask: url("../../public/brand/lockup@2x.webp") center / 100% 100% no-repeat;
+  mask: url("../../public/brand/lockup@2x.webp") center / 100% 100% no-repeat;
+}
+
+.bz-landing-glint::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(105deg, transparent 35%, rgb(255 251 234 / 0.6) 50%, transparent 65%);
+  transform: translateX(110%);
+  animation: bz-glint-loop 8s ease-in-out 1.4s infinite backwards;
+}
+
+@keyframes bz-glint-loop {
+  0% {
+    transform: translateX(-110%);
+  }
+  9%,
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes bz-tape-slap {
   from {
-    opacity: 0.3;
-    transform: scale(1.12) rotate(-3deg);
+    opacity: 0;
+    transform: skewX(-10deg) rotate(-10deg) scale(1.7);
+  }
+}
+
+@keyframes bz-slam {
+  0% {
+    opacity: 0;
+    transform: scale(1.4) rotate(-6deg);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  15% {
+    opacity: 1;
+  }
+  55% {
+    transform: scale(1.04, 0.94);
+    animation-timing-function: ease-out;
+  }
+  78% {
+    transform: scale(0.99, 1.02);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes bz-thud {
+  20% {
+    transform: translate(-3px, 3px);
+  }
+  45% {
+    transform: translate(3px, -2px);
+  }
+  70% {
+    transform: translate(-1px, 1px);
+  }
+}
+
+@keyframes bz-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@keyframes bz-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.2) rotate(-12deg);
+  }
+}
+
+@keyframes bz-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-1.5rem);
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 0.5);
+  }
+  35% {
+    opacity: 1;
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0.5, 0.5, 1);
+  }
+  55% {
+    transform: translateY(-0.5rem);
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 0.5);
+  }
+  72% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0.5, 0.5, 1);
+  }
+  86% {
+    transform: translateY(-0.15rem);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Arena lights catching: on, a dip, on. */
+@keyframes bz-power-on {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.85;
+  }
+  40% {
+    opacity: 0.2;
+  }
+  65% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.6;
+  }
+}
+
+/* Below the fold */
+
+.bz-landing-heading[data-scroll] {
+  animation: bz-heading-in 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) backwards;
+}
+
+@keyframes bz-heading-in {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem) skewX(-14deg);
+  }
+}
+
+.bz-landing-scoreboard {
+  animation: bz-power-on 0.55s linear backwards;
+}
+
+/* Champions turn up from edge-on, one after another. */
+.bz-champs li {
+  animation: bz-champ-in 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.1) calc(var(--i) * 0.14s + 0.1s) backwards;
+}
+
+@keyframes bz-champ-in {
+  from {
+    opacity: 0;
+    transform: perspective(900px) translateY(1.5rem) rotateY(-90deg);
+  }
+  35% {
+    opacity: 1;
+  }
+}
+
+/* What's inside: dealt off the top of the deck one at a time. */
+.bz-landing-features li {
+  animation: bz-deal-in 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.15) calc(var(--i, 0) * 0.09s) backwards;
+}
+
+@keyframes bz-deal-in {
+  from {
+    opacity: 0;
+    transform: translate(-4rem, -5rem) rotate(-24deg) scale(0.8);
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* About Charlotte: stickers slapped on, then their badges spin in. */
+.bz-about li {
+  animation: bz-sticker 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.5) calc(var(--i, 0) * 0.11s) backwards;
+}
+
+.bz-about-art {
+  animation: bz-badge-spin 0.55s cubic-bezier(0.2, 0.8, 0.3, 1.3) calc(var(--i, 0) * 0.11s + 0.25s) backwards;
+}
+
+@keyframes bz-sticker {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-18deg);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bz-badge-spin {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-200deg);
+  }
+}
+
+.bz-landing-card[data-scroll] {
+  animation: bz-rise 0.5s ease-out backwards;
+}
+
+/* The jersey drifts down a full pattern repeat every 40s, and a sheen of
+   light crosses it now and then. Both move by transform alone. */
+.bz-landing .bz-backdrop {
+  overflow: hidden;
+  background: none;
+}
+
+.bz-landing .bz-backdrop::before,
+.bz-landing .bz-backdrop::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.bz-landing .bz-backdrop::before {
+  top: -480px;
+  background: var(--bz-jersey-road);
+  animation: bz-jersey-drift 40s linear infinite;
+}
+
+.bz-landing .bz-backdrop::after {
+  background:
+    radial-gradient(70% 55% at 50% 0%, rgb(160 150 255 / 0.12), transparent 70%),
+    radial-gradient(130% 90% at 50% 40%, transparent 55%, rgb(12 6 36 / 0.5));
+}
+
+@keyframes bz-jersey-drift {
+  to {
+    transform: translateY(480px);
+  }
+}
+
+.bz-sheen {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bz-sheen::before {
+  position: absolute;
+  inset: 0 -50%;
+  content: "";
+  background: linear-gradient(100deg, transparent 40%, rgb(190 240 245 / 0.07) 47%, rgb(255 255 255 / 0.11) 50%, rgb(190 240 245 / 0.07) 53%, transparent 60%);
+  transform: translateX(-100%);
+  animation: bz-sheen 11s ease-in-out 2s infinite;
+}
+
+@keyframes bz-sheen {
+  0% {
+    transform: translateX(-100%);
+  }
+  30%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Every 18s the hornet buzzes across the jersey on a zig-zag, behind the
+   page's cards. At rest it waits off the left edge. */
+.bz-flyby {
+  position: fixed;
+  top: 30%;
+  left: 0;
+  z-index: -1;
+  width: clamp(3.5rem, 8vw, 5rem);
+  pointer-events: none;
+  transform: translateX(-6rem);
+  animation: bz-flyby-x 18s linear 7s infinite backwards;
+}
+
+.bz-flyby-y {
+  animation: bz-flyby-y 18s linear 7s infinite backwards;
+}
+
+.bz-flyby-head {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 5px rgb(8 4 24 / 0.5));
+}
+
+@keyframes bz-flyby-x {
+  0% {
+    transform: translateX(-6rem);
+  }
+  16%,
+  100% {
+    transform: translateX(calc(100vw + 6rem));
+  }
+}
+
+@keyframes bz-flyby-y {
+  0%,
+  16%,
+  100% {
+    transform: none;
+  }
+  2% {
+    transform: translateY(-2.5rem) rotate(-14deg);
+  }
+  4.5% {
+    transform: translateY(1.5rem) rotate(12deg);
+  }
+  7% {
+    transform: translateY(-2rem) rotate(-12deg);
+  }
+  9.5% {
+    transform: translateY(2rem) rotate(14deg);
+  }
+  12% {
+    transform: translateY(-1.5rem) rotate(-10deg);
+  }
+  14% {
+    transform: translateY(1rem) rotate(8deg);
+  }
+}
+
+/* Parallax: the skyline badge, the pennant and the helmet drift against the
+   scroll, where the browser can tie an animation to it. */
+@supports (animation-timeline: view()) {
+  .bz-landing-badge,
+  .bz-landing-pennant,
+  .bz-landing-helmet {
+    animation: bz-parallax linear both;
+    animation-timeline: view();
+  }
+
+  .bz-landing-badge {
+    --far: 1.25rem;
+  }
+
+  .bz-landing-pennant {
+    --far: 1.25rem;
+  }
+
+  .bz-landing-helmet {
+    --far: 1.75rem;
+  }
+}
+
+/* Upward only: drifting down, the badge would sit on the footer's heading. */
+@keyframes bz-parallax {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 calc(var(--far) * -2);
   }
 }
 
 @keyframes bz-shimmer-bar {
   to {
     background-position: -200% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bz-landing-lockup,
-  .bz-landing-features li,
-  .bz-about li {
-    animation: none;
   }
 }

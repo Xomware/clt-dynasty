@@ -4,11 +4,14 @@ import { type CSSProperties, Fragment, type ReactNode } from "react";
 
 import type { LandingProps } from "@/components/landing/Landing";
 import { FEATURES, FORMAT, GoogleMark } from "@/components/landing/landing-content";
-import { Champions, Seeds, Skeleton, Status } from "@/components/landing/LeagueLive";
+import { Skeleton, Status } from "@/components/landing/LeagueLive";
+import { useScrollIn } from "@/components/motion/use-scroll-in";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { LoadError } from "@/components/xp/LoadError";
 import { refreshOverview, useOverview } from "@/lib/landing/overview";
 import { BrandMark } from "./BrandMark";
+import { BoardSeeds } from "./landing/BoardSeeds";
+import { ChampionCards } from "./landing/ChampionCards";
 import { TRIVIA } from "./trivia";
 
 import "./buzz.css";
@@ -53,9 +56,12 @@ const CHARLOTTE: { title: string; fact: string; art: ReactNode }[] = [
 
 // The signed-out page in Buzz City: the league's lockup on the road jersey,
 // the same facts and live Sleeper data as the XP landing on arena boards and
-// trading cards, and a little Charlotte history.
+// trading cards, and a little Charlotte history. The hero's entrance waits for
+// the first-load intro to leave; everything below the fold enters as it
+// scrolls in (`data-scroll`).
 export function BuzzLanding({ onSignIn }: LandingProps) {
   const state = useOverview();
+  const { root, go } = useScrollIn<HTMLDivElement>();
   const o = state.status === "ok" ? state.overview : null;
   const live = (child: ReactNode, label: string, rows: number) =>
     state.status === "error" ? (
@@ -67,8 +73,14 @@ export function BuzzLanding({ onSignIn }: LandingProps) {
     );
 
   return (
-    <div className="buzz bz-landing">
+    <div ref={root} className="buzz bz-landing" data-go={go || undefined}>
       <i className="bz-backdrop" aria-hidden />
+      <i className="bz-sheen" aria-hidden />
+      <div className="bz-flyby" aria-hidden>
+        <div className="bz-flyby-y">
+          <BrandMark mark="head" alt="" className="bz-flyby-head" priority />
+        </div>
+      </div>
       <header className="bz-header bz-landing-header">
         <BrandMark mark="seal" alt="" className="bz-landing-seal" priority />
         <ThemeToggle />
@@ -80,14 +92,17 @@ export function BuzzLanding({ onSignIn }: LandingProps) {
             <p className="bz-tape">Charlotte, NC &middot; Est. 2024</p>
             <h1 className="bz-landing-title">
               <BrandMark mark="lockup" alt="CLT Dynasty Fantasy Football" className="bz-landing-lockup" priority />
+              <i className="bz-landing-glint" aria-hidden />
             </h1>
           </div>
           <div className="bz-landing-side">
             <p className="bz-landing-lede">Standings, scores, drafts and rule proposals for the twelve teams of CLT Dynasty. Members only.</p>
             <ul className="bz-landing-chips" aria-label="Format">
-              <li>12 teams</li>
-              <li>Superflex</li>
-              <li>Full PPR</li>
+              {["12 teams", "Superflex", "Full PPR"].map((chip, i) => (
+                <li key={chip} style={{ "--i": i } as CSSProperties}>
+                  {chip}
+                </li>
+              ))}
             </ul>
             <SignIn onSignIn={onSignIn} />
             <section aria-label="Tonight in the league" className="bz-landing-board">
@@ -99,32 +114,32 @@ export function BuzzLanding({ onSignIn }: LandingProps) {
         </section>
 
         <section aria-labelledby="bz-live" className="bz-landing-section">
-          <h2 id="bz-live" className="bz-landing-heading">
+          <h2 id="bz-live" className="bz-landing-heading" data-scroll>
             The league, live from Sleeper
           </h2>
           <div className="bz-landing-live">
-            <section aria-label="Playoff picture" className="bz-landing-scoreboard">
+            <section aria-label="Playoff picture" className="bz-landing-scoreboard" data-scroll>
               <h3 className="bz-landing-board-title">Playoff picture</h3>
-              {live(o && <Seeds overview={o} />, "Loading standings", 6)}
+              {live(o && <BoardSeeds overview={o} />, "Loading standings", 6)}
             </section>
             <section aria-label="Hall of champions" className="bz-landing-hall">
               <h3 className="bz-landing-hall-title">
                 <BrandMark mark="football-hornet" alt="" className="bz-landing-hall-mark" />
                 Hall of champions
               </h3>
-              {live(o && <Champions overview={o} />, "Loading champions", 3)}
+              {live(o && <ChampionCards champions={o.champions} />, "Loading champions", 3)}
             </section>
           </div>
         </section>
 
         <section aria-labelledby="bz-inside" className="bz-landing-section">
           <div className="bz-landing-heading-row">
-            <h2 id="bz-inside" className="bz-landing-heading">
+            <h2 id="bz-inside" className="bz-landing-heading" data-scroll>
               What&rsquo;s inside
             </h2>
             <BrandMark mark="pennant" alt="" className="bz-landing-pennant" />
           </div>
-          <ul className="bz-landing-features">
+          <ul className="bz-landing-features" data-scroll>
             {FEATURES.map(({ name, Icon, about }, i) => (
               <li key={name} style={{ "--i": i } as CSSProperties}>
                 <p className="bz-feature-top" aria-hidden="true">
@@ -142,10 +157,10 @@ export function BuzzLanding({ onSignIn }: LandingProps) {
         </section>
 
         <section aria-labelledby="bz-about" className="bz-landing-section">
-          <h2 id="bz-about" className="bz-landing-heading">
+          <h2 id="bz-about" className="bz-landing-heading" data-scroll>
             About Charlotte
           </h2>
-          <ul className="bz-about">
+          <ul className="bz-about" data-scroll>
             {CHARLOTTE.map(({ title, fact, art }, i) => (
               <li key={title} style={{ "--i": i } as CSSProperties}>
                 <span className="bz-about-art">{art}</span>
@@ -157,11 +172,11 @@ export function BuzzLanding({ onSignIn }: LandingProps) {
         </section>
 
         <section aria-labelledby="bz-format" className="bz-landing-section">
-          <h2 id="bz-format" className="bz-landing-heading">
+          <h2 id="bz-format" className="bz-landing-heading" data-scroll>
             League format
           </h2>
           <div className="bz-landing-format-row">
-            <section aria-label="The rulebook, short version" className="bz-card bz-landing-card">
+            <section aria-label="The rulebook, short version" className="bz-card bz-landing-card" data-scroll>
               <h3 className="bz-card-title">The rulebook, short version</h3>
               <dl className="xp-summary bz-landing-format">
                 {FORMAT.map(([k, v]) => (
