@@ -22,6 +22,7 @@ import playerFixture from "@/lib/test/fixtures/players.json";
 import { fixture, stubSleeper } from "@/lib/test/league-mock";
 import { BuzzHome } from "./BuzzHome";
 
+const MINE_W4 = fixture.matchups["4"].find((m) => m.roster_id === 4)!.matchup_id;
 const report = (period: string, title: string) => ({
   pk: `league#${LEAGUE_ID}`,
   sk: `weekly#${period}`,
@@ -29,7 +30,7 @@ const report = (period: string, title: string) => ({
   report_type: "weekly",
   period,
   body_markdown: `# ${title}\n\nThree upsets and a blowout.`,
-  metadata: {},
+  metadata: { matchups: [{ matchup_id: MINE_W4, team_a: "Team 4", team_b: "Team 9", blurb: `**Team 4 over Team 9** in ${period}` }] },
   created_at: `2026-09-${period.slice(-2)}T12:00:00Z`,
 });
 
@@ -42,7 +43,7 @@ const ROUTES = {
   [`${API_BASE}/clt/world-cup`]: { leagueId: LEAGUE_ID, season: "2026", divisions: [] },
   [`${API_BASE}/clt/proposals-list`]: { proposals: [] },
   [`${API_BASE}/clt/taxi-list`]: { leagueId: LEAGUE_ID, requests: [] },
-  [`${API_BASE}/ai-reports/list`]: { rows: [report("2026W03", "Week 3 chaos"), report("2026W04", "Week 4 bites back")], next_cursor: null },
+  [`${API_BASE}/ai-reports/list?type=weekly&limit=50`]: { rows: [report("2026W03", "Week 3 chaos"), report("2026W04", "Week 4 bites back")], next_cursor: null },
   [`/league/${LEAGUE_ID}/transactions/4`]: [],
   [`/league/${LEAGUE_ID}/transactions/3`]: [],
   [`/league/${LEAGUE_ID}/matchups/5`]: fixture.matchups["1"],
@@ -126,12 +127,16 @@ describe("Buzz City Home", () => {
     expect(race.getAllByText(/^Seed \d$/)).toHaveLength(fixture.league.settings.playoff_teams);
   });
 
-  it("lists the recaps newest first, each opening its report", async () => {
+  it("leads with the latest weekly recap, the member's game called out, earlier weeks a tap away", async () => {
     renderHub();
-    const recaps = within(await screen.findByRole("list", { name: "Recaps, newest first" }));
-    expect(recaps.getAllByRole("listitem").map((li) => li.querySelector(".u-recap-title")?.textContent)).toEqual(["Week 4 bites back", "Week 3 chaos"]);
-    fireEvent.click(recaps.getAllByRole("button", { name: "Read it" })[0]);
+    const feature = within(await screen.findByRole("article", { name: "Week 4 bites back" }));
+    expect(feature.getByText("Three upsets and a blowout.")).toBeTruthy();
+    expect(within(feature.getByRole("region", { name: "Your game" })).getByText("Team 4 over Team 9").tagName).toBe("STRONG");
+    fireEvent.click(feature.getByRole("button", { name: "Read the full recap" }));
     expect(go).toHaveBeenLastCalledWith({ kind: "ai-report", params: { period: "2026W04", type: "weekly" } });
+    const earlier = within(screen.getByRole("navigation", { name: "Earlier recaps" }));
+    fireEvent.click(earlier.getByRole("button", { name: /Week 3.*Week 3 chaos/ }));
+    expect(go).toHaveBeenLastCalledWith({ kind: "ai-report", params: { period: "2026W03", type: "weekly" } });
   });
 
   it("asks a member with no linked roster to link one", async () => {
