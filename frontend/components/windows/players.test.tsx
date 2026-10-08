@@ -179,6 +179,18 @@ describe("Players simulator", () => {
     expect(totals.getByRole("alert").textContent).toMatch(/Bryce Young can't go on IR/);
   });
 
+  it("trades with another team: my side and theirs", async () => {
+    open("to-9~send-11~get-12", "sim");
+    const totals = within(await screen.findByRole("region", { name: "What it does" }));
+    // McMillan's 11.0 at WR; Hubbard's empty projection leaves.
+    expect(totals.getByText("Best lineup, Week 4").nextElementSibling?.textContent).toBe("18.0 to 29.0+11.0");
+    expect(totals.getByText("Dynasty value").nextElementSibling?.textContent).toBe("0 to 6,100+6,100");
+    expect(totals.getByRole("heading", { name: /^Their side: / })).toBeTruthy();
+    expect(totals.getByText("Their dynasty value").nextElementSibling?.textContent).toBe("6,100 to 0-6,100");
+    expect(screen.getByRole("button", { name: "Get Tetairoa McMillan", pressed: true })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Send Chuba Hubbard", pressed: true })).toBeTruthy();
+  });
+
   it("compares saved scenarios side by side, the unsaved one first", async () => {
     localStorage.setItem("clt.players.scenarios", JSON.stringify([{ id: "a", name: "Mixon plan", v: "add-14" }, { id: "b", name: "Cut Hubbard", v: "drop-11" }]));
     open("add-14~drop-11", "compare");

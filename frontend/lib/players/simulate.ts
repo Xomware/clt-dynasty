@@ -9,14 +9,31 @@ export interface Scenario {
   drops: string[];
   // My players moved to injured reserve, which frees an active spot.
   ir: string[];
+  // A trade with another CLT team: my players sent, theirs received.
+  partner: number | null;
+  send: string[];
+  receive: string[];
 }
 
-export const EMPTY_SCENARIO: Scenario = { adds: [], drops: [], ir: [] };
+export type MoveKind = "adds" | "drops" | "ir" | "send" | "receive";
+export const MOVE_KINDS: MoveKind[] = ["adds", "drops", "ir", "send", "receive"];
+
+export const EMPTY_SCENARIO: Scenario = { adds: [], drops: [], ir: [], partner: null, send: [], receive: [] };
 
 const IDS = /^\d+$/;
 const ids = (s: string | undefined) => [...new Set(list(s).filter((id) => IDS.test(id)))];
 
-export const readScenario = (fields: Fields): Scenario => ({ adds: ids(fields.get("add")), drops: ids(fields.get("drop")), ir: ids(fields.get("ir")) });
+export function readScenario(fields: Fields): Scenario {
+  const partner = /^[1-9]\d?$/.test(fields.get("to") ?? "") ? Number(fields.get("to")) : null;
+  return {
+    adds: ids(fields.get("add")),
+    drops: ids(fields.get("drop")),
+    ir: ids(fields.get("ir")),
+    partner,
+    send: partner === null ? [] : ids(fields.get("send")),
+    receive: partner === null ? [] : ids(fields.get("get")),
+  };
+}
 
 export function writeScenario(s: Scenario, fields: Fields = new Map()): Fields {
   const out = new Map(fields);
@@ -24,10 +41,14 @@ export function writeScenario(s: Scenario, fields: Fields = new Map()): Fields {
   set("add", s.adds);
   set("drop", s.drops);
   set("ir", s.ir);
+  set("to", s.partner === null ? [] : [String(s.partner)]);
+  set("send", s.send);
+  set("get", s.receive);
   return out;
 }
 
-export const isEmpty = (s: Scenario) => s.adds.length + s.drops.length + s.ir.length === 0;
+export const moveCount = (s: Scenario) => MOVE_KINDS.reduce((n, k) => n + s[k].length, 0);
+export const isEmpty = (s: Scenario) => moveCount(s) === 0;
 
 export interface Limits {
   active: number;
@@ -87,11 +108,13 @@ export interface Depth {
 }
 
 export type Problem =
-  | { kind: "rostered" | "not-mine" | "locked" | "not-ir-eligible"; id: string }
-  | { kind: "over"; spot: keyof Counts; by: number };
+  | { kind: "rostered" | "not-mine" | "not-theirs" | "locked" | "not-ir-eligible"; id: string }
+  | { kind: "over"; spot: keyof Counts; by: number; partner?: true };
 
 export interface Simulation {
   mine: Side;
+  // The trade partner's side, when the scenario trades.
+  partner: Side | null;
   depth: Depth[];
   problems: Problem[];
 }
@@ -202,12 +225,24 @@ export function simulate({ scenario, rosterId, rosters, slots, limits, week, val
     if (mine.has(id) && !onIr.has(id) && !limits.irStatuses.includes(injury(id) ?? "")) problems.push({ kind: "not-ir-eligible", id });
   }
 
+  const them = rosters.find((r) => r.roster_id === scenario.partner && r.roster_id !== rosterId);
+  const theirs = new Set(them?.players ?? []);
+  const send = them ? scenario.send.filter((id) => mine.has(id)) : [];
+  const receive = them ? scenario.receive.filter((id) => theirs.has(id)) : [];
+  for (const id of them ? scenario.send : []) if (!mine.has(id)) problems.push({ kind: "not-mine", id });
+  for (const id of them ? scenario.receive : []) if (!theirs.has(id)) problems.push({ kind: "not-theirs", id });
+
   const adds = scenario.adds.filter((id) => !rostered.has(id));
   const taxi = new Set(roster.taxi ?? []);
-  const toIr = scenario.ir.filter((id) => mine.has(id) && !onIr.has(id) && !taxi.has(id) && !scenario.drops.includes(id));
-  const after = moveRoster(roster, scenario.drops.filter((id) => mine.has(id)), adds, toIr);
+  const leaving = [...scenario.drops, ...send];
+  const toIr = scenario.ir.filter((id) => mine.has(id) && !onIr.has(id) && !taxi.has(id) && !leaving.includes(id));
+  const after = moveRoster(roster, leaving.filter((id) => mine.has(id)), [...adds, ...receive], toIr);
   const side = sideOf(roster, after, slots, week, value);
   problems.push(...overLimits(side.counts, limits));
 
-  return { mine: side, depth: depthTable(roster, after, rosters, week, value), problems };
+  // Received players join their new team's active roster, as Sleeper does.
+  const partner = them && send.length + receive.length > 0 ? sideOf(them, moveRoster(them, receive, send), slots, week, value) : null;
+  if (partner) problems.push(...overLimits(partner.counts, limits).map((p) => ({ ...p, partner: true as const })));
+
+  return { mine: side, partner, depth: depthTable(roster, after, rosters, week, value), problems };
 }
