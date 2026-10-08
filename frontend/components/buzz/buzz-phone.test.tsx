@@ -95,6 +95,12 @@ const bar = () => screen.getByRole("heading", { level: 1 });
 const drawer = () => within(screen.getByRole("dialog", { name: "Menu" }));
 
 describe("Buzz City phone", () => {
+  it("welcomes a member with Buzz City's directions, not XP's", async () => {
+    await renderPhone();
+    expect(screen.getByText(/in the menu, and search finds any team or player/)).toBeTruthy();
+    expect(screen.queryByText(/double-click/)).toBeNull();
+  });
+
   it("opens on Home under the bar, its hero a step below the bar's title", async () => {
     await renderPhone();
     expect(bar().textContent).toBe("CLT Dynasty");
