@@ -8,8 +8,9 @@ import { TeamLink } from "@/components/xp/TeamLink";
 import type { TaxiRequest } from "@/lib/api/taxi";
 import type { WindowParams } from "@/lib/desktop/windows";
 import type { Team } from "@/lib/league/use-league";
-import { type AtRisk, atRisk, stealTargets } from "@/lib/taxi/market";
-import { type TaxiEntry, useTaxiMarket } from "@/lib/taxi/use-taxi-market";
+import { usePlayerBoard } from "@/lib/players/use-player-board";
+import type { AtRisk } from "@/lib/taxi/market";
+import { type TaxiEntry, type TaxiMarket, useTaxiMarket } from "@/lib/taxi/use-taxi-market";
 import type { SleeperRoster } from "@/lib/sleeper/types";
 
 import "./players-page.css";
@@ -61,7 +62,8 @@ function StealRule() {
 }
 
 export function TaxiWindow({ params = {} }: { params?: WindowParams }) {
-  const { board, market, error, retry, added } = useTaxiMarket();
+  const board = usePlayerBoard(false);
+  const { market, error, retry, added } = useTaxiMarket(board);
   const { myRosterId: me, teamFor, data } = board;
 
   if (error) return <LoadError what="taxi squads" message={error} onRetry={retry} />;
@@ -78,14 +80,20 @@ export function TaxiWindow({ params = {} }: { params?: WindowParams }) {
         label="Taxi views"
         selected={params.tab ?? (me === null ? "all" : "targets")}
         tabs={[
-          { id: "targets", label: "Steal targets", panel: () => <Targets entries={market.entries} card={card} /> },
-          { id: "risk", label: "At risk on your taxi", panel: () => <Risks entries={market.entries} card={card} roster={board.rosters?.find((r) => r.roster_id === me)} slots={data.league.roster_positions.length} /> },
+          { id: "targets", label: "Steal targets", panel: () => <Targets market={market} card={card} /> },
+          {
+            id: "risk",
+            label: "At risk on your taxi",
+            panel: () => <Risks market={market} card={card} roster={board.rosters?.find((r) => r.roster_id === me)} slots={data.league.roster_positions.length} />,
+          },
           { id: "all", label: "All squads", panel: () => <Squads entries={market.entries} card={card} teamFor={teamFor} /> },
         ]}
       />
     </div>
   );
 }
+
+type Market = NonNullable<TaxiMarket["market"]>;
 
 interface CardBase {
   me: number | null;
@@ -95,16 +103,13 @@ interface CardBase {
   onRequested: (r: TaxiRequest) => void;
 }
 
-function Targets({ entries, card }: { entries: TaxiEntry[]; card: CardBase }) {
+function Targets({ market, card }: { market: Market; card: CardBase }) {
   if (card.me === null) return <p>Link your Sleeper account in Settings to price steals with the picks you hold.</p>;
-  const theirs = entries.filter((e) => e.player.rosterId !== card.me);
-  const priced = theirs.flatMap((e) => (e.mine ? [{ ...e, assessment: e.mine }] : []));
-  const targets = stealTargets(priced);
+  const { targets, priced } = market;
   const close = priced
     .filter((e) => !targets.includes(e))
     .sort((a, b) => b.assessment.ratio - a.assessment.ratio)
     .slice(0, 3);
-
   return (
     <div className="tx-sec">
       <p>
@@ -134,22 +139,18 @@ function Targets({ entries, card }: { entries: TaxiEntry[]; card: CardBase }) {
 }
 
 interface RisksProps {
-  entries: TaxiEntry[];
+  market: Market;
   card: CardBase;
   roster: SleeperRoster | undefined;
   // Starters plus bench: the active roster's size.
   slots: number;
 }
 
-function Risks({ entries, card, roster, slots }: RisksProps) {
+function Risks({ market, card, roster, slots }: RisksProps) {
   if (card.me === null || !roster) return <p>Link your Sleeper account in Settings to see which of your taxi players are at risk.</p>;
-  const mine = entries.filter((e) => e.player.rosterId === card.me);
+  const mine = market.entries.filter((e) => e.player.rosterId === card.me);
   if (mine.length === 0) return <p>Your taxi squad is empty.</p>;
-  const requested = new Set(mine.flatMap((e) => (e.request ? [e.player.id] : [])));
-  const risks = atRisk(
-    mine.flatMap((e) => (e.assessment ? [{ player: e.player, assessment: e.assessment, rounds: e.cost.rounds }] : [])),
-    requested,
-  );
+  const { risks } = market;
   const flagged = new Set(risks.map((r) => r.player.id));
   const safe = mine.filter((e) => !flagged.has(e.player.id));
   const apart = new Set([...(roster.taxi ?? []), ...(roster.reserve ?? [])]);

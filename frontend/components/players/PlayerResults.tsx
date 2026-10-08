@@ -38,9 +38,13 @@ interface PlayerResultsProps {
   worth: ((id: string) => Worth | null) | null;
   // The simulator's add or drop button for a row.
   action: ((r: PlayerRow) => ReactNode) | null;
+  // A taxi player's steal verdict, in place of the worth badge.
+  taxi: ((id: string) => ReactNode) | null;
 }
 
-export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, showRos, worth, action }: PlayerResultsProps) {
+export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, showRos, worth, action, taxi }: PlayerResultsProps) {
+  const rated = worth !== null || taxi !== null;
+  const badge = (id: string) => taxi?.(id) ?? (worth && <WorthBadge worth={worth(id)} />);
   const columns: Column[] = [
     { sort: "age", label: "Age", title: "Age", cell: (r) => (r.age === null ? "-" : String(r.age)) },
     { sort: "pts", label: "Pts", title: "Season points", cell: (r) => pts(r.pts) },
@@ -72,7 +76,7 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                 </button>
               </th>
             ))}
-            {worth && (
+            {rated && (
               <th scope="col" className="pl-col-worth">
                 For you
               </th>
@@ -98,11 +102,7 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                   {c.cell(r)}
                 </td>
               ))}
-              {worth && (
-                <td className="pl-col-worth">
-                  <WorthBadge worth={worth(r.id)} />
-                </td>
-              )}
+              {rated && <td className="pl-col-worth">{badge(r.id)}</td>}
               {action && <td className="pl-col-act">{action(r)}</td>}
             </tr>
           ))}
@@ -124,9 +124,9 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                 </div>
               ))}
             </dl>
-            {(worth || action) && (
+            {(rated || action) && (
               <div className="pl-card-foot">
-                {worth && <WorthBadge worth={worth(r.id)} />}
+                {badge(r.id)}
                 {action?.(r)}
               </div>
             )}

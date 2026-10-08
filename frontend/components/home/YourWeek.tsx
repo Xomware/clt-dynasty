@@ -21,6 +21,7 @@ import type { LeagueData } from "@/lib/league/use-league";
 import { teamLink } from "@/lib/team/links";
 import { ordinal, slotLabel } from "@/lib/team/team";
 import { HomeCard } from "./HomeCard";
+import { TaxiSteals } from "./TaxiSteals";
 
 // Sleeper owns lineups and moves. On a phone Sleeper sends this link on to
 // its app; on a computer it opens the team on sleeper.com.
@@ -36,7 +37,7 @@ interface YourWeekProps {
 
 // The signed-in member's to-do list for the week: their lineup against this
 // week's projections, free agents worth picking up and the Team Analyzer's
-// best trade ideas.
+// best trade ideas, and the taxi steals to make or guard against.
 export function YourWeek({ data, myRosterId, memberLoading }: YourWeekProps) {
   const unlinked = data !== null && !memberLoading && myRosterId === null;
   return (
@@ -53,6 +54,7 @@ export function YourWeek({ data, myRosterId, memberLoading }: YourWeekProps) {
           <LineupSection data={data} rosterId={memberLoading ? null : myRosterId} />
           <WaiverSection data={data} rosterId={memberLoading ? null : myRosterId} />
           <TradeSection rosterId={memberLoading ? null : myRosterId} />
+          <TaxiSteals rosterId={memberLoading ? null : myRosterId} />
         </div>
       )}
     </HomeCard>

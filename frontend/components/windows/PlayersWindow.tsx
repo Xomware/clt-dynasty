@@ -5,6 +5,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { PlayerList } from "@/components/players/PlayerList";
 import { ScenarioCompare } from "@/components/players/ScenarioCompare";
 import { Simulator } from "@/components/players/Simulator";
+import { taxiBadges } from "@/components/taxi/TaxiBadge";
 import { LoadError } from "@/components/xp/LoadError";
 import { Tabs } from "@/components/xp/Tabs";
 import { valueOf } from "@/lib/analyzer/values";
@@ -14,9 +15,11 @@ import { cleanQuery, decode, encode, readView, type View, writeView } from "@/li
 import { limitsOf, MOVE_KINDS, type MoveKind, moveCount, readScenario, type Scenario, type SimFor, simulate, writeScenario } from "@/lib/players/simulate";
 import { type PlayerBoard, usePlayerBoard } from "@/lib/players/use-player-board";
 import { eliteValue, type PlayerFacts, type Worth, worthFor } from "@/lib/players/worth";
+import { useTaxiMarket } from "@/lib/taxi/use-taxi-market";
 import { ViewParamsContext } from "@/lib/view-params";
 
 import "./players-page.css";
+import "./taxi.css";
 import "./settings.css";
 
 export function PlayersWindow({ params }: { params: WindowParams }) {
@@ -34,6 +37,8 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
   }, [v, params.v, setParams]);
 
   const worth = useWorth(board);
+  const { market } = useTaxiMarket(board);
+  const taxi = useMemo(() => (market ? taxiBadges(market, board.myRosterId) : null), [market, board.myRosterId]);
   const simFor = useSimulation(board);
 
   // A player is in the scenario once: adding a dropped player undoes the drop.
@@ -66,6 +71,7 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
                 query={query}
                 onQuery={setQuery}
                 worth={worth}
+                taxi={taxi}
                 scenario={scenario}
                 onToggle={toggle}
                 onSimulate={() => pick("sim")}
