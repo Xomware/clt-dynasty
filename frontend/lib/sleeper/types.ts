@@ -193,5 +193,5 @@ export interface SleeperProjection {
   player_id: string;
   team: string | null;
   stats: Record<string, number>;
-  player: { position?: string | null; injury_status?: string | null } | null;
+  player: { position?: string | null; fantasy_positions?: string[] | null; injury_status?: string | null } | null;
 }

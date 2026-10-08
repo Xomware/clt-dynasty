@@ -13,13 +13,13 @@ import type { PlayerWeek } from "@/lib/home/projections";
 import { useLineup } from "@/lib/home/use-lineup";
 import { usePlayers } from "@/lib/league/players";
 import type { LeagueData } from "@/lib/league/use-league";
+import { slotLabel } from "@/lib/team/team";
 import { HomeCard } from "./HomeCard";
 
 // Sleeper owns lineups and moves. On a phone Sleeper sends this link on to
 // its app; on a computer it opens the team on sleeper.com.
 export const SLEEPER_TEAM_URL = `https://sleeper.com/leagues/${LEAGUE_ID}/team`;
 
-const SLOT_LABEL: Record<string, string> = { SUPER_FLEX: "SFLX", FLEX: "FLEX" };
 const pts = (n: number) => n.toFixed(1);
 
 interface YourWeekProps {
@@ -129,7 +129,7 @@ function LineupBody({ check, player, name }: BodyProps) {
         <ul className="yw-list" aria-label="Suggested swaps">
           {check.swaps.map((s) => (
             <li key={s.in} className="yw-item" data-kind="swap">
-              <span className="yw-slot">{SLOT_LABEL[s.slot] ?? s.slot}</span>
+              <span className="yw-slot">{slotLabel(s.slot)}</span>
               <span className="yw-line">
                 {s.out ? (
                   <>
@@ -145,7 +145,7 @@ function LineupBody({ check, player, name }: BodyProps) {
                 {s.move && (
                   <span className="yw-why">
                     {" "}
-                    and slide {link(s.move.id)} to {SLOT_LABEL[s.move.to] ?? s.move.to}
+                    and slide {link(s.move.id)} to {slotLabel(s.move.to)}
                   </span>
                 )}
               </span>
@@ -157,7 +157,7 @@ function LineupBody({ check, player, name }: BodyProps) {
         <ul className="yw-list" aria-label="Lineup warnings">
           {warnings.map((s) => (
             <li key={`${s.slot}:${s.id}`} className="yw-item" data-kind="warn">
-              <span className="yw-slot">{SLOT_LABEL[s.slot] ?? s.slot}</span>
+              <span className="yw-slot">{slotLabel(s.slot)}</span>
               <span className="yw-line">
                 {s.id === null ? (
                   "Empty, and nobody on your bench can play it"

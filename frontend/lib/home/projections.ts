@@ -7,6 +7,8 @@ const OUT = new Set(["Out", "IR", "PUP", "Sus", "NA", "DNR", "COV"]);
 export interface PlayerWeek {
   points: number;
   position: string;
+  // Every position Sleeper lets him start at, the primary one first.
+  positions: string[];
   team: string | null;
   injury: string | null;
   bye: boolean;
@@ -44,9 +46,11 @@ export function weekBoard(
     const p = players[id];
     const team = row?.team ?? p?.team ?? null;
     const game = team ? playing.get(team) : undefined;
+    const position = (row?.player?.position ?? p?.position ?? "").toUpperCase();
     const w: PlayerWeek = {
       points: row ? scoreProjection(row.stats, scoring) : 0,
-      position: (row?.player?.position ?? p?.position ?? "").toUpperCase(),
+      position,
+      positions: [...new Set([position, ...(row?.player?.fantasy_positions ?? [])])],
       team,
       injury: row?.player?.injury_status || p?.injury_status || null,
       // Without a schedule nobody is on bye; the projection is still 0.

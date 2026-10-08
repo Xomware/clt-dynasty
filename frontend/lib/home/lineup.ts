@@ -46,7 +46,8 @@ export function checkLineup(slots: string[], starters: string[], bench: string[]
   const ids = slots.map((_, i) => (starters[i] && starters[i] !== "0" ? starters[i] : null));
   const starting = new Set(ids.filter((id): id is string => id !== null));
   const locked = (id: string | null) => id !== null && week(id).locked;
-  const pos = (id: string) => week(id).position;
+  // Sleeper's fantasy positions: a two-way player can start at either.
+  const fits = (slot: string, id: string) => week(id).positions.some((p) => canFill(slot, p));
 
   // The best lineup Sleeper allows. Locked starters stay put; the rest fill the
   // narrowest slots first, each with the best player left who can play it.
@@ -61,7 +62,7 @@ export function checkLineup(slots: string[], starters: string[], bench: string[]
   const order = slots.map((_, i) => i).filter((i) => best[i] === null);
   order.sort((a, b) => slotPositions(slots[a]).length - slotPositions(slots[b]).length);
   for (const i of order) {
-    const pick = pool.filter((id) => !used.has(id) && canFill(slots[i], pos(id))).sort(rank)[0];
+    const pick = pool.filter((id) => !used.has(id) && fits(slots[i], id)).sort(rank)[0];
     if (!pick) continue;
     best[i] = pick;
     used.add(pick);
@@ -75,12 +76,12 @@ export function checkLineup(slots: string[], starters: string[], bench: string[]
 
   const swaps: Swap[] = [];
   for (const id of entering) {
-    const at = Math.max(0, leaving.findIndex((d) => canFill(d.slot, pos(id))));
+    const at = Math.max(0, leaving.findIndex((d) => fits(d.slot, id)));
     const [d] = leaving.splice(at, 1);
     if (!d) break;
     const swap: Swap = { slot: d.slot, out: d.id, outPoints: d.points, in: id, inPoints: week(id).points };
-    if (!canFill(d.slot, pos(id))) {
-      const j = ids.findIndex((c, k) => c !== null && used.has(c) && canFill(slots[k], pos(id)) && canFill(d.slot, pos(c)));
+    if (!fits(d.slot, id)) {
+      const j = ids.findIndex((c, k) => c !== null && used.has(c) && fits(slots[k], id) && fits(d.slot, c));
       const slide = ids[j];
       if (slide) {
         swap.slot = slots[j];

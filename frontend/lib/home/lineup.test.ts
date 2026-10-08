@@ -8,10 +8,10 @@ import { type PlayerWeek, scoreProjection, weekBoard } from "./projections";
 const SLOTS = ["QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "FLEX", "SUPER_FLEX"];
 
 const healthy = { team: "CHA", injury: null, bye: false, locked: false };
-const board = (players: Record<string, Partial<PlayerWeek> & { position: string; points: number }>) => (id: string): PlayerWeek => ({
-  ...healthy,
-  ...(players[id] ?? { position: "", points: 0 }),
-});
+const board = (players: Record<string, Partial<PlayerWeek> & { position: string; points: number }>) => (id: string): PlayerWeek => {
+  const p = players[id] ?? { position: "", points: 0 };
+  return { ...healthy, positions: [p.position], ...p };
+};
 
 // Roster 4's week: one starter at every slot, a bench to swap from.
 const ROSTER_4 = {
@@ -82,6 +82,11 @@ describe("lineup check", () => {
   it("marks a doubtful starter without benching him for a lower projection", () => {
     const week = board({ ...ROSTER_4, wr1: { position: "WR", points: 14.0, injury: "Doubtful" }, bn1: { position: "WR", points: 5.0 } });
     expect(checkLineup(SLOTS, STARTERS_4, ["bn1"], week).starters.find((s) => s.id === "wr1")?.flags).toEqual(["doubtful"]);
+  });
+
+  it("starts a two-way player at any position Sleeper lists for him", () => {
+    const week = board({ ...ROSTER_4, bn1: { position: "DB", positions: ["DB", "WR"], points: 9.9 } });
+    expect(checkLineup(SLOTS, STARTERS_4, ["bn1"], week).swaps).toEqual([{ slot: "SUPER_FLEX", out: "sf1", outPoints: 7.9, in: "bn1", inPoints: 9.9 }]);
   });
 
   it("fills an empty slot from the bench", () => {
