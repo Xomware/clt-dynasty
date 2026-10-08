@@ -18,6 +18,7 @@ import { playerLink } from "@/lib/player/links";
 import "./nfl-field.css";
 
 export interface Owner {
+  rosterId: number;
   team: Team;
   mine: boolean;
 }
