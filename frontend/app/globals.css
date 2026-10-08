@@ -431,6 +431,14 @@
       table-layout: auto;
     }
 
+    /* Tabs wrap onto a second row, like XP's multi-row property sheets, rather
+       than scroll sideways with some of them out of sight. */
+    .xp-tab-strip {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      mask-image: none;
+    }
+
     /* A 44px hit area without growing the rows or the sentences drill links sit in. */
     .xp-drill {
       position: relative;

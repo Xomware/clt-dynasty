@@ -224,7 +224,7 @@ function LeagueRanks({ teams, mine }: ViewProps) {
         <span data-standing="below">Well below average</span>
       </p>
       <div className="xp-table-scroll">
-        <table className="xp-table analyzer-ranks">
+        <table className="xp-table xp-stack analyzer-ranks">
           <caption className="sr-only">Teams ranked by total roster value</caption>
           <thead>
             <tr>
@@ -241,19 +241,19 @@ function LeagueRanks({ teams, mine }: ViewProps) {
           <tbody>
             {byTotal(teams).map((t, i) => (
               <tr key={t.rosterId} data-mine={t.rosterId === mine || undefined}>
-                <td className="text-right tabular-nums">{i + 1}</td>
-                <td className="analyzer-team-col">
+                <td className="stack-lead text-right tabular-nums">{i + 1}</td>
+                <td className="stack-main analyzer-team-col">
                   <DrillLink to={teamLink(LEAGUE_ID, t.rosterId)} className="max-w-full">
                     <TeamName name={t.name} avatarUrl={t.avatarUrl} />
                   </DrillLink>
                   {t.rosterId === mine && <span className="sr-only"> (your team)</span>}
                 </td>
                 {AXES.map((a) => (
-                  <td key={a} className="text-right">
+                  <td key={a} className="text-right" data-label={a}>
                     <Value value={t.axes[a]} average={shape.average[a]} />
                   </td>
                 ))}
-                <td className="text-right font-bold tabular-nums">{fmt(t.total)}</td>
+                <td className="text-right font-bold tabular-nums" data-label="Total">{fmt(t.total)}</td>
               </tr>
             ))}
           </tbody>

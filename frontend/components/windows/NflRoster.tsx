@@ -68,7 +68,7 @@ export function NflRoster({ team, players, ownerOf, ranks }: NflRosterProps) {
 
   return (
     <div className="xp-table-scroll nfl-roster-scroll">
-      <table className="xp-table team-table nfl-roster">
+      <table className="xp-table xp-stack team-table nfl-roster">
         <caption className="sr-only">
           {team.city} {team.name} roster with season, week {ranks.week ?? ""} projection and dynasty ranks. Column headers sort.
         </caption>
@@ -79,7 +79,7 @@ export function NflRoster({ team, players, ownerOf, ranks }: NflRosterProps) {
             <th scope="col" className="nfl-roster-owner">
               CLT team
             </th>
-            {columns.map((c) => header(c, "nfl-roster-num"))}
+            {columns.map((c) => header(c, c.key.endsWith("Rank") ? "nfl-roster-num nfl-roster-rank" : "nfl-roster-num"))}
           </tr>
         </thead>
         <tbody>
@@ -88,11 +88,11 @@ export function NflRoster({ team, players, ownerOf, ranks }: NflRosterProps) {
             const owner = ownerOf(p.player_id);
             return (
               <tr key={p.player_id} data-sidelined={d && sidelined(d) ? "" : undefined}>
-                <td className="tabular-nums whitespace-nowrap">
+                <td className="stack-lead tabular-nums whitespace-nowrap">
                   {p.position}
                   {depth ?? <span className="sr-only"> off the chart</span>}
                 </td>
-                <td>
+                <td className="stack-main">
                   <span className="team-player">
                     <span className="nfl-roster-face" data-injured={d ? "" : undefined}>
                       <PlayerFace id={p.player_id} position={p.position} />
@@ -108,15 +108,15 @@ export function NflRoster({ team, players, ownerOf, ranks }: NflRosterProps) {
                     </span>
                   </span>
                 </td>
-                <td>
+                <td className="stack-wide">
                   {owner ? <TeamLink rosterId={owner.rosterId} {...owner.team} isMine={owner.mine} /> : <span className="nfl-fa">Free agent</span>}
                 </td>
-                <td className="nfl-roster-num">{fixed(r.season?.points)}</td>
-                <td className="nfl-roster-num">{r.season ? `${r.season.position}${r.season.rank}` : "-"}</td>
-                <td className="nfl-roster-num">{fixed(r.projected?.points)}</td>
-                <td className="nfl-roster-num">{r.projected ? `${r.projected.position}${r.projected.rank}` : "-"}</td>
-                <td className="nfl-roster-num">{r.dynasty ? r.dynasty.value.toLocaleString("en-US") : "-"}</td>
-                <td className="nfl-roster-num">{r.dynasty ? `${r.dynasty.position}${r.dynasty.rank}` : "-"}</td>
+                <td className="nfl-roster-num" data-label="Season">{fixed(r.season?.points)}</td>
+                <td className="nfl-roster-num" data-label="Rk">{r.season ? `${r.season.position}${r.season.rank}` : "-"}</td>
+                <td className="nfl-roster-num" data-label={`${wk} proj`}>{fixed(r.projected?.points)}</td>
+                <td className="nfl-roster-num" data-label="Rk">{r.projected ? `${r.projected.position}${r.projected.rank}` : "-"}</td>
+                <td className="nfl-roster-num" data-label="Dynasty">{r.dynasty ? r.dynasty.value.toLocaleString("en-US") : "-"}</td>
+                <td className="nfl-roster-num" data-label="Rk">{r.dynasty ? `${r.dynasty.position}${r.dynasty.rank}` : "-"}</td>
               </tr>
             );
           })}

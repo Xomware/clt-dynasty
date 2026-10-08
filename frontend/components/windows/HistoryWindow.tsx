@@ -76,7 +76,7 @@ function Standings({ seasons, myRosterId }: { seasons: Season[]; myRosterId: num
         </select>
       </div>
       <div className="xp-table-scroll">
-        <table className="xp-table">
+        <table className="xp-table xp-stack">
           <caption className="sr-only">{s.league.season} regular season standings</caption>
           <thead>
             <tr>
@@ -101,14 +101,14 @@ function Standings({ seasons, myRosterId }: { seasons: Season[]; myRosterId: num
           <tbody>
             {s.standings.map((row, i) => (
               <tr key={row.rosterId}>
-                <td className="tabular-nums">{i + 1}</td>
-                <td className="md:max-w-0">
+                <td className="stack-lead tabular-nums">{i + 1}</td>
+                <td className="stack-main md:max-w-0">
                   <TeamLink leagueId={s.league.league_id} rosterId={row.rosterId} {...seasonTeam(s, row.rosterId)} isMine={row.rosterId === myRosterId} />
                 </td>
-                <td className="tabular-nums">{record(row.wins, row.losses, row.ties)}</td>
-                <td className="text-right tabular-nums">{row.pf.toFixed(2)}</td>
-                <td className="standings-extra text-right tabular-nums">{row.pa.toFixed(2)}</td>
-                <td>{place(row.rosterId)}</td>
+                <td className="tabular-nums" data-label="W-L">{record(row.wins, row.losses, row.ties)}</td>
+                <td className="text-right tabular-nums" data-label="PF">{row.pf.toFixed(2)}</td>
+                <td className="standings-extra text-right tabular-nums" data-label="PA">{row.pa.toFixed(2)}</td>
+                <td data-label="Finish">{place(row.rosterId)}</td>
               </tr>
             ))}
           </tbody>
@@ -155,7 +155,7 @@ function Rivals({ games, rosterIds, teamFor, myRosterId }: RivalsProps) {
         <p>No finished games for this team yet.</p>
       ) : (
         <div className="xp-table-scroll">
-          <table className="xp-table">
+          <table className="xp-table xp-stack">
             <caption className="sr-only">{teamFor(pick).name} head-to-head</caption>
             <thead>
               <tr>
@@ -177,13 +177,13 @@ function Rivals({ games, rosterIds, teamFor, myRosterId }: RivalsProps) {
             <tbody>
               {rows.map((r) => (
                 <tr key={r.opponent}>
-                  <td className="md:max-w-0">
+                  <td className="stack-main md:max-w-0">
                     <TeamLink rosterId={r.opponent} {...teamFor(r.opponent)} isMine={r.opponent === myRosterId} />
                   </td>
-                  <td className="tabular-nums">{record(r.wins, r.losses, r.ties)}</td>
-                  <td className="text-right tabular-nums">{r.pf.toFixed(2)}</td>
-                  <td className="standings-extra text-right tabular-nums">{r.pa.toFixed(2)}</td>
-                  <td className="standings-extra text-right tabular-nums">{r.games}</td>
+                  <td className="tabular-nums" data-label="W-L">{record(r.wins, r.losses, r.ties)}</td>
+                  <td className="text-right tabular-nums" data-label="PF">{r.pf.toFixed(2)}</td>
+                  <td className="standings-extra text-right tabular-nums" data-label="PA">{r.pa.toFixed(2)}</td>
+                  <td className="standings-extra text-right tabular-nums" data-label="Games">{r.games}</td>
                 </tr>
               ))}
             </tbody>

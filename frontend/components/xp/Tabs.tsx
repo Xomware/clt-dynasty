@@ -30,7 +30,8 @@ export function Tabs({ label, tabs, selected: param }: TabsProps) {
   const strip = useRef<HTMLDivElement>(null);
   const [more, setMore] = useState({ start: false, end: false });
 
-  // A phone's strip scrolls sideways, fading at an edge while there is more that way.
+  // A narrow window's strip scrolls sideways, fading at an edge while there is
+  // more that way. A phone's wraps instead.
   const measure = () => {
     const el = strip.current;
     if (!el) return;
