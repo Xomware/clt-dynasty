@@ -190,17 +190,35 @@
   font-size: 1.0625rem;
 }
 
+/* Back names the screen it returns to, like Explorer's Back with its label. */
 .m-back {
-  display: grid;
+  display: inline-flex;
   flex: none;
-  place-items: center;
-  width: 2.75rem;
+  align-items: center;
+  gap: 0.125rem;
+  min-width: 2.75rem;
+  max-width: 36%;
   height: 2.75rem;
+  padding-right: 0.5rem;
   border-radius: 4px;
 }
 
-.m-back:hover {
-  background: rgb(255 255 255 / 0.15);
+.m-back svg {
+  flex: none;
+}
+
+.m-back-label {
+  overflow: hidden;
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Touch keeps :hover on the spot last tapped, which after Back is this button again. */
+@media (hover: hover) {
+  .m-back:hover {
+    background: rgb(255 255 255 / 0.15);
+  }
 }
 
 .m-back:active {

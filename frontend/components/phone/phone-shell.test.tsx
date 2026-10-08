@@ -102,9 +102,9 @@ describe("phone shell", () => {
     expect(screen.queryByRole("navigation", { name: "Programs" })).toBeNull();
     expect(window.location.search).toBe("?open=standings");
 
-    fireEvent.click(within(win).getByRole("button", { name: "Back" }));
+    fireEvent.click(within(win).getByRole("button", { name: /^Back to/ }));
     expect(await screen.findByRole("region", { name: "League" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
     await waitFor(() => expect(screen.getByRole("navigation", { name: "Programs" })).toBeTruthy());
     expect(window.location.search).toBe("");
   });
@@ -117,8 +117,19 @@ describe("phone shell", () => {
     expect(screen.getByRole("region", { name: "Team 6" })).toBeTruthy();
     expect(window.location.search).toBe("?open=team:6");
 
-    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
     expect(await screen.findByRole("region", { name: "League Standings" })).toBeTruthy();
+  });
+
+  it("names the screen Back returns to, kept as it was left", async () => {
+    await renderPhone();
+    openStandings();
+    const team = screen.getByRole("button", { name: "Team 6" });
+    fireEvent.click(team);
+    fireEvent.click(screen.getByRole("button", { name: "Back to League Standings" }));
+    expect(await screen.findByRole("region", { name: "League Standings" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Team 6" })).toBe(team);
+    expect(document.activeElement).toBe(team);
   });
 
   it("goes straight home from Start", async () => {
@@ -149,7 +160,7 @@ describe("phone shell", () => {
     mount();
     expect(await screen.findByRole("region", { name: "Team 3" })).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
     expect(screen.getByRole("navigation", { name: "Programs" })).toBeTruthy();
     expect(window.location.search).toBe("");
   });
