@@ -60,4 +60,16 @@ describe("useAfterIntro", () => {
     await act(async () => intro.remove());
     expect(screen.getByText("go")).toBeTruthy();
   });
+
+  it("goes as soon as the intro starts to leave", async () => {
+    const intro = Object.assign(document.createElement("div"), { className: "bzi" });
+    intro.getClientRects = () => [new DOMRect(0, 0, 10, 10)] as unknown as DOMRectList;
+    intro.setAttribute("data-phase", "play");
+    document.body.append(intro);
+    render(<Gate />);
+    expect(screen.getByText("wait")).toBeTruthy();
+
+    await act(async () => intro.setAttribute("data-phase", "leave"));
+    expect(screen.getByText("go")).toBeTruthy();
+  });
 });

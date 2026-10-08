@@ -91,6 +91,17 @@ describe("BuzzIntro", () => {
     expect(key.container.querySelector(".bzi")?.getAttribute("data-phase")).toBe("skip");
   });
 
+  it("turns to leave as the slats start to clear, and can still be skipped", () => {
+    const { container } = render(<BuzzIntro />);
+    const stage = container.querySelector(".bzi")!;
+    const start = Object.assign(new Event("webkitAnimationStart", { bubbles: true }), { animationName: "bzi-slat-up" });
+    act(() => void container.querySelector(".bzi-slats i")!.dispatchEvent(start));
+    expect(stage.getAttribute("data-phase")).toBe("leave");
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(stage.getAttribute("data-phase")).toBe("skip");
+  });
+
   it("uncovers the page even if no animation event ever comes", () => {
     vi.useFakeTimers();
     const { container } = render(<BuzzIntro />);
