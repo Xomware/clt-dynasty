@@ -353,10 +353,116 @@
   outline-offset: 2px;
 }
 
+/* Motion, kept to what XP itself did. The Welcome screen's bands slide in and
+   its tiles settle once the first-load intro has gone (data-go); each window
+   opens as it scrolls into view (data-in), until then held on its first frame.
+   Entrances fill backwards only, so hover styles are free once they finish. */
+.landing:not([data-go]) :is(.landing-hero, .landing-hero *),
+.landing :is(.xp-window, .landing-cta):not([data-in]) {
+  animation-play-state: paused;
+}
+
+.landing-hero-top {
+  animation: landing-band-down 0.35s ease-out backwards;
+}
+
+.landing-hero .xp-logon-foot {
+  animation: landing-band-up 0.35s ease-out backwards;
+}
+
+.landing-hero .xp-logon-brand {
+  animation: landing-fade 0.45s ease-out 0.2s backwards;
+}
+
+.landing-hero .xp-logon-seal {
+  animation: landing-seal 0.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) 0.25s backwards;
+}
+
+.landing-hero .xp-logon-panel > * {
+  animation: landing-tile 0.3s ease-out backwards;
+}
+
+.landing-hero .xp-logon-panel > :nth-child(1) {
+  animation-delay: 0.35s;
+}
+
+.landing-hero .xp-logon-panel > :nth-child(2) {
+  animation-delay: 0.45s;
+}
+
+.landing-hero .xp-logon-panel > :nth-child(n + 3) {
+  animation-delay: 0.55s;
+}
+
+/* A window opening: up from below and out from a little smaller, quickly. */
+.landing .xp-window {
+  transform-origin: 50% 100%;
+  animation: landing-window-open 0.26s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+
+.landing-cta {
+  animation: landing-fade 0.4s ease-out backwards;
+}
+
+.landing-balloon[data-leaving] .xp-balloon {
+  animation: landing-balloon-out 0.2s ease-in forwards;
+}
+
+@keyframes landing-band-down {
+  from {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes landing-band-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes landing-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes landing-seal {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes landing-tile {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+@keyframes landing-window-open {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.9);
+  }
+}
+
+@keyframes landing-balloon-out {
+  to {
+    opacity: 0;
+    transform: translateY(0.375rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-cue-chevron,
   .landing-live-dot,
-  .landing-skeleton span {
-    animation: none;
+  .landing-skeleton span,
+  .landing-hero *,
+  .landing .xp-window,
+  .landing-cta,
+  .landing-balloon .xp-balloon {
+    /* Important: the hero's own rules out-rank these selectors. */
+    animation: none !important;
   }
 }
