@@ -5,7 +5,7 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { BrandMark } from "@/components/buzz/BrandMark";
-import { BackArrowIcon, FolderIcon, HomeIcon, JerseyIcon, ScoresIcon, SearchIcon, StandingsIcon } from "@/components/xp/icons";
+import { BackArrowIcon, FolderIcon, HomeIcon, PlayersIcon, ScoresIcon, SearchIcon, StandingsIcon } from "@/components/xp/icons";
 import { SpeakerToggle } from "@/components/xp/SpeakerToggle";
 import { useAuth } from "@/lib/auth/use-auth";
 import type { WindowLink } from "@/lib/desktop/deep-link";
@@ -21,12 +21,12 @@ import { ViewParamsContext } from "@/lib/view-params";
 
 import "./phone.css";
 
-// The taskbar's quick launch beside Start. Players opens NFL player search until the Players page lands.
+// The taskbar's quick launch beside Start.
 const TABS: { link: WindowLink; label: string; Icon: typeof HomeIcon }[] = [
   { link: { kind: "home", params: {} }, label: "Home", Icon: HomeIcon },
   { link: { kind: "scores", params: {} }, label: "Scores", Icon: ScoresIcon },
   { link: { kind: "standings", params: {} }, label: "Standings", Icon: StandingsIcon },
-  { link: { kind: "search", params: { mode: "nfl" } }, label: "Players", Icon: JerseyIcon },
+  { link: { kind: "players", params: {} }, label: "Players", Icon: PlayersIcon },
 ];
 
 const SEARCH: WindowLink = { kind: "search", params: {} };

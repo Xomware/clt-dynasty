@@ -30,12 +30,11 @@ import { BuzzTicker } from "./BuzzTicker";
 import "./buzz.css";
 import "./buzz-skin.css";
 
-// Players opens NFL player search until the Players page lands.
 const TABS: { link: WindowLink; label: string; d: string }[] = [
   { link: { kind: "home", params: {} }, label: "Home", d: LINE.home },
   { link: { kind: "scores", params: {} }, label: "Scores", d: LINE.scores },
   { link: { kind: "standings", params: {} }, label: "Standings", d: LINE.standings },
-  { link: { kind: "search", params: { mode: "nfl" } }, label: "Players", d: LINE.player },
+  { link: { kind: "players", params: {} }, label: "Players", d: LINE.player },
 ];
 
 type SheetName = "more" | "account";
