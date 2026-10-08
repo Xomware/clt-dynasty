@@ -1,18 +1,22 @@
 "use client";
 
-import { type MouseEvent, type ReactNode, useCallback, useId, useLayoutEffect, useRef, useState } from "react";
+import { type MouseEvent, useCallback, useId, useLayoutEffect, useRef, useState } from "react";
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { REVEAL, useReveal } from "@/components/motion/use-reveal";
-import { DrawerNav } from "./DrawerNav";
+import { TeamAvatar } from "@/components/xp/TeamAvatar";
+import { AccountNav } from "./AccountNav";
 import { LINE, LineIcon } from "./line-icons";
-import { MenuDrawer } from "./MenuDrawer";
+import { MoreNav } from "./MoreNav";
 import { Related } from "./Related";
+import { Sheet } from "./Sheet";
 import { Spotlight } from "./Spotlight";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY, useLaunchers, useWindowTitle } from "@/lib/desktop/registry";
-import { viewKey, windowId, type WindowParams } from "@/lib/desktop/windows";
+import { viewKey, type WindowParams } from "@/lib/desktop/windows";
+import { useLeague } from "@/lib/league/use-league";
+import { useMember } from "@/lib/member/use-member";
 import { ViewLabelContext } from "@/lib/nav/label";
 import { useOpeners } from "@/lib/nav/openers";
 import { useEdgeSwipe } from "@/lib/phone/use-edge-swipe";
@@ -22,26 +26,33 @@ import { BODIES } from "./bodies";
 import { BrandMark } from "./BrandMark";
 import { BuzzHome } from "./BuzzHome";
 import { BuzzTicker } from "./BuzzTicker";
-import { type Crumb, Crumbs } from "./Crumbs";
 
 import "./buzz.css";
 import "./buzz-skin.css";
 
-const TABS = [
-  { kind: "home", label: "Home", d: LINE.home },
-  { kind: "scores", label: "Scores", d: LINE.scores },
-  { kind: "standings", label: "Standings", d: LINE.standings },
-  { kind: "playoffs", label: "Playoffs", d: LINE.bracket },
-  { kind: "my-team", label: "My Team", d: LINE.star },
-] as const;
+// Players opens NFL player search until the Players page lands.
+const TABS: { link: WindowLink; label: string; d: string }[] = [
+  { link: { kind: "home", params: {} }, label: "Home", d: LINE.home },
+  { link: { kind: "scores", params: {} }, label: "Scores", d: LINE.scores },
+  { link: { kind: "standings", params: {} }, label: "Standings", d: LINE.standings },
+  { link: { kind: "search", params: { mode: "nfl" } }, label: "Players", d: LINE.player },
+];
+
+type SheetName = "more" | "account";
 
 // Buzz City on a phone: Home under a short arena bar, every other page stacked
-// over it, the weekly pages on a tab bar and the groups in a menu drawer. Same
-// stack and history as the XP phone.
+// over it with one Back row, four destinations and More on a tab bar, the
+// groups in More's sheet and the member's own pages in the account sheet.
+// Same stack and history as the XP phone.
 export function BuzzPhone() {
-  const { stack, top, open, back, patch, home, unwind, setLabel, labelAt } = usePhoneStack();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { stack, top, open, back, patch, home, setLabel, labelAt } = usePhoneStack();
+  const [sheet, setSheet] = useState<SheetName | null>(null);
+  // What the sheet holds, kept while it slides away closed.
+  const [held, setHeld] = useState<SheetName>("more");
   const [searching, setSearching] = useState(false);
+  const { state } = useMember();
+  const { teamFor, myRosterId } = useLeague();
+  const name = state.status === "member" ? state.me.member.displayName : "";
   const windowTitle = useWindowTitle();
   const launchers = useLaunchers();
   const heading = useRef<HTMLHeadingElement>(null);
@@ -51,11 +62,13 @@ export function BuzzPhone() {
   // A push slides the new screen in from the right; Back brings the last one in from the left.
   const [depth, setDepth] = useState({ at: stack.length, dir: "in" });
   if (depth.at !== stack.length) setDepth({ at: stack.length, dir: stack.length > depth.at ? "next" : "back" });
-  const drawerId = useId();
+  const sheetId = useId();
   // The bar is narrow, so it names what the screen shows: the team, not "Team Profile - team".
   const title = top ? labelAt(stack.length) : "CLT Dynasty";
   const current = top?.kind ?? "home";
-  const tabs = TABS.filter((t) => t.kind === "home" || launchers.some((l) => l.kind === t.kind));
+  const tabs = TABS.filter((t) => t.link.kind === "home" || launchers.some((l) => l.kind === t.link.kind));
+  // A page off the tab bar files under More.
+  const onTab = tabs.some((t) => t.link.kind === current);
   const backTo = labelAt(stack.length - 1);
   useEdgeSwipe(main, stack.length, back);
 
@@ -75,51 +88,54 @@ export function BuzzPhone() {
     open(to);
   };
   const toTab = (to: WindowLink) => (to.kind === "home" ? home() : go(to));
-  const fromMenu = (to: WindowLink) => {
-    setMenuOpen(false);
+  const show = (which: SheetName) => {
+    setHeld(which);
+    setSheet(which);
+  };
+  const fromSheet = (to: WindowLink) => {
+    setSheet(null);
     toTab(to);
   };
-  // Safari never focuses a tapped button, and the drawer and Spotlight hand focus back to it.
-  const opener = (show: () => void) => (e: MouseEvent<HTMLButtonElement>) => {
+  // Safari never focuses a tapped button, and the sheets and Spotlight hand focus back to it.
+  const opener = (run: () => void) => (e: MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.focus();
-    show();
+    run();
   };
-  // The screens behind this one. Three deep or more, the path sits over the
-  // page too, Home first; the Back label covers anything shallower.
-  const crumbs: Crumb[] = stack.slice(0, -1).map((v, i) => ({ label: labelAt(i + 1), href: `/?open=${windowId(v.kind, v.params)}`, onSelect: () => unwind(i + 1) }));
   const kept = stack.map((view, i) => ({ view, at: i + 1 })).slice(-PHONE_KEEP);
 
   return (
     <div className="buzz bz-phone">
       <i className="bz-backdrop" aria-hidden />
-      <header className="bz-bar">
-        {top ? (
-          <button type="button" className="bz-bar-back" onClick={back}>
-            <LineIcon d={LINE.back} size={22} />
-            {/* The space outside the spans: a name trims each child's text. */}
-            <span className="sr-only">Back to</span> <span className="truncate">{backTo}</span>
+      <div className="bz-phone-top">
+        <header className="bz-bar">
+          <button type="button" className="bz-bar-home" aria-label="CLT Dynasty, home" onClick={home}>
+            <BrandMark mark="monogram" alt="" className="bz-bar-mark" priority />
           </button>
-        ) : (
-          <BrandMark mark="monogram" alt="" className="bz-bar-mark" priority />
+          <h1 ref={heading} tabIndex={-1} className="bz-bar-title">
+            {title}
+          </h1>
+          <button type="button" className="bz-icon" aria-label="Search" onClick={opener(() => setSearching(true))}>
+            <LineIcon d={LINE.search} />
+          </button>
+          <button
+            type="button"
+            className="bz-icon bz-account"
+            aria-label="Account"
+            aria-haspopup="dialog"
+            aria-expanded={sheet === "account"}
+            aria-controls={sheetId}
+            onClick={opener(() => show("account"))}
+          >
+            <TeamAvatar name={name || "Account"} url={myRosterId === null ? null : teamFor(myRosterId).avatarUrl} size={30} className="u-avatar" />
+          </button>
+        </header>
+        {top && (
+          <button type="button" className="bz-backrow" onClick={back}>
+            <LineIcon d={LINE.back} size={18} />
+            <span className="truncate">Back to {backTo}</span>
+          </button>
         )}
-        <h1 ref={heading} tabIndex={-1} className="bz-bar-title">
-          {title}
-        </h1>
-        <button type="button" className="bz-icon" aria-label="Search" onClick={opener(() => setSearching(true))}>
-          <LineIcon d={LINE.search} />
-        </button>
-        <button
-          type="button"
-          className="bz-icon"
-          aria-label="Menu"
-          aria-haspopup="dialog"
-          aria-expanded={menuOpen}
-          aria-controls={drawerId}
-          onClick={opener(() => setMenuOpen(true))}
-        >
-          <LineIcon d={LINE.menu} />
-        </button>
-      </header>
+      </div>
       <DrillContext value={go}>
         {!top && <BuzzTicker />}
         <NavigateContext value={go}>
@@ -137,7 +153,6 @@ export function BuzzPhone() {
                 current={at === stack.length}
                 dir={depth.dir}
                 title={windowTitle(view)}
-                crumbs={crumbs.length > 1 ? <Crumbs items={[{ label: "Home", href: "/", onSelect: home }, ...crumbs]} here={labelAt(at)} className="bz-crumbs-phone" /> : null}
                 onPatch={patch}
                 onNav={go}
                 setLabel={setLabel}
@@ -146,23 +161,34 @@ export function BuzzPhone() {
           </main>
         </NavigateContext>
       </DrillContext>
-      <nav aria-label="Quick" className="bz-dock">
+      <nav aria-label="Primary" className="bz-dock">
         {tabs.map((t) => (
           <button
-            key={t.kind}
+            key={t.label}
             type="button"
-            aria-current={t.kind === current ? "page" : undefined}
-            onClick={() => toTab({ kind: t.kind, params: {} })}
+            aria-current={t.link.kind === current && !sheet ? "page" : undefined}
+            onClick={() => toTab(t.link)}
           >
             <LineIcon d={t.d} size={22} />
             <span>{t.label}</span>
           </button>
         ))}
+        <button
+          type="button"
+          aria-current={(!onTab && !sheet) || sheet === "more" ? "page" : undefined}
+          aria-haspopup="dialog"
+          aria-expanded={sheet === "more"}
+          aria-controls={sheetId}
+          onClick={opener(() => show("more"))}
+        >
+          <LineIcon d={LINE.more} size={22} />
+          <span>More</span>
+        </button>
       </nav>
       {searching && <Spotlight onClose={() => setSearching(false)} onGo={go} />}
-      <MenuDrawer id={drawerId} open={menuOpen} onClose={() => setMenuOpen(false)}>
-        <DrawerNav current={top} onGo={fromMenu} />
-      </MenuDrawer>
+      <Sheet id={sheetId} label={held === "account" ? "Account" : "More"} open={sheet !== null} onClose={() => setSheet(null)}>
+        {held === "account" ? <AccountNav current={top} onGo={fromSheet} /> : <MoreNav current={top} onGo={fromSheet} />}
+      </Sheet>
     </div>
   );
 }
@@ -173,7 +199,6 @@ interface PhoneScreenProps {
   current: boolean;
   dir: string;
   title: string;
-  crumbs: ReactNode;
   onPatch: (params: WindowParams) => void;
   onNav: (to: WindowLink) => void;
   setLabel: (depth: number, label: string | null) => void;
@@ -181,12 +206,11 @@ interface PhoneScreenProps {
 
 // One screen of the stack. The ones under the top stay mounted but hidden, so
 // Back shows them as they were left.
-function PhoneScreen({ view, at, current, dir, title, crumbs, onPatch, onNav, setLabel }: PhoneScreenProps) {
+function PhoneScreen({ view, at, current, dir, title, onPatch, onNav, setLabel }: PhoneScreenProps) {
   const Page = BODIES[view.kind] ?? REGISTRY[view.kind].component;
   const label = useCallback((l: string | null) => setLabel(at, l), [at, setLabel]);
   return (
     <div className="bz-route" data-dir={dir} data-restored={(current && dir === "back") || undefined} hidden={!current}>
-      {current && crumbs}
       <ViewLabelContext value={label}>
         <section aria-label={title} className="bz-panel" data-kind={view.kind}>
           <WindowBoundary>

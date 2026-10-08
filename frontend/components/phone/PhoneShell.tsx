@@ -5,12 +5,12 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { BrandMark } from "@/components/buzz/BrandMark";
-import { BackArrowIcon, FolderIcon } from "@/components/xp/icons";
+import { BackArrowIcon, FolderIcon, HomeIcon, JerseyIcon, ScoresIcon, SearchIcon, StandingsIcon } from "@/components/xp/icons";
 import { SpeakerToggle } from "@/components/xp/SpeakerToggle";
 import { useAuth } from "@/lib/auth/use-auth";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
-import { REGISTRY, useLauncherGroups, useWindowTitle } from "@/lib/desktop/registry";
+import { REGISTRY, useLauncherGroups, useLaunchers, useWindowTitle } from "@/lib/desktop/registry";
 import { viewKey, type WindowParams } from "@/lib/desktop/windows";
 import { useMember } from "@/lib/member/use-member";
 import { ViewLabelContext } from "@/lib/nav/label";
@@ -21,7 +21,18 @@ import { ViewParamsContext } from "@/lib/view-params";
 
 import "./phone.css";
 
-// One column: the program list, and any window opened full-screen over it.
+// The taskbar's quick launch beside Start. Players opens NFL player search until the Players page lands.
+const TABS: { link: WindowLink; label: string; Icon: typeof HomeIcon }[] = [
+  { link: { kind: "home", params: {} }, label: "Home", Icon: HomeIcon },
+  { link: { kind: "scores", params: {} }, label: "Scores", Icon: ScoresIcon },
+  { link: { kind: "standings", params: {} }, label: "Standings", Icon: StandingsIcon },
+  { link: { kind: "search", params: { mode: "nfl" } }, label: "Players", Icon: JerseyIcon },
+];
+
+const SEARCH: WindowLink = { kind: "search", params: {} };
+
+// One column: the program list, and any window opened full-screen over it,
+// with Start and four destinations on the taskbar.
 export function PhoneShell() {
   const { state } = useMember();
   const { signOut } = useAuth();
@@ -30,6 +41,8 @@ export function PhoneShell() {
   const screens = useRef<HTMLDivElement>(null);
   const openers = useOpeners(screens);
   const shown = useRef(stack.length);
+  const launchers = useLaunchers();
+  const tabs = TABS.filter((t) => launchers.some((l) => l.kind === t.link.kind));
   useEdgeSwipe(screens, stack.length, back);
 
   // A new screen's title takes focus; Back hands it to the row or link that
@@ -44,6 +57,7 @@ export function PhoneShell() {
   }, [stack.length, openers]);
 
   const go = (to: WindowLink) => {
+    if (top && viewKey(to.kind, to.params) === viewKey(top.kind, top.params)) return;
     openers.leave(stack.length);
     open(to);
   };
@@ -59,11 +73,18 @@ export function PhoneShell() {
             <h1 tabIndex={-1} className="m-bar-title">
               CLT Dynasty League
             </h1>
+            <SearchButton onSearch={() => go(SEARCH)} />
           </header>
           <Programs onOpen={go} />
           <section className="m-account m-theme" aria-label="Theme">
             <span>Theme</span>
             <ThemeToggle />
+          </section>
+          <section className="m-account m-theme" aria-label="Sound">
+            <span>Sound</span>
+            <span className="xp-tray">
+              <SpeakerToggle />
+            </span>
           </section>
           <AdminPrograms onOpen={go} />
           <section className="m-account" aria-label="Account">
@@ -82,25 +103,30 @@ export function PhoneShell() {
             backTo={labelAt(at - 1)}
             onBack={back}
             onNavigate={go}
+            onSearch={() => go(SEARCH)}
             onPatch={patch}
             setLabel={setLabel}
           />
         ))}
       </div>
-      <footer className="m-taskbar">
-        <button
-          type="button"
-          className="xp-start"
-          aria-label="Start: all programs"
-          onClick={() => (top ? home() : window.scrollTo(0, 0))}
-        >
+      <nav className="m-taskbar" aria-label="Taskbar">
+        <button type="button" className="xp-start" aria-label="Start: all programs" aria-current={top ? undefined : "page"} onClick={() => (top ? home() : window.scrollTo(0, 0))}>
           <BrandMark mark="crown" alt="" height={18} className="flex-none" />
           start
         </button>
-        <span className="xp-tray">
-          <SpeakerToggle />
-        </span>
-      </footer>
+        {tabs.map(({ link, label, Icon }) => (
+          <button
+            key={label}
+            type="button"
+            className="m-task"
+            aria-current={top?.kind === link.kind ? "page" : undefined}
+            onClick={() => go(link)}
+          >
+            <Icon width={22} height={22} />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
     </DrillContext>
   );
 }
@@ -166,6 +192,14 @@ const ChevronGlyph = () => (
   </svg>
 );
 
+function SearchButton({ onSearch }: { onSearch: () => void }) {
+  return (
+    <button type="button" className="m-search" aria-label="Search" onClick={onSearch}>
+      <SearchIcon width={26} height={26} />
+    </button>
+  );
+}
+
 interface PhoneWindowProps {
   view: WindowLink;
   at: number;
@@ -173,6 +207,7 @@ interface PhoneWindowProps {
   backTo: string;
   onBack: () => void;
   onNavigate: (to: WindowLink) => void;
+  onSearch: () => void;
   onPatch: (params: WindowParams) => void;
   setLabel: (depth: number, label: string | null) => void;
 }
@@ -180,7 +215,7 @@ interface PhoneWindowProps {
 // A screen under the top one never changes its own link.
 const ignore = () => {};
 
-function PhoneWindow({ view, at, current, backTo, onBack, onNavigate, onPatch, setLabel }: PhoneWindowProps) {
+function PhoneWindow({ view, at, current, backTo, onBack, onNavigate, onSearch, onPatch, setLabel }: PhoneWindowProps) {
   const { Icon, component: Body } = REGISTRY[view.kind];
   const title = useWindowTitle()(view);
   const label = useCallback((l: string | null) => setLabel(at, l), [at, setLabel]);
@@ -197,6 +232,7 @@ function PhoneWindow({ view, at, current, backTo, onBack, onNavigate, onPatch, s
         <h1 tabIndex={-1} className="xp-titlebar-text">
           {title}
         </h1>
+        {view.kind !== "search" && <SearchButton onSearch={onSearch} />}
       </header>
       <div className="xp-window-body m-window-body">
         <WindowBoundary>
