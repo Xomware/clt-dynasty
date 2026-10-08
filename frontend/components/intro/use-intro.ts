@@ -19,9 +19,11 @@ const noSubscribe = () => () => {};
  * When a server-rendered intro overlay goes: on its own `exit` animation,
  * after a Skip (click, tap or Escape) fades it, or at the fallback. `playing`
  * is false for an intro that isn't this visitor's, which then renders nothing.
+ * The phase turns "leave" when the `leave` animation starts (the overlay
+ * beginning to uncover the page), so the page can start its entrance under it.
  */
-export function useIntro(playing: boolean, exit: string) {
-  const [phase, setPhase] = useState<"play" | "skip" | "done">("play");
+export function useIntro(playing: boolean, exit: string, leave: string) {
+  const [phase, setPhase] = useState<"play" | "leave" | "skip" | "done">("play");
   const hidden = useSyncExternalStore(noSubscribe, hiddenByHead, () => false);
   const live = playing && !hidden;
 
@@ -29,7 +31,7 @@ export function useIntro(playing: boolean, exit: string) {
     markSeen();
     setPhase("done");
   }, []);
-  const skip = useCallback(() => setPhase((p) => (p === "play" ? "skip" : p)), []);
+  const skip = useCallback(() => setPhase((p) => (p === "play" || p === "leave" ? "skip" : p)), []);
 
   useEffect(() => {
     if (!live) return;
@@ -52,5 +54,9 @@ export function useIntro(playing: boolean, exit: string) {
     if (e.target === e.currentTarget && e.animationName.startsWith(exit)) finish();
   };
 
-  return { shown: live && phase !== "done", phase, skip, onAnimationEnd };
+  const onAnimationStart = (e: AnimationEvent) => {
+    if (e.animationName === leave) setPhase((p) => (p === "play" ? "leave" : p));
+  };
+
+  return { shown: live && phase !== "done", phase, skip, onAnimationStart, onAnimationEnd };
 }

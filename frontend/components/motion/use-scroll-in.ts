@@ -3,12 +3,16 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 
 // A first-load intro still covering the screen. Each theme prerenders its own
-// and CSS hides the other, so only a box that renders counts.
-const introPlaying = () => [...document.querySelectorAll(".intro, .bzi")].some((el) => el.getClientRects().length > 0);
+// and CSS hides the other, so only a box that renders counts. Once it starts
+// uncovering the page (data-phase leave, or a Skip's fade) the page may move.
+const introPlaying = () =>
+  [...document.querySelectorAll(".intro, .bzi")].some(
+    (el) => el.getClientRects().length > 0 && !["leave", "skip"].includes(el.getAttribute("data-phase") ?? ""),
+  );
 
 function subscribe(onChange: () => void) {
   const watch = new MutationObserver(onChange);
-  watch.observe(document.body, { childList: true });
+  watch.observe(document.body, { childList: true, subtree: true, attributeFilter: ["data-phase"] });
   return () => watch.disconnect();
 }
 

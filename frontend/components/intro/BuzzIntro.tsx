@@ -57,7 +57,9 @@ const STREAKS = Array.from({ length: 10 }, (_, i) => (i / 10) * 360 + 9);
 export function BuzzIntro() {
   // Undefined while hydrating: keep the prerendered stage until the theme is known.
   const theme = useStoredTheme();
-  const { shown, phase, skip, onAnimationEnd } = useIntro(theme === undefined || theme === "buzz", "bzi-exit");
+  // The page starts its entrance as the slats start to clear, so its own lockup
+  // is landing as they go.
+  const { shown, phase, skip, onAnimationStart, onAnimationEnd } = useIntro(theme === undefined || theme === "buzz", "bzi-exit", "bzi-slat-up");
   const stage = useRef<HTMLDivElement>(null);
 
   // WebKit decodes an image the first time it paints, which for the lockup is
@@ -73,7 +75,15 @@ export function BuzzIntro() {
   return (
     // Skips on click, not pointerdown: a tap's click would otherwise land on
     // whatever the overlay was covering.
-    <div ref={stage} className="bzi" data-phase={phase} onClick={skip} onAnimationEnd={onAnimationEnd} style={flightVars}>
+    <div
+      ref={stage}
+      className="bzi"
+      data-phase={phase}
+      onClick={skip}
+      onAnimationStart={onAnimationStart}
+      onAnimationEnd={onAnimationEnd}
+      style={flightVars}
+    >
       <div className="bzi-slats" aria-hidden>
         {Array.from({ length: 8 }, (_, n) => (
           <i key={n} style={{ "--n": n } as CSSProperties} />

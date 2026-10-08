@@ -8,7 +8,8 @@
          shockwave, a flash, and the board blinks
    2.62  the FANTASY FOOTBALL ribbon unfurls from the centre; 2.95 a strip of tape
    3.0   a glint across the lockup
-   3.55  board and lockup fade; 3.62 the slats wipe away, alternately up and down
+   3.5   the slats start to wipe away, alternately up and down, and the page's
+         own entrance starts under them; 3.55 board and lockup fade
    4.15  the overlay's own exit, which is the clock the component waits on
    Every element's resting style is its finished frame with the slats still
    down, and each keyframe opens from its first. With animation off (reduced
@@ -103,7 +104,7 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
     var(--bz-road);
   animation:
     bzi-slat-in 0.4s cubic-bezier(0.6, 0, 0.3, 1.1) calc(0.05s + var(--n) * 0.04s) both,
-    bzi-slat-up 0.36s cubic-bezier(0.6, 0, 0.4, 1) calc(3.62s + var(--n) * 0.035s) forwards;
+    bzi-slat-up 0.4s cubic-bezier(0.3, 0, 0.3, 1) calc(3.5s + var(--n) * 0.035s) forwards;
 }
 
 .bzi-slats i:nth-child(even) {
@@ -730,6 +731,13 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
 .bzi-skip:focus-visible {
   outline: 3px solid var(--bz-focus);
   outline-offset: 3px;
+}
+
+/* A signed-in page mounted under the intro (Home, or a linked page) holds its
+   entrance on the first frame until the slats start to clear (phase leave),
+   so it plays where it can be seen. The landing gates itself the same way in JS. */
+html:not([data-intro="skip"]) body:has(> .bzi[data-phase="play"]) :is(.bz-route, .bz-route *) {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {

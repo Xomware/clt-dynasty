@@ -19,13 +19,13 @@ const SPARKS = Array.from({ length: 12 }, (_, i) => {
 // drives every beat. This component only decides when to remove it. Buzz City
 // has its own intro, and CSS hides this one under it before hydration.
 export function Intro() {
-  const { shown, phase, skip, onAnimationEnd } = useIntro(useStoredTheme() !== "buzz", "intro-exit");
+  const { shown, phase, skip, onAnimationStart, onAnimationEnd } = useIntro(useStoredTheme() !== "buzz", "intro-exit", "intro-exit");
   if (!shown) return null;
 
   return (
     // Skips on click, not pointerdown: a tap's click would otherwise land on
     // whatever the overlay was covering.
-    <div className="intro" data-phase={phase} onClick={skip} onAnimationEnd={onAnimationEnd}>
+    <div className="intro" data-phase={phase} onClick={skip} onAnimationStart={onAnimationStart} onAnimationEnd={onAnimationEnd}>
       <div className="intro-sky" aria-hidden>
         <div className="intro-stars" />
       </div>
