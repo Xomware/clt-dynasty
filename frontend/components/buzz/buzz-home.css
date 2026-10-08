@@ -432,6 +432,16 @@
   color: var(--bz-purple);
 }
 
+.buzz .bz-hub .yw-item[data-kind="trade"] .yw-slot {
+  background: var(--bz-amber);
+}
+
+.buzz .bz-hub .yw-side-label {
+  color: var(--bz-teal-deep);
+  font: italic 800 0.75rem var(--bz-jersey);
+  letter-spacing: 0.06em;
+}
+
 .buzz .bz-hub .yw-closed {
   border: 2px solid var(--bz-ink);
   border-radius: 8px;

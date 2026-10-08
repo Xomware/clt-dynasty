@@ -48,4 +48,13 @@ describe("recommended trades", () => {
     const farTeams = rosters.map((r) => analyze(r, [], {}, far));
     expect(recommendTrades(farTeams[0], farTeams, rosters, {}, far).trades).toEqual([]);
   });
+
+  it("keeps only the biggest lifts when Home asks for its top few", () => {
+    const deep = parseValues([...rosters.flatMap((r) => r.players ?? []).map((id) => v(id, id.slice(0, 2).toUpperCase(), values.players.get(id)!.value)), v("rb5", "RB", 8700)]);
+    const four = [...rosters, roster(4, ["qb3", "rb5"])];
+    const teams4 = four.map((r) => analyze(r, [], {}, deep));
+    const all = recommendTrades(teams4[0], teams4, four, {}, deep).trades;
+    expect(all.map((t) => t.partner.rosterId).sort()).toEqual([2, 4]);
+    expect(recommendTrades(teams4[0], teams4, four, {}, deep, 1).trades).toEqual(all.slice(0, 1));
+  });
 });

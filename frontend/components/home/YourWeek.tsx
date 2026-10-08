@@ -6,15 +6,19 @@ import { DrillLink } from "@/components/xp/DrillLink";
 import { RosterMoveIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
 import { PlayerLink } from "@/components/xp/PlayerLink";
+import { TeamName } from "@/components/xp/TeamName";
 import { playerName } from "@/lib/api/players";
 import { LEAGUE_ID } from "@/lib/config";
 import type { Flag, LineupCheck } from "@/lib/home/lineup";
 import type { PlayerWeek } from "@/lib/home/projections";
 import { useLineup } from "@/lib/home/use-lineup";
+import { useTradeIdeas } from "@/lib/home/use-trade-ideas";
 import { useWaivers } from "@/lib/home/use-waivers";
 import type { Candidate, Pickup } from "@/lib/home/waivers";
 import { usePlayers } from "@/lib/league/players";
+import type { recommendTrades, TradePlayer } from "@/lib/analyzer/trades";
 import type { LeagueData } from "@/lib/league/use-league";
+import { teamLink } from "@/lib/team/links";
 import { ordinal, slotLabel } from "@/lib/team/team";
 import { HomeCard } from "./HomeCard";
 
@@ -31,7 +35,8 @@ interface YourWeekProps {
 }
 
 // The signed-in member's to-do list for the week: their lineup against this
-// week's projections, then free agents worth picking up.
+// week's projections, free agents worth picking up and the Team Analyzer's
+// best trade ideas.
 export function YourWeek({ data, myRosterId, memberLoading }: YourWeekProps) {
   const unlinked = data !== null && !memberLoading && myRosterId === null;
   return (
@@ -47,6 +52,7 @@ export function YourWeek({ data, myRosterId, memberLoading }: YourWeekProps) {
         <div className="yw-grid">
           <LineupSection data={data} rosterId={memberLoading ? null : myRosterId} />
           <WaiverSection data={data} rosterId={memberLoading ? null : myRosterId} />
+          <TradeSection rosterId={memberLoading ? null : myRosterId} />
         </div>
       )}
     </HomeCard>
@@ -241,3 +247,64 @@ function why({ add, need }: Pickup, team: string | undefined): string {
 }
 
 const dropWhy = (d: Candidate) => `Your weakest bench player: value ${fmt(d.value)}, projects ${pts(d.points)}.`;
+
+const pct = (n: number) => `${Math.round(n * 100)}%`;
+
+function TradeSection({ rosterId }: { rosterId: number | null }) {
+  const { state, retry } = useTradeIdeas(rosterId);
+  return (
+    <Section title="Trade ideas">
+      {state.status === "loading" && <p role="status">Running the Team Analyzer...</p>}
+      {state.status === "error" && <LoadError what="trade ideas" message={state.message} onRetry={retry} />}
+      {state.status === "ok" && <TradeBody ideas={state.ideas} />}
+      <DrillLink to={{ kind: "analyzer", params: { tab: "trades" } }} className="home-more">
+        All trade ideas in the Team Analyzer
+      </DrillLink>
+    </Section>
+  );
+}
+
+function TradeBody({ ideas: { weak, strong, trades } }: { ideas: ReturnType<typeof recommendTrades> }) {
+  if (weak.length === 0) return <p className="yw-ok">No starting position is 15% under the league average, so there&rsquo;s no hole to trade for.</p>;
+  if (strong.length === 0) return <p className="yw-ok">Short at {weak.join(", ")}, but nothing is deep enough to trade from.</p>;
+  if (trades.length === 0) return <p className="yw-ok">Short at {weak.join(", ")} and deep at {strong.join(", ")}, but no partner has a fair one-for-one.</p>;
+  return (
+    <ul className="yw-list" aria-label="Trade ideas">
+      {trades.map((t) => (
+        <li key={`${t.partner.rosterId}:${t.give.id}:${t.receive.id}`} className="yw-item yw-trade" data-kind="trade">
+          <span className="yw-slot">{t.receive.position}</span>
+          <span className="yw-line">
+            <span className="yw-with">
+              With{" "}
+              <DrillLink to={teamLink(LEAGUE_ID, t.partner.rosterId)} className="min-w-0">
+                <TeamName name={t.partner.name} avatarUrl={t.partner.avatarUrl} />
+              </DrillLink>
+            </span>
+            <span className="yw-sides">
+              <TradeSide label="Give" player={t.give} />
+              <TradeSide label="Get" player={t.receive} />
+            </span>
+            <span className="yw-why yw-why-block">
+              Adds {fmt(t.improvement)} value at {t.receive.position}, where you&rsquo;re short. Values{" "}
+              {t.gap === 0 ? "match" : t.gap < 0.005 ? "within 1%" : `${pct(t.gap)} apart`}.
+            </span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function TradeSide({ label, player }: { label: string; player: TradePlayer }) {
+  return (
+    <span className="yw-side">
+      <span className="yw-side-label">{label}</span>
+      <PlayerLink id={player.id} className="yw-player">
+        {player.name}
+      </PlayerLink>
+      <span className="yw-why">
+        {player.position} · {fmt(player.value)}
+      </span>
+    </span>
+  );
+}
