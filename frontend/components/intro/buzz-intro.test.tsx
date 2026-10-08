@@ -7,7 +7,9 @@ import { BuzzIntro } from "./BuzzIntro";
 import { Intro } from "./Intro";
 
 // Node's own localStorage stub shadows jsdom's; the theme store reads the global.
+// jsdom has no HTMLImageElement.decode, which the stage calls on mount.
 beforeEach(() => {
+  HTMLImageElement.prototype.decode ??= () => Promise.resolve();
   vi.stubGlobal("localStorage", (globalThis as unknown as { jsdom: { window: Window } }).jsdom.window.localStorage);
 });
 
