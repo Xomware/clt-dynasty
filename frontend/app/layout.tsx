@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { AuthGate } from "@/components/auth/auth-gate";
+import { BuzzIntro } from "@/components/intro/BuzzIntro";
 import { Intro } from "@/components/intro/Intro";
 import { HEAD_SCRIPT } from "@/lib/intro/seen";
 import { THEME_SCRIPT } from "@/lib/theme/script";
@@ -47,7 +48,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full">
         <ThemeProvider>
+          {/* Both prerendered; CSS shows the one for the theme the head script set. */}
           <Intro />
+          <BuzzIntro />
           <AuthGate>{children}</AuthGate>
         </ThemeProvider>
       </body>

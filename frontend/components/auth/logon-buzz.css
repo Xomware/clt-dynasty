@@ -1,0 +1,73 @@
+@import "../buzz/buzz-tokens.css";
+
+/* The roster check's answers and the callback's failure in Buzz City: the road
+   jersey between ink rails, the seal on the left and the message on a paper card. */
+
+[data-theme="buzz"] .xp-logon {
+  color: var(--bz-paper);
+  font-family: var(--bz-body);
+  background:
+    radial-gradient(60% 50% at 30% 40%, rgb(127 221 226 / 0.16), transparent 70%),
+    var(--bz-jersey-road);
+}
+
+[data-theme="buzz"] .xp-logon-band {
+  background: var(--bz-ink);
+  box-shadow: inset 0 -3px 0 var(--bz-teal);
+}
+
+[data-theme="buzz"] .xp-logon-foot {
+  box-shadow: inset 0 3px 0 var(--bz-teal);
+}
+
+[data-theme="buzz"] .xp-logon-body {
+  background: none;
+}
+
+[data-theme="buzz"] .xp-logon-brand {
+  border-color: rgb(127 221 226 / 0.5);
+}
+
+[data-theme="buzz"] .xp-logon-seal {
+  filter: drop-shadow(0 6px 10px rgb(8 4 24 / 0.55));
+}
+
+[data-theme="buzz"] .xp-logon-name {
+  font: 1.875rem / 1.1 var(--bz-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-shadow: 3px 3px 0 var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-logon-tagline {
+  font: italic 700 1rem var(--bz-jersey);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .xp-logon-panel {
+  padding: 1.5rem;
+  border-radius: 14px;
+  color: var(--bz-text);
+  background: var(--bz-paper);
+  box-shadow: 6px 6px 0 var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-logon-panel h1 {
+  color: var(--bz-purple-deep);
+  font: italic 900 1.5rem / 1.1 var(--bz-jersey);
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .xp-logon-panel p[role="alert"] {
+  color: var(--bz-red-text);
+  font-weight: 600;
+}
+
+[data-theme="buzz"] .xp-logon-link {
+  color: var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-logon-link:focus-visible {
+  outline: 3px solid var(--bz-focus);
+}

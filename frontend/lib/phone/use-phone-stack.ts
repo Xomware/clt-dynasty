@@ -1,14 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
 import { patchParams, windowId, type WindowParams } from "@/lib/desktop/windows";
+import { crumbLabel } from "@/lib/nav/label";
+import { manualScrollRestoration, restoreScroll } from "@/lib/nav/scroll";
 
 const urlOf = (stack: WindowLink[]) => {
   const top = stack.at(-1);
   return top ? `/?open=${windowId(top.kind, top.params)}` : "/";
 };
+
+// Screens kept mounted under the top one, so Back finds each as it was left.
+export const PHONE_KEEP = 4;
 
 // The phone's screens: a stack over the home screen, each open a browser
 // history entry, so the iOS back swipe closes it. Both phone shells share it.
@@ -17,55 +22,81 @@ export function usePhoneStack() {
   // Screens opened from a deep link have no history entry of ours behind them,
   // so Back pops those itself instead of leaving the site.
   const linked = useRef(stack.length);
+  // Where each depth was scrolled when a screen was opened over it; 0 is home.
+  const scrolls = useRef<number[]>([]);
+  // Names a screen gave itself ("Week 5 Scores"), by depth, for the Back label.
+  const [labels, setLabels] = useState<Record<number, string | null>>({});
+  const depth = stack.length;
+  const was = useRef(depth);
 
   useEffect(() => {
-    // Our entries carry their stack depth; anything else is the program list.
+    // Our entries carry their whole stack, so Forward rebuilds it too;
+    // anything else is the program list, or the screens a deep link opened.
     const onPop = (e: PopStateEvent) => {
-      const depth = (e.state as { phoneDepth?: number } | null)?.phoneDepth ?? linked.current;
-      setStack((s) => s.slice(0, Math.max(depth, 0)));
+      const saved = (e.state as { phoneStack?: WindowLink[] } | null)?.phoneStack;
+      setStack((s) => saved ?? s.slice(0, Math.max(linked.current, 0)));
     };
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    const restore = manualScrollRestoration();
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      restore();
+    };
   }, []);
 
-  // A block body: Chromium's scrollTo returns a promise, and an effect must not return one.
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [stack.length]);
+  // A new screen starts at the top; one Back uncovers is where it was left.
+  useLayoutEffect(() => {
+    if (was.current === depth) return;
+    const back = depth < was.current;
+    was.current = depth;
+    return restoreScroll(back ? (scrolls.current[depth] ?? 0) : 0);
+  }, [depth]);
 
-  const open = useCallback((link: WindowLink) => {
-    setStack((s) => {
-      const next = [...s, link];
-      window.history.pushState({ phoneDepth: next.length }, "", urlOf(next));
-      return next;
-    });
-  }, []);
+  const open = (link: WindowLink) => {
+    const next = [...stack, link];
+    scrolls.current[stack.length] = window.scrollY;
+    window.history.pushState({ phoneStack: next }, "", urlOf(next));
+    setStack(next);
+  };
 
-  const back = () => {
-    if (stack.length > linked.current) return window.history.back();
-    linked.current = stack.length - 1;
-    const next = stack.slice(0, -1);
+  // Back to `to` screens deep: our own history entries are walked back
+  // through, so the browser agrees; ones from a deep link are popped here.
+  const unwind = (to: number) => {
+    const steps = stack.length - to;
+    if (steps <= 0) return;
+    const ours = stack.length - linked.current;
+    if (steps <= ours) return window.history.go(-steps);
+    linked.current = to;
+    if (ours > 0) return window.history.go(-ours);
+    const next = stack.slice(0, to);
     setStack(next);
     window.history.replaceState(null, "", urlOf(next));
   };
 
-  const patch = (params: WindowParams) =>
-    setStack((s) => {
-      const top = s.at(-1);
-      if (!top) return s;
-      const next = [...s.slice(0, -1), { ...top, params: patchParams(top.params, params) }];
-      window.history.replaceState({ phoneDepth: next.length }, "", urlOf(next));
-      return next;
-    });
-
-  // Start goes straight back to the list, unwinding our own history entries.
-  const home = () => {
-    const ours = stack.length - linked.current;
-    linked.current = 0;
-    if (ours > 0) return window.history.go(-ours);
-    setStack([]);
-    window.history.replaceState(null, "", "/");
+  const patch = (params: WindowParams) => {
+    const top = stack.at(-1);
+    if (!top) return;
+    const next = [...stack.slice(0, -1), { ...top, params: patchParams(top.params, params) }];
+    window.history.replaceState({ phoneStack: next }, "", urlOf(next));
+    setStack(next);
   };
 
-  return { stack, top: stack.at(-1), open, back, patch, home };
+  const setLabel = useCallback((depth: number, label: string | null) => {
+    setLabels((l) => (l[depth] === label ? l : { ...l, [depth]: label }));
+  }, []);
+  // Depth 0 is the home screen; screen n sits at depth n.
+  const labelAt = (depth: number) => (depth <= 0 ? "Home" : (labels[depth] ?? crumbLabel(stack[depth - 1])));
+
+  return {
+    stack,
+    top: stack.at(-1),
+    open,
+    back: () => unwind(stack.length - 1),
+    // Start goes straight back to the list.
+    home: () => unwind(0),
+    unwind,
+    patch,
+    setLabel,
+    labelAt,
+  };
 }

@@ -4,23 +4,24 @@ import Image from "next/image";
 
 import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
-import { PlayerFace } from "@/components/xp/PlayerFace";
-import { PlayerLink } from "@/components/xp/PlayerLink";
-import { TeamLink } from "@/components/xp/TeamLink";
-import { type Player, playerName } from "@/lib/api/players";
+import { Tabs } from "@/components/xp/Tabs";
+import type { Player } from "@/lib/api/players";
 import { LEAGUE_ID } from "@/lib/config";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { nflSchedule } from "@/lib/league/cache";
 import { refreshPlayers, usePlayers } from "@/lib/league/players";
 import { teamOf } from "@/lib/league/use-league";
 import { depthChart } from "@/lib/nfl/depth";
+import { useRanks } from "@/lib/nfl/use-ranks";
 import { NFL_TEAMS, type NflTeam, nflLogo, nflTeam, nflTeamName } from "@/lib/nfl/teams";
 import { nflLink } from "@/lib/player/links";
 import { byeWeek } from "@/lib/player/season";
 import { rosterOf } from "@/lib/sleeper/rosters";
 import { type LeagueData, loadLeagueData, useMySleeperId } from "@/lib/team/data";
-import { injuryTag } from "@/lib/team/team";
 import { useLoad } from "@/lib/use-load";
+
+import { NflField, type Owner } from "./NflField";
+import { NflRoster } from "./NflRoster";
 
 import "./nfl.css";
 import "./team.css";
@@ -32,8 +33,6 @@ export const nflTitle = (p: WindowParams) => {
   const t = nflTeam(String(p.team));
   return t ? nflTeamName(t) : "NFL Team";
 };
-
-const POSITION_NAMES: Record<string, string> = { QB: "Quarterbacks", RB: "Running backs", WR: "Wide receivers", TE: "Tight ends", K: "Kickers" };
 
 async function loadTeamPage() {
   const data = await loadLeagueData(LEAGUE_ID);
@@ -51,7 +50,7 @@ export function NflTeamWindow({ params }: { params: WindowParams }) {
   if (load.status === "loading" || players.status === "loading") return <p role="status">Loading the depth chart...</p>;
   if (load.status === "error") return <LoadError what="the league from Sleeper" message={load.message} onRetry={retry} />;
   if (players.status === "error") return <LoadError what="NFL players" message={players.message} onRetry={refreshPlayers} />;
-  return <DepthChart team={team} players={players.players} data={load.value.data} bye={byeWeek(load.value.schedule, team.abbr)} />;
+  return <DepthChart team={team} players={players.players} data={load.value.data} bye={byeWeek(load.value.schedule, team.abbr)} tab={params.tab} />;
 }
 
 interface DepthChartProps {
@@ -59,49 +58,21 @@ interface DepthChartProps {
   players: Record<string, Player>;
   data: LeagueData;
   bye: number | null;
+  tab: WindowParams[string];
 }
 
-function DepthChart({ team, players, data, bye }: DepthChartProps) {
+function DepthChart({ team, players, data, bye, tab }: DepthChartProps) {
+  const ranks = useRanks();
   const me = useMySleeperId();
   const myRoster = me ? rosterOf(data.rosters, me) : null;
   const owners = new Map(data.rosters.flatMap((r) => (r.players ?? []).map((id) => [id, r.roster_id] as const)));
   const groups = depthChart(players, team.abbr);
   const owned = groups.flatMap((g) => [...g.charted, ...g.rest]).filter((p) => owners.has(p.player_id)).length;
-
-  const row = (p: Player, rank: number | null) => {
-    const rosterId = owners.get(p.player_id);
-    const injury = injuryTag(p);
-    return (
-      <tr key={p.player_id}>
-        <td className="tabular-nums">{rank ?? ""}</td>
-        <td>
-          <span className="team-player">
-            <PlayerFace id={p.player_id} position={p.position} />
-            <span className="min-w-0">
-              <PlayerLink id={p.player_id} className="team-player-name">
-                {playerName(p, p.player_id)}
-              </PlayerLink>
-              {/* The tag sits under the name, so a phone column keeps the name whole. */}
-              <span className="team-player-meta nfl-meta">
-                {p.number !== undefined && p.number > 0 && `#${p.number}`}
-                {injury && (
-                  <span className="xp-tag team-injury" title={p.injury_status}>
-                    {injury}
-                  </span>
-                )}
-              </span>
-            </span>
-          </span>
-        </td>
-        <td>
-          {rosterId === undefined ? (
-            <span className="nfl-fa">Free agent</span>
-          ) : (
-            <TeamLink rosterId={rosterId} {...teamOf(data.users, data.rosters.find((r) => r.roster_id === rosterId), rosterId)} isMine={rosterId === myRoster} />
-          )}
-        </td>
-      </tr>
-    );
+  const ownerOf = (id: string): Owner | null => {
+    const rosterId = owners.get(id);
+    if (rosterId === undefined) return null;
+    const roster = data.rosters.find((r) => r.roster_id === rosterId);
+    return { rosterId, team: teamOf(data.users, roster, rosterId), mine: rosterId === myRoster };
   };
 
   return (
@@ -121,35 +92,14 @@ function DepthChart({ team, players, data, bye }: DepthChartProps) {
           {owned} on CLT rosters
         </p>
       </section>
-      {groups.map((g) =>
-        g.charted.length + g.rest.length === 0 ? null : (
-          <section key={g.position} className="xp-group" aria-label={POSITION_NAMES[g.position]}>
-            <h3 className="xp-group-title">{POSITION_NAMES[g.position]}</h3>
-            <div className="xp-table-scroll">
-              <table className="xp-table team-table nfl-table">
-                <thead>
-                  <tr>
-                    <th scope="col" className="w-10">
-                      <abbr title="Depth chart">{g.position}</abbr>
-                    </th>
-                    <th scope="col">Player</th>
-                    <th scope="col" className="nfl-owner-col">CLT team</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {g.charted.map((p, i) => row(p, i + 1))}
-                  {g.rest.length > 0 && (
-                    <tr className="nfl-rest">
-                      <td colSpan={3}>Off the depth chart</td>
-                    </tr>
-                  )}
-                  {g.rest.map((p) => row(p, null))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        ),
-      )}
+      <Tabs
+        label="Depth chart views"
+        selected={tab}
+        tabs={[
+          { id: "field", label: "Depth chart", panel: () => <NflField team={team} players={players} ownerOf={ownerOf} ranks={ranks} /> },
+          { id: "roster", label: "Roster", panel: () => <NflRoster team={team} players={players} ownerOf={ownerOf} ranks={ranks} /> },
+        ]}
+      />
     </div>
   );
 }

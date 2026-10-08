@@ -26,7 +26,9 @@ const p = (player_id: string, first_name: string, position: string, depth_chart_
 const PLAYERS = {
   "1": p("1", "Justin", "QB", 1),
   "2": p("2", "Trey", "QB", 2),
-  "3": p("3", "Ladd", "WR", 1, { injury_status: "Out" }),
+  "3": p("3", "Ladd", "WR", 1, { injury_status: "Out", depth_chart_position: "SWR", number: 15 }),
+  "6": p("6", "Quentin", "WR", 2, { injury_status: "Questionable", injury_body_part: "Chest", depth_chart_position: "LWR" }),
+  "7": p("7", "Marquez", "WR", 4, { depth_chart_position: "LWR" }),
   "4": p("4", "Practice", "WR", undefined),
   "5": { player_id: "5", first_name: "Josh", last_name: "Allen", position: "QB", team: "BUF", depth_chart_order: 1 },
 };
@@ -51,34 +53,79 @@ const open = (ui: ReactNode) =>
   );
 
 describe("NFL Team window", () => {
-  it("lists the team's depth chart by position, off-chart players last", async () => {
-    open(<NflTeamWindow params={{ team: "LAC" }} />);
-    const qbs = await screen.findByRole("region", { name: "Quarterbacks" });
-    expect(within(qbs).getAllByRole("row").slice(1).map((r) => r.textContent)).toEqual([
-      expect.stringMatching(/^1Justin Charger/),
-      expect.stringMatching(/^2Trey Charger/),
+  it("lists the roster in chart order, off-chart players after the charted at each position", async () => {
+    open(<NflTeamWindow params={{ team: "LAC", tab: "roster" }} />);
+    const table = await screen.findByRole("table");
+    const rows = within(table).getAllByRole("row").slice(1);
+    expect(rows.map((r) => within(r).getAllByRole("cell")[0].textContent)).toEqual(["QB1", "QB2", "WR1", "WR2", "WR3", "WR off the chart"]);
+    expect(rows.map((r) => within(r).getByRole("button", { name: /Charger/ }).textContent)).toEqual([
+      "Justin Charger",
+      "Trey Charger",
+      "Ladd Charger",
+      "Quentin Charger",
+      "Marquez Charger",
+      "Practice Charger",
     ]);
-    const wrs = screen.getByRole("region", { name: "Wide receivers" });
-    expect(within(wrs).getByText("Off the depth chart")).toBeTruthy();
-    expect(within(wrs).getByText("Out")).toBeTruthy();
+    expect(within(rows[2]).getByText("Out", { selector: ".sr-only" })).toBeTruthy();
+    expect(rows[2].hasAttribute("data-sidelined")).toBe(true);
     expect(screen.queryByText("Josh Allen")).toBeNull();
-    expect(screen.queryByRole("region", { name: "Tight ends" })).toBeNull();
     expect(screen.getByText(/bye in week 1/)).toBeTruthy();
   });
 
-  it("opens a player and the CLT team that owns him", async () => {
-    open(<NflTeamWindow params={{ team: "LAC" }} />);
-    const wrs = await screen.findByRole("region", { name: "Wide receivers" });
-    fireEvent.click(within(wrs).getByRole("button", { name: "Ladd Charger" }));
+  it("sorts by a column header, and opens a player and the CLT team that owns him", async () => {
+    open(<NflTeamWindow params={{ team: "LAC", tab: "roster" }} />);
+    const table = await screen.findByRole("table");
+    const sortBy = within(table).getByRole("button", { name: "Player" });
+    fireEvent.click(sortBy);
+    expect(sortBy.closest("th")?.getAttribute("aria-sort")).toBe("ascending");
+    expect(within(table).getAllByRole("row")[1].textContent).toContain("Justin Charger");
+    fireEvent.click(sortBy);
+    expect(sortBy.closest("th")?.getAttribute("aria-sort")).toBe("descending");
+    expect(within(table).getAllByRole("row")[1].textContent).toContain("Trey Charger");
+
+    fireEvent.click(within(table).getByRole("button", { name: "Ladd Charger" }));
     expect(navigate).toHaveBeenLastCalledWith({ kind: "player", params: { playerId: "3" } });
-    fireEvent.click(within(wrs).getByRole("button", { name: "Team 3" }));
+    fireEvent.click(within(table).getByRole("button", { name: "Team 3" }));
     expect(navigate).toHaveBeenLastCalledWith({ kind: "team", params: { rosterId: 3 } });
-    expect(within(wrs).getAllByText("Free agent")).toHaveLength(1);
+    expect(within(table).getAllByText("Free agent")).toHaveLength(5);
   });
 
   it("reads its link and names itself", () => {
     expect(parseOpen("?open=nfl:LAC,nfl:XYZ,nfl:lac")).toEqual([{ kind: "nfl", params: { team: "LAC" } }]);
     expect(windowTitle({ kind: "nfl", params: { team: "BAL" } })).toBe("Baltimore Ravens");
+  });
+});
+
+describe("NFL Team field", () => {
+  it("lines the depth chart up on the field, starters first, injured players marked", async () => {
+    open(<NflTeamWindow params={{ team: "LAC" }} />);
+    const field = await screen.findByRole("region", { name: "Los Angeles Chargers depth chart" });
+    expect(screen.getByRole("tab", { name: "Depth chart", selected: true })).toBeTruthy();
+    const qb = within(field).getByRole("button", { name: /^Quarterback, starter: Justin Charger/ });
+    expect(qb.getAttribute("aria-label")).toBe("Quarterback, starter: Justin Charger, free agent");
+    const slot = within(field).getByRole("button", { name: /^Slot receiver, starter/ });
+    expect(slot.getAttribute("aria-label")).toBe("Slot receiver, starter: Ladd Charger, #15, Out, on Team 3");
+    expect(slot.querySelector("[data-sidelined]")).toBeTruthy();
+    const x = within(field).getByRole("button", { name: /^X receiver, starter/ });
+    expect(x.getAttribute("aria-label")).toContain("Quentin Charger, Questionable: Chest");
+    expect(x.querySelector("[data-injured]")).toBeTruthy();
+    expect(x.querySelector("[data-sidelined]")).toBeNull();
+    // Off the chart, so not on the field.
+    expect(within(field).queryByRole("button", { name: /Practice/ })).toBeNull();
+    expect(within(screen.getByRole("region", { name: "Injury designations" })).getByText("Injured reserve", { selector: "dd" })).toBeTruthy();
+  });
+
+  it("expands a spot's backups and opens any player", async () => {
+    open(<NflTeamWindow params={{ team: "LAC" }} />);
+    const field = await screen.findByRole("region", { name: "Los Angeles Chargers depth chart" });
+    const more = within(field).getByRole("button", { name: "Quarterback backups, 1" });
+    expect(more.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(more);
+    const list = within(field).getByRole("list", { name: "Quarterback backups" });
+    fireEvent.click(within(list).getByRole("button", { name: /^Quarterback, 2nd string: Trey Charger/ }));
+    expect(navigate).toHaveBeenLastCalledWith({ kind: "player", params: { playerId: "2" } });
+    fireEvent.keyDown(more, { key: "Escape" });
+    expect(within(field).queryByRole("list", { name: "Quarterback backups" })).toBeNull();
   });
 });
 

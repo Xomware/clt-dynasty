@@ -1,8 +1,10 @@
 "use client";
 
+import { BallotIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
 import { listProposals } from "@/lib/api/proposals";
 import { useLoad } from "@/lib/use-load";
+import { CardAction } from "./CardAction";
 import { HomeCard } from "./HomeCard";
 
 const DATE = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
@@ -36,6 +38,9 @@ export function ProposalsCard() {
           </div>
         </>
       )}
+      <CardAction to={{ kind: "proposals", params: {} }} Icon={BallotIcon}>
+        Propose a rule
+      </CardAction>
     </HomeCard>
   );
 }
