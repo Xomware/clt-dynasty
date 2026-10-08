@@ -40,7 +40,7 @@ afterEach(() => {
   localStorage.clear();
   delete html.dataset.theme;
   html.removeAttribute("style");
-  document.querySelector('meta[name="theme-color"]')?.remove();
+  for (const el of document.head.querySelectorAll('meta[name="theme-color"], link')) el.remove();
   vi.unstubAllGlobals();
 });
 
@@ -56,7 +56,16 @@ function motion(reduced: boolean) {
 }
 
 describe("ThemeProvider", () => {
-  it("starts in XP and leaves <html> as XP always had it", () => {
+  it("starts a new visitor in Buzz City", () => {
+    renderToggle();
+    expect(screen.getByTestId("theme").textContent).toBe("buzz");
+    expect(pressed("Buzz City")).toBe("true");
+    expect(html.dataset.theme).toBe("buzz");
+    expect(themeColor()).toBe("#170d31");
+  });
+
+  it("keeps a stored XP choice and leaves <html> as XP always had it", () => {
+    localStorage.setItem(THEME_KEY, "xp");
     renderToggle();
     expect(screen.getByTestId("theme").textContent).toBe("xp");
     expect(pressed("Classic XP")).toBe("true");
@@ -65,6 +74,7 @@ describe("ThemeProvider", () => {
   });
 
   it("covers the screen, swaps under the cover, then uncovers", () => {
+    localStorage.setItem(THEME_KEY, "xp");
     renderToggle();
     fireEvent.click(screen.getByRole("button", { name: "Buzz City" }));
 
@@ -88,6 +98,7 @@ describe("ThemeProvider", () => {
   });
 
   it("ignores a second switch while one plays", () => {
+    localStorage.setItem(THEME_KEY, "xp");
     function Both() {
       const { setTheme } = useTheme();
       return (
@@ -152,6 +163,7 @@ describe("ThemeProvider", () => {
 
   it("swaps at once with no overlay under reduced motion", () => {
     motion(true);
+    localStorage.setItem(THEME_KEY, "xp");
     renderToggle();
     fireEvent.click(screen.getByRole("button", { name: "Buzz City" }));
     expect(overlay()).toBeNull();
@@ -159,6 +171,7 @@ describe("ThemeProvider", () => {
   });
 
   it("holds the choice for the visit when storage refuses it", () => {
+    localStorage.setItem(THEME_KEY, "xp");
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new DOMException("quota", "QuotaExceededError");
     });
@@ -192,18 +205,28 @@ describe("THEME_SCRIPT", () => {
     expect(html.dataset.theme).toBe("buzz");
   });
 
-  it("leaves XP and unknown values alone", () => {
+  it("paints Buzz City for a new visitor and for unknown values", () => {
+    run();
+    expect(html.dataset.theme).toBe("buzz");
+    delete html.dataset.theme;
     localStorage.setItem(THEME_KEY, "glacier");
+    run();
+    expect(html.dataset.theme).toBe("buzz");
+  });
+
+  it("leaves a stored XP choice alone", () => {
+    localStorage.setItem(THEME_KEY, "xp");
     run();
     expect(html.dataset.theme).toBeUndefined();
     expect(themeColor()).toBeUndefined();
+    expect(document.querySelector(`link[href^="https://fonts.googleapis.com"]`)).toBeNull();
   });
 
-  it("survives storage that throws", () => {
+  it("paints Buzz City when storage throws", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new DOMException("denied", "SecurityError");
     });
     expect(run).not.toThrow();
-    expect(html.dataset.theme).toBeUndefined();
+    expect(html.dataset.theme).toBe("buzz");
   });
 });

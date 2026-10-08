@@ -20,6 +20,8 @@ import { AlertsProvider } from "@/lib/alerts/alerts";
 import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
+import { THEME_KEY } from "@/lib/theme/script";
+import { ThemeProvider } from "@/lib/theme/theme";
 
 registerTestWindows();
 
@@ -40,11 +42,13 @@ afterAll(() => {
 
 const renderShell = async () => {
   render(
-    <MemberProvider>
-      <AlertsProvider>
-        <AppShell />
-      </AlertsProvider>
-    </MemberProvider>,
+    <ThemeProvider>
+      <MemberProvider>
+        <AlertsProvider>
+          <AppShell />
+        </AlertsProvider>
+      </MemberProvider>
+    </ThemeProvider>,
   );
   await screen.findByText("Welcome back, Roster 4");
 };
@@ -61,6 +65,7 @@ const launch = (name: string) => {
 const startMenu = () => within(screen.getByRole("navigation", { name: "Start menu" }));
 
 beforeEach(() => {
+  localStorage.setItem(THEME_KEY, "xp");
   // jsdom has no pointer capture.
   Element.prototype.setPointerCapture = vi.fn();
 });
