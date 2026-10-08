@@ -146,6 +146,17 @@ export function JerseyIcon(props: IconProps) {
   );
 }
 
+// The player database: a gold jersey behind the blue one.
+export function PlayersIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8.5.5 5.5 2.25 6.5 4.5l1-.5v6h6V4l1 .5 1-2.25-3-1.75a1.75 1.75 0 0 1-3.5 0z" className="fill-(--xp-gold) stroke-(--xp-wood)" strokeWidth="0.75" strokeLinejoin="round" />
+      <path d="M4.5 4 1 6l1.25 2.5L3.5 8v7.5h6V8l1.25.5L12 6 8.5 4a2 2 0 0 1-4 0z" className="fill-(--xp-select) stroke-(--clt-navy)" strokeLinejoin="round" />
+      <path d="M5.5 9h2v4" className="fill-none stroke-(--xp-cream) stroke-[1.25]" />
+    </Icon>
+  );
+}
+
 // The NFL: a football with its laces.
 export function FootballIcon(props: IconProps) {
   return (

@@ -21,5 +21,5 @@ export const groupLabel = (id: unknown) => [...GROUPS, ADMIN].find((g) => g.id =
 
 // Start's left column, above the recent programs, and its right column, XP's
 // My Documents / Control Panel / Help side.
-export const START_PINNED = ["home", "standings", "scores"];
+export const START_PINNED = ["home", "standings", "scores", "players"];
 export const START_PLACES = ["my-team", "profile", "settings", "rules", "search"];

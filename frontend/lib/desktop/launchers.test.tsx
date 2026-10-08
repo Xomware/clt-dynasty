@@ -52,7 +52,7 @@ describe("launcher groups", () => {
     await waitFor(() => expect(result.current.groups.length).toBeGreaterThan(0));
     expect(result.current.pinned.map((l) => l.kind)).toEqual(["home"]);
     expect(Object.fromEntries(result.current.groups.map((g) => [g.label, g.items.map((l) => l.label)]))).toEqual({
-      League: ["Standings", "Scores", "Playoffs", "World Cup", "NFL Teams", "Rules"],
+      League: ["Standings", "Scores", "Players", "Playoffs", "World Cup", "NFL Teams", "Rules"],
       History: ["History", "Matchup History"],
       Draft: ["Draft History", "Draft Order", "Taxi Squads"],
       "My Stuff": ["My Team", "Profile", "Team Analyzer", "Settings"],

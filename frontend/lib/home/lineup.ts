@@ -40,6 +40,34 @@ export interface LineupCheck {
 
 const sum = (ns: number[]) => Math.round(ns.reduce((a, b) => a + b, 0) * 10) / 10;
 
+// The best lineup Sleeper allows from `pool`. `fixed` holds, by slot, the
+// starters whose games have kicked off: they stay put. The rest fill the
+// narrowest slots first, each with the best player left who can play it; on
+// equal points a healthy player, then a `preferred` one, wins.
+// Slot sets nest (QB in SUPER_FLEX, RB in FLEX in SUPER_FLEX), so this is optimal.
+export function bestLineup(
+  slots: string[],
+  fixed: (string | null)[],
+  pool: string[],
+  week: (id: string) => PlayerWeek,
+  preferred: (id: string) => boolean = () => false,
+): (string | null)[] {
+  const best = slots.map((_, i) => fixed[i] ?? null);
+  const used = new Set(best.filter((id): id is string => id !== null));
+  const fits = (slot: string, id: string) => week(id).positions.some((p) => canFill(slot, p));
+  const rank = (a: string, b: string) =>
+    week(b).points - week(a).points || Number(isOut(week(a))) - Number(isOut(week(b))) || Number(preferred(b)) - Number(preferred(a));
+  const order = slots.map((_, i) => i).filter((i) => best[i] === null);
+  order.sort((a, b) => slotPositions(slots[a]).length - slotPositions(slots[b]).length);
+  for (const i of order) {
+    const pick = pool.filter((id) => !used.has(id) && fits(slots[i], id)).sort(rank)[0];
+    if (!pick) continue;
+    best[i] = pick;
+    used.add(pick);
+  }
+  return best;
+}
+
 // `starters` is the roster's lineup in slot order, "0" for an empty slot;
 // `bench` is everyone else who could start (not taxi or IR).
 export function checkLineup(slots: string[], starters: string[], bench: string[], week: (id: string) => PlayerWeek): LineupCheck {
@@ -49,24 +77,9 @@ export function checkLineup(slots: string[], starters: string[], bench: string[]
   // Sleeper's fantasy positions: a two-way player can start at either.
   const fits = (slot: string, id: string) => week(id).positions.some((p) => canFill(slot, p));
 
-  // The best lineup Sleeper allows. Locked starters stay put; the rest fill the
-  // narrowest slots first, each with the best player left who can play it.
-  // Slot sets nest (QB in SUPER_FLEX, RB in FLEX in SUPER_FLEX), so this is optimal.
-  const best = ids.map((id) => (locked(id) ? id : null));
-  const used = new Set(best.filter((id): id is string => id !== null));
   const pool = [...new Set([...starting, ...bench])].filter((id) => !locked(id));
-  const rank = (a: string, b: string) =>
-    week(b).points - week(a).points ||
-    Number(isOut(week(a))) - Number(isOut(week(b))) ||
-    Number(starting.has(b)) - Number(starting.has(a));
-  const order = slots.map((_, i) => i).filter((i) => best[i] === null);
-  order.sort((a, b) => slotPositions(slots[a]).length - slotPositions(slots[b]).length);
-  for (const i of order) {
-    const pick = pool.filter((id) => !used.has(id) && fits(slots[i], id)).sort(rank)[0];
-    if (!pick) continue;
-    best[i] = pick;
-    used.add(pick);
-  }
+  const best = bestLineup(slots, ids.map((id) => (locked(id) ? id : null)), pool, week, (id) => starting.has(id));
+  const used = new Set(best.filter((id): id is string => id !== null));
 
   const leaving = ids
     .map((id, i) => ({ slot: slots[i], id, points: id ? week(id).points : 0 }))

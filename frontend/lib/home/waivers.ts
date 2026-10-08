@@ -6,11 +6,11 @@ import type { PlayerWeek } from "./projections";
 
 // One projected point this week is worth this much FantasyCalc value. Dynasty
 // value leads, but a waiver pickup usually earns his spot by playing now.
-const POINT_VALUE = 50;
+export const POINT_VALUE = 50;
 // An add has to beat the player he replaces by a fifth, plus a floor, so two
 // near-worthless bench players never trade places.
-const MARGIN = 1.2;
-const FLOOR = 25;
+export const MARGIN = 1.2;
+export const FLOOR = 25;
 
 // How the team stands at a position against the league: 1st is deepest.
 export interface Need {
