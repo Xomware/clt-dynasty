@@ -5,10 +5,12 @@ import { useContext, useDeferredValue, useEffect, useMemo, useState } from "reac
 import { PlayerFilters } from "@/components/players/PlayerFilters";
 import { PlayerResults } from "@/components/players/PlayerResults";
 import { LoadError } from "@/components/xp/LoadError";
+import { valueOf } from "@/lib/analyzer/values";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { cleanQuery, decode, encode, naturalDesc, readView, type SortKey, type View, writeView } from "@/lib/players/params";
-import { filterRows, sortRows } from "@/lib/players/rows";
+import { filterRows, type PlayerRow, sortRows } from "@/lib/players/rows";
 import { usePlayerBoard } from "@/lib/players/use-player-board";
+import { type Worth, worthFor } from "@/lib/players/worth";
 import { searchPlayers } from "@/lib/search/nfl";
 import { ViewParamsContext } from "@/lib/view-params";
 
@@ -46,7 +48,12 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
     const q = cleanQuery(deferredQuery).trim();
     return q && players ? new Set(searchPlayers(players, q, 2000).map((h) => h.item.player_id)) : null;
   }, [deferredQuery, players]);
-  const found = useMemo(() => (rows ? sortRows(filterRows(rows, view, myRosterId, matches), view.sort, view.desc) : null), [rows, view, myRosterId, matches]);
+  const worth = useWorth(board);
+  const found = useMemo(() => {
+    if (!rows) return null;
+    const kept = filterRows(rows, view, myRosterId, matches).filter((r) => !view.worth || !worth || (r.owner === null && worth(r.id)?.verdict !== "none"));
+    return sortRows(kept, view.sort, view.desc);
+  }, [rows, view, myRosterId, matches, worth]);
   const teams = useMemo(
     () => (rosters ?? []).map((r) => ({ rosterId: r.roster_id, team: teamFor(r.roster_id) })).sort((a, b) => a.team.name.localeCompare(b.team.name)),
     [rosters, teamFor],
@@ -64,6 +71,7 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
         teams={teams}
         mine={myRosterId}
         inSeason={board.week !== null}
+        canRate={worth !== null}
       />
       {!found ? (
         <p role="status">Loading every player, his CLT team and this season&rsquo;s numbers...</p>
@@ -86,6 +94,7 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
               teamFor={teamFor}
               week={board.week}
               showRos={view.sort === "ros"}
+              worth={worth}
             />
           )}
           {found.length > shown && (
@@ -101,6 +110,23 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
       </p>
     </div>
   );
+}
+
+// The worth-adding check for every player not on my team, judged once per
+// data change. Players with no projection and no value are never worth it.
+function useWorth({ rows, rosters, myRosterId, board, slots, values }: ReturnType<typeof usePlayerBoard>) {
+  return useMemo(() => {
+    const roster = rosters?.find((r) => r.roster_id === myRosterId);
+    if (!rows || !roster || !board || !values) return null;
+    const judge = worthFor({ slots, roster, week: board, value: (id) => valueOf(values, id) });
+    const verdicts = new Map<string, Worth>();
+    const none = (r: PlayerRow): Worth => ({ verdict: "none", position: r.position, gain: 0, slot: null, floor: null, valueDelta: 0 });
+    for (const r of rows) {
+      if (r.owner === myRosterId) continue;
+      verdicts.set(r.id, (r.proj ?? 0) > 0 || r.value > 0 ? judge(r.id) : none(r));
+    }
+    return (id: string) => verdicts.get(id) ?? null;
+  }, [rows, rosters, myRosterId, board, slots, values]);
 }
 
 function Notes({ missing }: { missing: { stats: boolean; proj: boolean; values: boolean; ros: boolean } }) {

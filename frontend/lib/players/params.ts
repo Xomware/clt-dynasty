@@ -35,6 +35,8 @@ export interface View {
   slot: Slot;
   health: Health;
   rookies: boolean;
+  // Only available players the worth-adding check rates above "not worth it".
+  worth: boolean;
   ageMin: number | null;
   ageMax: number | null;
   sort: SortKey;
@@ -52,6 +54,7 @@ export const DEFAULT_VIEW: View = {
   slot: "any",
   health: "any",
   rookies: false,
+  worth: false,
   ageMin: null,
   ageMax: null,
   sort: "pts",
@@ -81,6 +84,7 @@ export function readView(fields: Fields): View {
     slot: pick(SLOTS, fields.get("slot"), "any"),
     health: pick(HEALTH, fields.get("hl"), "any"),
     rookies: fields.get("rk") === "1",
+    worth: fields.get("wa") === "1",
     ageMin: age(fields.get("amin")),
     ageMax: age(fields.get("amax")),
     sort,
@@ -99,6 +103,7 @@ export function writeView(view: View, fields: Fields = new Map()): Fields {
   set("slot", view.slot === "any" ? null : view.slot);
   set("hl", view.health === "any" ? null : view.health);
   set("rk", view.rookies ? "1" : null);
+  set("wa", view.worth ? "1" : null);
   set("amin", view.ageMin === null ? null : String(view.ageMin));
   set("amax", view.ageMax === null ? null : String(view.ageMax));
   set("sort", view.sort === DEFAULT_VIEW.sort ? null : view.sort);

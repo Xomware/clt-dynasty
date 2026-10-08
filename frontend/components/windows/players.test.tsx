@@ -120,6 +120,21 @@ describe("Players window", () => {
     expect(names(t)[0]).toBe("Free Agent");
   });
 
+  it("rates every player not on my team and filters to the free agents worth adding", async () => {
+    open();
+    const t = await table();
+    const cell = (name: string) => (within(t).getByText(name).closest("tr") as HTMLElement).querySelector(".pl-col-worth") as HTMLElement;
+    // 70 rush yards is 7.0 points, all of it over my RB2, who has no projection.
+    await within(t).findAllByText("Starter upgrade");
+    expect(cell("Free Agent").textContent).toBe("Starter upgrade+7.0 pts this week at RB");
+    expect(cell("Tetairoa McMillan").textContent).toMatch(/^Starter upgrade\+11\.0 pts this week at /);
+    expect(cell("Ja'Tavion Sanders").textContent).toBe("Not worth it");
+    expect(cell("Bryce Young").textContent).toBe("");
+    fireEvent.click(screen.getByRole("checkbox", { name: "Only free agents worth adding to my team" }));
+    expect(names(t)).toEqual(["Free Agent"]);
+    expect(setParams).toHaveBeenLastCalledWith({ v: "wa-1" });
+  });
+
   it("restores a linked view", async () => {
     open("pos-QB.TE~sort-age");
     const t = await screen.findByRole("table", { name: /^Players, sorted by Age/ });
