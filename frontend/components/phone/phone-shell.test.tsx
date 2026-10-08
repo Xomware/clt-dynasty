@@ -88,6 +88,12 @@ describe("phone shell", () => {
     expect(screen.queryByRole("list", { name: "Desktop" })).toBeNull();
   });
 
+  it("greets with the phone's directions, not the desktop's double-click", async () => {
+    await renderPhone();
+    expect(await screen.findByText(/Every program is under Start/)).toBeTruthy();
+    expect(screen.queryByText(/double-click/)).toBeNull();
+  });
+
   it("lists Admin under an admin's account, apart from Programs", async () => {
     admin.on = true;
     await renderPhone();

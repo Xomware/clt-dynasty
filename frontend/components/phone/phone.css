@@ -306,19 +306,23 @@
   background: var(--xp-title-dark);
 }
 
-/* No tray to point at: the balloon hangs under the title bar instead. */
+/* XP's balloon sits over the phone taskbar like the real one, its tail on
+   Start. Buzz City's skin hangs its own under the header. */
 @media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
   .xp-balloon {
-    top: calc(3.5rem + env(safe-area-inset-top) + 0.5rem);
     right: 0.75rem;
-    bottom: auto;
     left: 0.75rem;
     width: auto;
     font-size: 1rem;
   }
 
-  .xp-balloon::after {
-    display: none;
+  :root:not([data-theme="buzz"]) .xp-balloon {
+    bottom: calc(3.5rem + env(safe-area-inset-bottom) + 14px);
+  }
+
+  :root:not([data-theme="buzz"]) .xp-balloon::after {
+    right: auto;
+    left: 2.75rem;
   }
 
   .xp-balloon-close {
