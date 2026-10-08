@@ -861,8 +861,58 @@
 }
 
 @media (max-width: 767.98px) {
+  /* Above the fold on a phone: a smaller lockup, this week's game, then a
+     shorter card. */
   .bz-hero {
-    gap: 1.75rem;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .bz-hero-copy {
+    display: grid;
+    justify-items: center;
+  }
+
+  .bz-hero-lockup {
+    width: min(100%, 13.5rem);
+  }
+
+  .bz-hero-card {
+    gap: 0.875rem;
+  }
+
+  .bz-hero-card .bz-matchup {
+    order: -1;
+  }
+
+  .bz-tcard {
+    padding: 0.5rem;
+    border-width: 7px;
+  }
+
+  .bz-tcard-photo {
+    aspect-ratio: 16 / 7;
+  }
+
+  .bz-tcard-avatar {
+    width: 6rem;
+    height: 6rem;
+    border-width: 4px;
+    font-size: 2.25rem;
+  }
+
+  .bz-seed {
+    width: 3.25rem;
+    height: 3.25rem;
+    font-size: 0.75rem;
+  }
+
+  .bz-tcard-name {
+    font-size: 1.25rem;
+  }
+
+  .bz-tcard-sub {
+    margin: 0.375rem 0 0.5rem;
   }
 
   .buzz .bz-hub .yw-action {
@@ -871,7 +921,8 @@
   }
 
   .bz-hero-title {
-    margin-bottom: 1.25rem;
+    justify-self: center;
+    margin-bottom: 0;
   }
 
   .bz-hub,

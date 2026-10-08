@@ -1305,8 +1305,8 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  height: calc(3.75rem + env(safe-area-inset-top));
-  padding: env(safe-area-inset-top) 0.5rem 0 0.75rem;
+  height: calc(3.25rem + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 0.375rem 0 0.5rem;
   color: var(--bz-paper);
   background: linear-gradient(var(--bz-ink-2), var(--bz-ink));
 }
@@ -1329,7 +1329,7 @@
 
 .bz-bar-mark {
   width: auto;
-  height: 2.75rem;
+  height: 2.375rem;
 }
 
 .bz-bar-title {
@@ -1393,12 +1393,12 @@
 
 .bz-phone .bz-led {
   position: sticky;
-  top: calc(3.75rem + env(safe-area-inset-top));
+  top: calc(3.25rem + env(safe-area-inset-top));
   z-index: 29;
 }
 
 .bz-screen {
-  padding: 1.25rem 1rem 1.5rem;
+  padding: 0.875rem 0.625rem 1.5rem;
   /* The wipe crosses past the edge mid-flight; clip it to the screen. Clip, not
      hidden, so this is no scroll container and nothing inside loses sticky. */
   overflow-x: clip;
@@ -1486,6 +1486,37 @@
   .bz-search kbd,
   .buzz .u-account-name {
     display: none;
+  }
+}
+
+/* Phone density: one surface per page. The panel is the card, so the groups
+   inside it are sections split by a rule, not cards of their own. */
+@media (max-width: 767.98px) {
+  .bz-phone .bz-panel {
+    padding: 0.75rem 0.625rem;
+    border-width: 2px;
+    box-shadow: 3px 3px 0 var(--bz-purple);
+  }
+
+  .bz-phone .bz-panel .xp-group:not(:has(> .xp-matchup), .xp-group .xp-group, .team-head) {
+    padding: 0.75rem 0.125rem 0.25rem;
+    border: 0;
+    border-top: 2px dashed var(--bz-paper-3);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .bz-phone .bz-panel :is(.xp-tab-panel, .xp-tabs) > .xp-group:first-child,
+  .bz-phone .bz-panel > div > .xp-group:first-child {
+    border-top: 0;
+  }
+
+  .bz-phone :is(.xp-matchup) {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .bz-phone .xp-matchup-hint {
+    font-size: 0.75rem;
   }
 }
 
