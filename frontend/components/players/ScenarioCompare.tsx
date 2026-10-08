@@ -4,8 +4,9 @@ import { PlayerLink } from "@/components/xp/PlayerLink";
 import { playerName } from "@/lib/api/players";
 import { decode, encode } from "@/lib/players/params";
 import { useSavedScenarios } from "@/lib/players/scenarios";
-import { isEmpty, readScenario, type Scenario, type SimFor, writeScenario } from "@/lib/players/simulate";
+import { isEmpty, MOVE_KINDS, readScenario, type Scenario, type SimFor, writeScenario } from "@/lib/players/simulate";
 import type { PlayerBoard } from "@/lib/players/use-player-board";
+import { VERBS } from "./Simulator";
 
 const pts = (n: number) => n.toFixed(1);
 const int = (n: number) => Math.round(n).toLocaleString("en-US");
@@ -40,11 +41,8 @@ export function ScenarioCompare({ board, simFor, current, onLoad }: ScenarioComp
         if (!sim) return null;
         const lineup = Math.round((sim.mine.afterPoints - sim.mine.beforePoints) * 10) / 10;
         const value = sim.mine.valueAfter - sim.mine.valueBefore;
-        const moves = [
-          ...c.scenario.adds.map((id) => ({ kind: "adds", verb: "Add", id })),
-          ...c.scenario.drops.map((id) => ({ kind: "drops", verb: "Drop", id })),
-          ...c.scenario.ir.map((id) => ({ kind: "ir", verb: "IR", id })),
-        ];
+        const moves = MOVE_KINDS.flatMap((kind) => c.scenario[kind].map((id) => ({ kind, verb: VERBS[kind], id })));
+        const partner = sim.partner ? { team: board.teamFor(sim.partner.rosterId), lineup: Math.round((sim.partner.afterPoints - sim.partner.beforePoints) * 10) / 10, value: sim.partner.valueAfter - sim.partner.valueBefore } : null;
         return (
           <li key={c.id} className="sim-card" data-current={c.id === "current" || undefined}>
             <h3 className="sim-title">{c.name}</h3>
@@ -61,6 +59,20 @@ export function ScenarioCompare({ board, simFor, current, onLoad }: ScenarioComp
                   {signed(value, int)}
                 </dd>
               </div>
+              {partner && (
+                <div>
+                  <dt>{partner.team.name}</dt>
+                  <dd>
+                    <span className="sim-delta" data-sign={Math.sign(partner.lineup)}>
+                      {signed(partner.lineup, pts)}
+                    </span>{" "}
+                    pts,{" "}
+                    <span className="sim-delta" data-sign={Math.sign(partner.value)}>
+                      {signed(partner.value, int)}
+                    </span>
+                  </dd>
+                </div>
+              )}
               <div>
                 <dt>Roster</dt>
                 <dd>{sim.problems.length === 0 ? "Legal" : `${sim.problems.length} ${sim.problems.length === 1 ? "problem" : "problems"}`}</dd>

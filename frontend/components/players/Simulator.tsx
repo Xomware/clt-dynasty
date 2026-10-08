@@ -10,7 +10,9 @@ import { playerName } from "@/lib/api/players";
 import { cleanQuery, encode } from "@/lib/players/params";
 import type { PlayerRow } from "@/lib/players/rows";
 import { MAX_SAVED, useSavedScenarios } from "@/lib/players/scenarios";
-import { isEmpty, limitsOf, type Problem, type Scenario, type SimFor, type Simulation, writeScenario } from "@/lib/players/simulate";
+import { EMPTY_SCENARIO, isEmpty, limitsOf, MOVE_KINDS, type MoveKind, type Problem, type Scenario, type SimFor, type Side, type Simulation, writeScenario } from "@/lib/players/simulate";
+import type { Team } from "@/lib/league/use-league";
+import { TradeDesk } from "./TradeDesk";
 import type { PlayerBoard } from "@/lib/players/use-player-board";
 import type { SleeperRoster } from "@/lib/sleeper/types";
 import type { Verdict, Worth } from "@/lib/players/worth";
@@ -22,13 +24,15 @@ const pts = (n: number) => n.toFixed(1);
 const int = (n: number) => Math.round(n).toLocaleString("en-US");
 const signed = (n: number, f: (n: number) => string) => (n > 0 ? `+${f(n)}` : n < 0 ? `-${f(-n)}` : "no change");
 const SHOWN = 8;
+
+export const VERBS: Record<MoveKind, string> = { adds: "Add", drops: "Drop", ir: "IR", send: "Send", receive: "Get" };
 const VERDICT_ORDER: Verdict[] = ["starter", "depth", "stash", "none"];
 
 interface SimulatorProps {
   board: PlayerBoard;
   scenario: Scenario;
   onScenario: (s: Scenario) => void;
-  onToggle: (kind: keyof Scenario, id: string) => void;
+  onToggle: (kind: MoveKind, id: string) => void;
   worth: ((id: string) => Worth | null) | null;
   simFor: SimFor;
 }
@@ -53,14 +57,17 @@ export function Simulator({ board, scenario, onScenario, onToggle, worth, simFor
   return (
     <div className="sim">
       <p className="pl-note">
-        Try adds, drops and IR moves on your team and see this week&rsquo;s best lineup, your depth and your dynasty value
-        before you make them. Nothing here changes Sleeper.
+        Try adds, drops, IR moves and trades on your team and see this week&rsquo;s best lineup, your depth and your
+        dynasty value before you make them. Nothing here changes Sleeper.
       </p>
-      <Moves scenario={scenario} name={name} onToggle={onToggle} />
-      {!isEmpty(scenario) && <Results sim={sim} scenario={scenario} board={board} name={name} onClear={() => onScenario({ adds: [], drops: [], ir: [] })} />}
+      <Moves scenario={scenario} name={name} onToggle={onToggle} partner={scenario.partner === null ? null : board.teamFor(scenario.partner)} />
+      {!isEmpty(scenario) && <Results sim={sim} scenario={scenario} board={board} name={name} onClear={() => onScenario(EMPTY_SCENARIO)} />}
       <div className="sim-pickers">
         <FreeAgents rows={rows} players={board.players} scenario={scenario} onToggle={onToggle} worth={worth} />
-        <MyRoster roster={board.rosters?.find((r) => r.roster_id === myRosterId)} byId={byId} scenario={scenario} onToggle={onToggle} irStatuses={limitsOf(data.league).irStatuses} />
+        <MyRoster roster={board.rosters?.find((r) => r.roster_id === myRosterId)} byId={byId} scenario={scenario} onToggle={onToggle} irStatuses={limitsOf(data.league).irStatuses}
+          trading={scenario.partner !== null}
+        />
+        <TradeDesk board={board} byId={byId} scenario={scenario} onScenario={onScenario} onToggle={onToggle} />
       </div>
     </div>
   );
@@ -68,16 +75,13 @@ export function Simulator({ board, scenario, onScenario, onToggle, worth, simFor
 
 interface MovesProps {
   scenario: Scenario;
+  partner: Team | null;
   name: (id: string) => string;
-  onToggle: (kind: keyof Scenario, id: string) => void;
+  onToggle: (kind: MoveKind, id: string) => void;
 }
 
-function Moves({ scenario, name, onToggle }: MovesProps) {
-  const moves = [
-    ...scenario.adds.map((id) => ({ kind: "adds" as const, id, verb: "Add" })),
-    ...scenario.drops.map((id) => ({ kind: "drops" as const, id, verb: "Drop" })),
-    ...scenario.ir.map((id) => ({ kind: "ir" as const, id, verb: "IR" })),
-  ];
+function Moves({ scenario, partner, name, onToggle }: MovesProps) {
+  const moves = MOVE_KINDS.flatMap((kind) => scenario[kind].map((id) => ({ kind, id, verb: VERBS[kind] })));
   return (
     <section className="sim-sec" aria-label="Your moves">
       <h3 className="sim-title">Your moves</h3>
@@ -91,6 +95,11 @@ function Moves({ scenario, name, onToggle }: MovesProps) {
               <PlayerLink id={m.id} className="sim-move-name">
                 {name(m.id)}
               </PlayerLink>
+              {partner && (m.kind === "send" || m.kind === "receive") && (
+                <span className="sim-move-team">
+                  {m.kind === "send" ? "to" : "from"} {partner.name}
+                </span>
+              )}
               <button type="button" className="sim-x" aria-label={`Undo ${m.verb.toLowerCase()} ${name(m.id)}`} onClick={() => onToggle(m.kind, m.id)}>
                 Undo
               </button>
@@ -154,11 +163,14 @@ function Results({ sim, scenario, board, name, onClear }: ResultsProps) {
           </dd>
         </div>
       </dl>
+      {sim.partner && <PartnerSide side={sim.partner} team={board.teamFor(sim.partner.rosterId)} active={limits.active} />}
 
       {problems.length > 0 ? (
         <ul className="sim-problems" role="alert">
           {problems.map((p) => (
-            <li key={p.kind === "over" ? `over:${p.spot}` : `${p.kind}:${p.id}`}>{problemText(p, name, limits)}</li>
+            <li key={p.kind === "over" ? `over:${p.spot}:${p.partner ?? ""}` : `${p.kind}:${p.id}`}>
+              {problemText(p, name, limits, sim.partner ? board.teamFor(sim.partner.rosterId).name : "")}
+            </li>
           ))}
         </ul>
       ) : (
@@ -251,18 +263,60 @@ function Results({ sim, scenario, board, name, onClear }: ResultsProps) {
   );
 }
 
-function problemText(p: Problem, name: (id: string) => string, limits: ReturnType<typeof limitsOf>): string {
+// What the trade does to the other team, so it reads as an offer they might take.
+function PartnerSide({ side, team, active }: { side: Side; team: Team; active: number }) {
+  const lineup = Math.round((side.afterPoints - side.beforePoints) * 10) / 10;
+  const value = side.valueAfter - side.valueBefore;
+  return (
+    <div className="sim-partner">
+      <h4 className="sim-group-title">Their side: {team.name}</h4>
+      <dl className="sim-totals">
+        <div>
+          <dt>Their best lineup</dt>
+          <dd>
+            {pts(side.beforePoints)} to {pts(side.afterPoints)}
+            <span className="sim-delta" data-sign={Math.sign(lineup)}>
+              {signed(lineup, pts)}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>Their dynasty value</dt>
+          <dd>
+            {int(side.valueBefore)} to {int(side.valueAfter)}
+            <span className="sim-delta" data-sign={Math.sign(value)}>
+              {signed(value, int)}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>Their roster</dt>
+          <dd className="sim-counts">
+            <span data-over={side.counts.active > active || undefined}>
+              Active {side.counts.active}/{active}
+            </span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
+function problemText(p: Problem, name: (id: string) => string, limits: ReturnType<typeof limitsOf>, partner: string): string {
   switch (p.kind) {
     case "rostered":
       return `${name(p.id)} is already on a CLT roster.`;
     case "not-mine":
       return `${name(p.id)} isn't on your roster.`;
+    case "not-theirs":
+      return `${name(p.id)} isn't on ${partner || "their"} roster.`;
     case "locked":
       return `${name(p.id)}'s game has kicked off, so Sleeper locks him until it ends.`;
     case "not-ir-eligible":
       return `${name(p.id)} can't go on IR: CLT's IR takes ${limits.irStatuses.join(", ")} designations.`;
     case "over": {
       const spot = { active: "active roster", taxi: "taxi squad", ir: "IR" }[p.spot];
+      if (p.partner) return `${partner} would be ${p.by} over the ${limits[p.spot]}-player ${spot} and have to drop ${p.by}.`;
       const more = p.spot === "active" ? ` Drop ${p.by} more or move an injured player to IR.` : "";
       return `${p.by} over the ${limits[p.spot]}-player ${spot}.${more}`;
     }
@@ -303,7 +357,7 @@ interface FreeAgentsProps {
   rows: PlayerRow[];
   players: PlayerBoard["players"];
   scenario: Scenario;
-  onToggle: (kind: keyof Scenario, id: string) => void;
+  onToggle: (kind: MoveKind, id: string) => void;
   worth: ((id: string) => Worth | null) | null;
 }
 
@@ -378,13 +432,15 @@ interface MyRosterProps {
   roster: SleeperRoster | undefined;
   byId: Map<string, PlayerRow>;
   scenario: Scenario;
-  onToggle: (kind: keyof Scenario, id: string) => void;
+  onToggle: (kind: MoveKind, id: string) => void;
   irStatuses: string[];
+  // A trade partner is picked, so my players can be sent.
+  trading: boolean;
 }
 
 // My roster as Sleeper has it now, by spot, each player droppable and the
 // IR-eligible ones movable to IR.
-function MyRoster({ roster, byId, scenario, onToggle, irStatuses }: MyRosterProps) {
+function MyRoster({ roster, byId, scenario, onToggle, irStatuses, trading }: MyRosterProps) {
   const id = useId();
   const taxi = roster?.taxi ?? [];
   const ir = roster?.reserve ?? [];
@@ -398,7 +454,7 @@ function MyRoster({ roster, byId, scenario, onToggle, irStatuses }: MyRosterProp
   return (
     <section className="sim-sec" aria-labelledby={`${id}-h`}>
       <h3 id={`${id}-h`} className="sim-title">
-        Drop, or move to IR
+        {trading ? "Drop, move to IR or send" : "Drop, or move to IR"}
       </h3>
       {groups.map((g) =>
         g.ids.length === 0 ? null : (
@@ -408,9 +464,10 @@ function MyRoster({ roster, byId, scenario, onToggle, irStatuses }: MyRosterProp
               {sort(g.ids).map((r) => {
                 const dropped = scenario.drops.includes(r.id);
                 const toIr = scenario.ir.includes(r.id);
+                const sent = scenario.send.includes(r.id);
                 const canIr = g.label === "Active" && irStatuses.includes(r.player.injury_status ?? "");
                 return (
-                  <li key={r.id} className="sim-pick" data-out={dropped || undefined}>
+                  <li key={r.id} className="sim-pick" data-out={dropped || sent || undefined}>
                     <Who row={r} />
                     <span className="sim-pick-stats">
                       {r.proj !== null && <span>{pts(r.proj)} pts</span>}
@@ -420,6 +477,11 @@ function MyRoster({ roster, byId, scenario, onToggle, irStatuses }: MyRosterProp
                       {canIr && (
                         <button type="button" className="pl-act" data-kind="ir" aria-pressed={toIr} aria-label={`Move ${r.name} to IR`} onClick={() => onToggle("ir", r.id)}>
                           {toIr ? "To IR" : "IR"}
+                        </button>
+                      )}
+                      {trading && (
+                        <button type="button" className="pl-act" data-kind="send" aria-pressed={sent} aria-label={`Send ${r.name}`} onClick={() => onToggle("send", r.id)}>
+                          {sent ? "Sent" : "Send"}
                         </button>
                       )}
                       <button type="button" className="pl-act" data-kind="drops" aria-pressed={dropped} aria-label={`Drop ${r.name}`} onClick={() => onToggle("drops", r.id)}>

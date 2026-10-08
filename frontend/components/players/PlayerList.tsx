@@ -4,7 +4,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 
 import { cleanQuery, naturalDesc, type SortKey, type View } from "@/lib/players/params";
 import { filterRows, type PlayerRow, sortRows } from "@/lib/players/rows";
-import type { Scenario } from "@/lib/players/simulate";
+import { type MoveKind, moveCount, type Scenario } from "@/lib/players/simulate";
 import type { PlayerBoard } from "@/lib/players/use-player-board";
 import type { Worth } from "@/lib/players/worth";
 import { searchPlayers } from "@/lib/search/nfl";
@@ -21,7 +21,7 @@ interface PlayerListProps {
   onQuery: (q: string) => void;
   worth: ((id: string) => Worth | null) | null;
   scenario: Scenario;
-  onToggle: (kind: keyof Scenario, id: string) => void;
+  onToggle: (kind: MoveKind, id: string) => void;
   onSimulate: () => void;
 }
 
@@ -65,7 +65,7 @@ export function PlayerList({ board, view, onView, query, onQuery, worth, scenari
             </button>
           );
         };
-  const moves = scenario.adds.length + scenario.drops.length + scenario.ir.length;
+  const moves = moveCount(scenario);
 
   return (
     <div className="pl-list">
@@ -87,7 +87,8 @@ export function PlayerList({ board, view, onView, query, onQuery, worth, scenari
           <span>
             Your scenario: {scenario.adds.length} {scenario.adds.length === 1 ? "add" : "adds"}, {scenario.drops.length}{" "}
             {scenario.drops.length === 1 ? "drop" : "drops"}
-            {scenario.ir.length > 0 && `, ${scenario.ir.length} to IR`}.
+            {scenario.ir.length > 0 && `, ${scenario.ir.length} to IR`}
+            {scenario.send.length + scenario.receive.length > 0 && `, a ${scenario.send.length}-for-${scenario.receive.length} trade`}.
           </span>
           <button type="button" className="xp-button" onClick={onSimulate}>
             Open the simulator
