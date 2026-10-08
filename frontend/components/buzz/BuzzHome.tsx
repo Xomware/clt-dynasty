@@ -24,7 +24,6 @@ import { ordinal } from "@/lib/team/team";
 import { BrandMark } from "./BrandMark";
 import { Flip } from "./Flip";
 import { Led } from "./Led";
-import { TRIVIA } from "./trivia";
 
 import "@/components/windows/home.css";
 import "./buzz-home.css";
@@ -111,10 +110,7 @@ export function BuzzHome({ ref, phone = false }: BuzzHomeProps) {
           <ProposalsCard />
           <TaxiCard {...league} />
         </div>
-        <div className="bz-hub-foot">
-          <LeaguePulse data={data} week={week} error={error} />
-          <Fact />
-        </div>
+        <LeaguePulse data={data} week={week} error={error} />
       </div>
     </div>
   );
@@ -258,23 +254,3 @@ function GameTile({ game, live, mine, teamFor }: GameTileProps) {
   );
 }
 
-// A Charlotte fact on a sticker, the next one a tap away. Starts on the day's
-// fact, so a regular sees a new one each visit.
-function Fact() {
-  const [n, setN] = useState(() => Math.floor(Date.now() / 86_400_000) % TRIVIA.length);
-  return (
-    <HomeCard title="Did you know" className="bz-factcard">
-      <p key={n} className="bz-factcard-text" aria-live="polite">
-        {TRIVIA[n]}
-      </p>
-      <button type="button" className="bz-sticker-btn" onClick={() => setN((n + 1) % TRIVIA.length)}>
-        Next fact
-      </button>
-      <svg className="bz-factcard-coin" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-        <circle cx="32" cy="32" r="29" />
-        <circle cx="32" cy="32" r="22" />
-        <path d="M32 16l4.2 9.4 10.3 1-7.7 6.9 2.2 10.1L32 38.2l-9 5.2 2.2-10.1-7.7-6.9 10.3-1z" />
-      </svg>
-    </HomeCard>
-  );
-}

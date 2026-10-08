@@ -34,7 +34,7 @@ describe("Buzz City landing", () => {
     expect(screen.getByRole("table", { name: "Playoff seeds as of today" })).toBeTruthy();
     expect(screen.getByRole("list", { name: "Champions by season" })).toBeTruthy();
 
-    expect(within(screen.getByRole("region", { name: "About Charlotte" })).getAllByRole("listitem")).toHaveLength(4);
+    expect(screen.queryByRole("region", { name: "About Charlotte" })).toBeNull();
     const buttons = screen.getAllByRole("button", { name: "Sign in with Google" });
     expect(buttons).toHaveLength(2);
     buttons.forEach((b) => fireEvent.click(b));
