@@ -58,15 +58,16 @@ beforeEach(() => {
   });
 });
 afterEach(() => {
+  localStorage.clear();
   vi.restoreAllMocks();
   setParams.mockReset();
 });
 
-const open = (v = "") =>
+const open = (v = "", tab = "") =>
   render(
     <MemberProvider>
       <ViewParamsContext value={setParams}>
-        <PlayersWindow params={v ? { v } : {}} />
+        <PlayersWindow params={{ ...(v ? { v } : {}), ...(tab ? { tab } : {}) }} />
       </ViewParamsContext>
     </MemberProvider>,
   );
@@ -141,5 +142,52 @@ describe("Players window", () => {
     await within(t).findByText("Bryce Young");
     expect(names(t)).toEqual(["Ja'Tavion Sanders", "Bryce Young"]);
     expect(screen.getByRole("button", { name: "QB", pressed: true })).toBeTruthy();
+  });
+
+  it("puts a free agent into the scenario from the list", async () => {
+    open();
+    const t = await table();
+    fireEvent.click(within(t).getByRole("button", { name: "Add Free Agent", pressed: false }));
+    expect(setParams).toHaveBeenLastCalledWith({ v: "add-14" });
+    expect(screen.getByText("Your scenario: 1 add, 0 drops.")).toBeTruthy();
+    expect(screen.getByRole("tab", { name: "Simulator (1)" })).toBeTruthy();
+  });
+});
+
+describe("Players simulator", () => {
+  it("shows the lineup, value and roster after an add and a drop, and saves the scenario", async () => {
+    open("add-14~drop-11", "sim");
+    const totals = within(await screen.findByRole("region", { name: "What it does" }));
+    // Young's 18.0 alone, then Young plus the free agent's 7.0 in Hubbard's RB slot.
+    expect(totals.getByText("Best lineup, Week 4").nextElementSibling?.textContent).toBe("18.0 to 25.0+7.0");
+    expect(totals.getByText("Active 2/26")).toBeTruthy();
+    expect(totals.getByText(/^Legal/)).toBeTruthy();
+    const lineup = totals.getByRole("table", { name: "Best lineup this week" });
+    const changed = within(lineup).getAllByRole("row").filter((r) => r.hasAttribute("data-changed"));
+    expect(changed.map((r) => r.textContent)).toEqual(["RBChuba HubbardFree Agent (changed)"]);
+    expect(totals.getByRole("link", { name: /Make it real in Sleeper/ }).getAttribute("href")).toBe(`https://sleeper.com/leagues/${fixture.league.league_id}/team`);
+
+    fireEvent.change(totals.getByLabelText("Save this scenario"), { target: { value: "Mixon plan" } });
+    fireEvent.click(totals.getByRole("button", { name: "Save" }));
+    expect(JSON.parse(localStorage.getItem("clt.players.scenarios") ?? "[]")).toMatchObject([{ name: "Mixon plan", v: "add-14~drop-11" }]);
+    expect(totals.getByText('Saved "Mixon plan". Compare it on the Saved tab.')).toBeTruthy();
+  });
+
+  it("flags a move past the roster limits", async () => {
+    open("ir-10", "sim");
+    const totals = within(await screen.findByRole("region", { name: "What it does" }));
+    expect(totals.getByRole("alert").textContent).toMatch(/Bryce Young can't go on IR/);
+  });
+
+  it("compares saved scenarios side by side, the unsaved one first", async () => {
+    localStorage.setItem("clt.players.scenarios", JSON.stringify([{ id: "a", name: "Mixon plan", v: "add-14" }, { id: "b", name: "Cut Hubbard", v: "drop-11" }]));
+    open("add-14~drop-11", "compare");
+    const cards = await screen.findAllByRole("heading", { level: 3 });
+    expect(cards.map((h) => h.textContent)).toEqual(["Unsaved (in the simulator)", "Mixon plan", "Cut Hubbard"]);
+    const card = (name: string) => within(screen.getByRole("heading", { name }).closest("li") as HTMLElement);
+    expect(card("Mixon plan").getByText("+7.0")).toBeTruthy();
+    expect(card("Cut Hubbard").getByText("Week 4 lineup").nextElementSibling?.textContent).toBe("0");
+    fireEvent.click(card("Cut Hubbard").getByRole("button", { name: "Delete Cut Hubbard" }));
+    expect(screen.queryByRole("heading", { name: "Cut Hubbard" })).toBeNull();
   });
 });

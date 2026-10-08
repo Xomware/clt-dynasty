@@ -1,120 +1,99 @@
 "use client";
 
-import { useContext, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
-import { PlayerFilters } from "@/components/players/PlayerFilters";
-import { PlayerResults } from "@/components/players/PlayerResults";
+import { PlayerList } from "@/components/players/PlayerList";
+import { ScenarioCompare } from "@/components/players/ScenarioCompare";
+import { Simulator } from "@/components/players/Simulator";
 import { LoadError } from "@/components/xp/LoadError";
+import { Tabs } from "@/components/xp/Tabs";
 import { valueOf } from "@/lib/analyzer/values";
 import type { WindowParams } from "@/lib/desktop/windows";
-import { cleanQuery, decode, encode, naturalDesc, readView, type SortKey, type View, writeView } from "@/lib/players/params";
-import { filterRows, type PlayerRow, sortRows } from "@/lib/players/rows";
-import { usePlayerBoard } from "@/lib/players/use-player-board";
+import type { PlayerWeek } from "@/lib/home/projections";
+import { cleanQuery, decode, encode, readView, type View, writeView } from "@/lib/players/params";
+import type { PlayerRow } from "@/lib/players/rows";
+import { limitsOf, readScenario, type Scenario, type SimFor, simulate, writeScenario } from "@/lib/players/simulate";
+import { type PlayerBoard, usePlayerBoard } from "@/lib/players/use-player-board";
 import { type Worth, worthFor } from "@/lib/players/worth";
-import { searchPlayers } from "@/lib/search/nfl";
 import { ViewParamsContext } from "@/lib/view-params";
 
 import "./players-page.css";
 import "./settings.css";
 
-const PAGE = 50;
-
 export function PlayersWindow({ params }: { params: WindowParams }) {
   const setParams = useContext(ViewParamsContext);
   const [view, setView] = useState<View>(() => readView(decode(String(params.v ?? ""))));
   const [query, setQuery] = useState(view.q);
-  const [shown, setShown] = useState(PAGE);
+  const [scenario, setScenario] = useState<Scenario>(() => readScenario(decode(String(params.v ?? ""))));
   const board = usePlayerBoard(view.sort === "ros");
-  const deferredQuery = useDeferredValue(query);
 
-  // The view lives in the window's link, so Back from a player and a shared link both restore it.
-  const v = encode(writeView({ ...view, q: cleanQuery(query) }, decode(String(params.v ?? ""))));
+  // The filters and the scenario live in the window's link, so Back from a
+  // player and a shared link both restore them.
+  const v = encode(writeScenario(scenario, writeView({ ...view, q: cleanQuery(query) }, decode(String(params.v ?? "")))));
   useEffect(() => {
     if (setParams && v !== String(params.v ?? "")) setParams({ v });
   }, [v, params.v, setParams]);
 
-  const change = (patch: Partial<View>) => {
-    setView((old) => ({ ...old, ...patch }));
-    setShown(PAGE);
-  };
-  const onQuery = (q: string) => {
-    setQuery(q);
-    setShown(PAGE);
-  };
-  const onSort = (sort: SortKey) => change({ sort, desc: sort === view.sort ? !view.desc : naturalDesc(sort) });
-
-  const { rows, players, myRosterId, teamFor, rosters } = board;
-  const matches = useMemo(() => {
-    const q = cleanQuery(deferredQuery).trim();
-    return q && players ? new Set(searchPlayers(players, q, 2000).map((h) => h.item.player_id)) : null;
-  }, [deferredQuery, players]);
   const worth = useWorth(board);
-  const found = useMemo(() => {
-    if (!rows) return null;
-    const kept = filterRows(rows, view, myRosterId, matches).filter((r) => !view.worth || !worth || (r.owner === null && worth(r.id)?.verdict !== "none"));
-    return sortRows(kept, view.sort, view.desc);
-  }, [rows, view, myRosterId, matches, worth]);
-  const teams = useMemo(
-    () => (rosters ?? []).map((r) => ({ rosterId: r.roster_id, team: teamFor(r.roster_id) })).sort((a, b) => a.team.name.localeCompare(b.team.name)),
-    [rosters, teamFor],
-  );
+  const simFor = useSimulation(board);
+
+  // A player is in the scenario once: adding a dropped player undoes the drop.
+  const toggle = (kind: keyof Scenario, id: string) =>
+    setScenario((s) => {
+      const on = s[kind].includes(id);
+      const rest = { adds: s.adds.filter((x) => x !== id), drops: s.drops.filter((x) => x !== id), ir: s.ir.filter((x) => x !== id) };
+      return on ? rest : { ...rest, [kind]: [...rest[kind], id] };
+    });
 
   if (board.error) return <LoadError what="players and rosters" message={board.error} onRetry={board.retry} />;
 
+  const moves = scenario.adds.length + scenario.drops.length + scenario.ir.length;
+  const pick = (tab: string) => setParams?.({ tab });
   return (
     <div className="pl">
-      <PlayerFilters
-        view={view}
-        onChange={change}
-        query={query}
-        onQuery={onQuery}
-        teams={teams}
-        mine={myRosterId}
-        inSeason={board.week !== null}
-        canRate={worth !== null}
+      <Tabs
+        label="Players views"
+        selected={params.tab}
+        tabs={[
+          {
+            id: "list",
+            label: "Players",
+            panel: () => (
+              <PlayerList
+                board={board}
+                view={view}
+                onView={(patch) => setView((old) => ({ ...old, ...patch }))}
+                query={query}
+                onQuery={setQuery}
+                worth={worth}
+                scenario={scenario}
+                onToggle={toggle}
+                onSimulate={() => pick("sim")}
+              />
+            ),
+          },
+          {
+            id: "sim",
+            label: moves ? `Simulator (${moves})` : "Simulator",
+            panel: () => <Simulator board={board} scenario={scenario} onScenario={setScenario} onToggle={toggle} worth={worth} simFor={simFor} />,
+          },
+          {
+            id: "compare",
+            label: "Saved",
+            panel: () => <ScenarioCompare board={board} simFor={simFor} current={scenario} onLoad={(s) => {
+                  setScenario(s);
+                  pick("sim");
+                }} />,
+          },
+        ]}
       />
-      {!found ? (
-        <p role="status">Loading every player, his CLT team and this season&rsquo;s numbers...</p>
-      ) : (
-        <>
-          <p className="pl-count" aria-live="polite">
-            {found.length === 0
-              ? "No players match these filters."
-              : `${found.length.toLocaleString("en-US")} ${found.length === 1 ? "player" : "players"}${found.length > shown ? `, showing the first ${shown}` : ""}`}
-            {board.rosLoading && " Loading the rest-of-season projections..."}
-          </p>
-          <Notes missing={board.missing} />
-          {found.length > 0 && (
-            <PlayerResults
-              rows={found.slice(0, shown)}
-              sort={view.sort}
-              desc={view.desc}
-              onSort={onSort}
-              mine={myRosterId}
-              teamFor={teamFor}
-              week={board.week}
-              showRos={view.sort === "ros"}
-              worth={worth}
-            />
-          )}
-          {found.length > shown && (
-            <button type="button" className="xp-button pl-more" onClick={() => setShown((n) => n + PAGE)}>
-              Show {Math.min(PAGE, found.length - shown)} more
-            </button>
-          )}
-        </>
-      )}
-      <p className="pl-note">
-        Points are this season&rsquo;s, scored with CLT&rsquo;s settings (TE premium included). Projections are
-        Sleeper&rsquo;s; dynasty values are FantasyCalc&rsquo;s superflex values.
-      </p>
     </div>
   );
 }
 
 // The worth-adding check for every player not on my team, judged once per
 // data change. Players with no projection and no value are never worth it.
-function useWorth({ rows, rosters, myRosterId, board, slots, values }: ReturnType<typeof usePlayerBoard>) {
+function useWorth({ rows, rosters, myRosterId, board, slots, values }: PlayerBoard) {
   return useMemo(() => {
     const roster = rosters?.find((r) => r.roster_id === myRosterId);
     if (!rows || !roster || !board || !values) return null;
@@ -129,8 +108,19 @@ function useWorth({ rows, rosters, myRosterId, board, slots, values }: ReturnTyp
   }, [rows, rosters, myRosterId, board, slots, values]);
 }
 
-function Notes({ missing }: { missing: { stats: boolean; proj: boolean; values: boolean; ros: boolean } }) {
-  const gone = [missing.stats && "season stats", missing.proj && "this week's projections", missing.values && "dynasty values", missing.ros && "rest-of-season projections"].filter(Boolean);
-  if (gone.length === 0) return null;
-  return <p className="pl-warn">Couldn&rsquo;t load {gone.join(", ")}, so those columns are empty. Reopen Players to try again.</p>;
+// Runs any scenario against my team. Out of season every projection is 0, so
+// only the roster count and dynasty value move.
+function useSimulation({ data, rosters, myRosterId, board, slots, values, players }: PlayerBoard): SimFor {
+  return useMemo(() => {
+    if (!data || !rosters || myRosterId === null || !players) return null;
+    const limits = limitsOf(data.league);
+    const idle = (id: string): PlayerWeek => {
+      const position = players[id]?.position ?? "";
+      return { points: 0, position, positions: [position], team: players[id]?.team ?? null, injury: players[id]?.injury_status ?? null, bye: false, locked: false };
+    };
+    const week = board ?? idle;
+    const value = (id: string) => (values ? valueOf(values, id) : 0);
+    return (scenario: Scenario) =>
+      simulate({ scenario, rosterId: myRosterId, rosters, slots, limits, week, value, injury: (id) => week(id).injury ?? players[id]?.injury_status ?? null });
+  }, [data, rosters, myRosterId, board, slots, values, players]);
 }

@@ -86,6 +86,8 @@ export function usePlayerBoard(withRos: boolean) {
   };
 }
 
+export type PlayerBoard = ReturnType<typeof usePlayerBoard>;
+
 interface RosRange {
   season: string;
   from: number;

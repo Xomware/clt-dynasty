@@ -12,6 +12,8 @@ export const POOL: Record<string, [string, number, number, boolean?]> = {
   te1: ["TE", 10.3, 2500], fx1: ["WR", 8.4, 1200], fx2: ["RB", 11.0, 2600], sf1: ["RB", 7.9, 900],
   // Roster 4's bench, taxi rookie and IR tight end.
   bnWr: ["WR", 5.0, 800], bnRb: ["RB", 4.0, 300], txWr: ["WR", 0, 2000], irTe: ["TE", 0, 1000],
+  // Roster 9's three.
+  r9qb: ["QB", 15.0, 3000], r9rb: ["RB", 8.0, 1000], r9wr: ["WR", 9.0, 1500],
   // Free agents.
   faWr: ["WR", 12.1, 500], faRb: ["RB", 6.0, 200], faRb2: ["RB", 6.0, 1500], faTe: ["TE", 0, 3000], faK: ["K", 9.0, 50], faLate: ["WR", 20.0, 1500, true],
 };
