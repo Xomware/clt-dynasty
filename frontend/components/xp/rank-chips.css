@@ -25,17 +25,6 @@
   background: var(--xp-gold);
 }
 
-.xp-ranks[data-compact] {
-  justify-content: center;
-  gap: 0.125rem;
-}
-
-.xp-ranks[data-compact] .xp-rank {
-  padding: 0 0.1875rem;
-  font-size: 0.625rem;
-  line-height: 1.4;
-}
-
 [data-theme="buzz"] .xp-rank {
   border: 2px solid var(--bz-ink);
   border-radius: 999px;
@@ -56,13 +45,6 @@
   background: var(--bz-purple);
 }
 
-[data-theme="buzz"] .xp-ranks[data-compact] .xp-rank {
-  padding: 0 0.25rem;
-  border-width: 1.5px;
-  font-size: 0.6875rem;
-  line-height: 1.25;
-}
-
 .player-ranks {
   margin-top: 0.25rem;
 }
@@ -74,9 +56,9 @@
   background: var(--bz-paper-2);
 }
 
-/* The one-line strip a narrow token shows instead of the chips. */
+/* A field token's one line of ranks. */
 .xp-rank-strip {
-  display: none;
+  display: inline-flex;
   overflow: hidden;
   border: 1px solid var(--xp-text);
   border-radius: 3px;
