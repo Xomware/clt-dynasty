@@ -432,6 +432,16 @@
   color: var(--bz-purple);
 }
 
+.buzz .bz-hub .yw-closed {
+  border: 2px solid var(--bz-ink);
+  border-radius: 8px;
+  background: var(--bz-amber-light);
+}
+
+.buzz .bz-hub .yw-item[data-kind="add"] .yw-slot {
+  background: var(--bz-purple-light);
+}
+
 .buzz .bz-hub .yw-note {
   color: var(--bz-muted);
 }
