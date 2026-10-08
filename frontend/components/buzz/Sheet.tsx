@@ -6,23 +6,24 @@ import { LINE, LineIcon } from "./line-icons";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-interface MenuDrawerProps {
+interface SheetProps {
   id: string;
+  label: string;
   open: boolean;
   onClose: () => void;
   children: ReactNode;
 }
 
-// Slides in from the right. Stays mounted while closed, inert, so it can
-// slide out as well as in.
-export function MenuDrawer({ id, open, onClose, children }: MenuDrawerProps) {
+// The phone's bottom sheet, over the tab bar. Stays mounted while closed,
+// inert, so it can slide down as well as up.
+export function Sheet({ id, label, open, onClose, children }: SheetProps) {
   const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const opener = document.activeElement as HTMLElement | null;
     panel.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
-    // The page under the drawer would otherwise scroll with the finger.
+    // The page under the sheet would otherwise scroll with the finger.
     const root = document.documentElement;
     root.style.overflow = "hidden";
     return () => {
@@ -43,16 +44,16 @@ export function MenuDrawer({ id, open, onClose, children }: MenuDrawerProps) {
   };
 
   return (
-    <div className="u-drawer" data-open={open} inert={!open}>
-      <div className="u-drawer-scrim" aria-hidden="true" onClick={onClose} />
-      <div ref={panel} id={id} role="dialog" aria-modal="true" aria-label="Menu" className="u-drawer-panel" onKeyDown={onKeyDown}>
-        <div className="u-drawer-head">
-          <h2>Menu</h2>
-          <button type="button" className="u-drawer-close" aria-label="Close menu" onClick={onClose}>
+    <div className="u-sheet" data-open={open} inert={!open}>
+      <div className="u-sheet-scrim" aria-hidden="true" onClick={onClose} />
+      <div ref={panel} id={id} role="dialog" aria-modal="true" aria-label={label} className="u-sheet-panel" onKeyDown={onKeyDown}>
+        <div className="u-sheet-head">
+          <h2>{label}</h2>
+          <button type="button" className="u-sheet-close" aria-label={`Close ${label.toLowerCase()}`} onClick={onClose}>
             <LineIcon d={LINE.close} />
           </button>
         </div>
-        <div className="u-drawer-body">{children}</div>
+        <div className="u-sheet-body">{children}</div>
       </div>
     </div>
   );

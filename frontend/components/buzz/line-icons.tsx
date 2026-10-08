@@ -11,6 +11,8 @@ export const LINE = {
   standings: "M5 20V11M12 20V5M19 20v-6",
   bracket: "M4 6h5v4h4v4H9v4H4M13 12h7",
   star: "M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3l-5.5 2.9 1-6.2L3 9.6l6.2-.9z",
+  player: "M12 11a4 4 0 1 0 0-8a4 4 0 1 0 0 8M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5",
+  more: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
 };
 
 interface LineIconProps {

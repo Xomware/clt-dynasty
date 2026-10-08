@@ -141,6 +141,17 @@ describe("phone shell", () => {
     await waitFor(() => expect(screen.getByRole("navigation", { name: "Programs" })).toBeTruthy());
   });
 
+  it("opens a destination from the taskbar and marks it", async () => {
+    await renderPhone();
+    const taskbar = () => within(screen.getByRole("navigation", { name: "Taskbar" }));
+    expect(taskbar().getAllByRole("button").map((b) => b.textContent)).toEqual(["start", "Home", "Standings"]);
+    fireEvent.click(taskbar().getByRole("button", { name: "Standings" }));
+    expect(screen.getByRole("region", { name: "League Standings" })).toBeTruthy();
+    expect(taskbar().getByRole("button", { name: "Standings" }).getAttribute("aria-current")).toBe("page");
+    fireEvent.click(taskbar().getByRole("button", { name: "Standings" }));
+    expect(window.location.search).toBe("?open=standings");
+  });
+
   // Chromium's scrollTo returns a promise now; an effect handing it back as its
   // cleanup threw "destroy is not a function" on the next screen change.
   it("survives a scrollTo that returns a promise", async () => {

@@ -25,7 +25,7 @@ export function SignInGreeting() {
     notify({
       title: member.displayName ? `Welcome back, ${member.displayName}` : "Welcome to CLT Dynasty",
       body: buzz
-        ? "Everything in the league is in the menu, and search finds any team or player."
+        ? "Every page is a tap away in the nav, and search finds any team or player."
         : "Everything in the league is a double-click away: open a folder or the Start menu.",
       icon: "info",
     });

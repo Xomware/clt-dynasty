@@ -92,12 +92,13 @@ async function renderPhone() {
 }
 
 const bar = () => screen.getByRole("heading", { level: 1 });
-const drawer = () => within(screen.getByRole("dialog", { name: "Menu" }));
+const sheet = (name: string) => within(screen.getByRole("dialog", { name }));
+const dock = () => within(screen.getByRole("navigation", { name: "Primary" }));
 
 describe("Buzz City phone", () => {
   it("welcomes a member with Buzz City's directions, not XP's", async () => {
     await renderPhone();
-    expect(screen.getByText(/in the menu, and search finds any team or player/)).toBeTruthy();
+    expect(screen.getByText(/in the nav, and search finds any team or player/)).toBeTruthy();
     expect(screen.queryByText(/double-click/)).toBeNull();
   });
 
@@ -109,10 +110,9 @@ describe("Buzz City phone", () => {
     expect(screen.queryByRole("navigation", { name: "Programs" })).toBeNull();
   });
 
-  it("offers the weekly pages in the tab bar, marking the one showing", async () => {
+  it("offers the weekly pages and More in the tab bar, marking the one showing", async () => {
     await renderPhone();
-    const dock = () => within(screen.getByRole("navigation", { name: "Quick" }));
-    expect(dock().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "Standings"]);
+    expect(dock().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "Standings", "More"]);
     expect(dock().getByRole("button", { name: "Home" }).getAttribute("aria-current")).toBe("page");
 
     fireEvent.click(dock().getByRole("button", { name: "Standings" }));
@@ -123,20 +123,33 @@ describe("Buzz City phone", () => {
     expect(bar().textContent).toBe("League Standings");
   });
 
-  it("lists every group's pages in the menu and opens one as a screen Back closes", async () => {
+  it("lists every group's pages under More and opens one as a screen Back closes", async () => {
     await renderPhone();
-    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(screen.getByRole("button", { name: "Menu" }).getAttribute("aria-expanded")).toBe("true");
-    const league = within(drawer().getByRole("region", { name: "League" }));
+    fireEvent.click(dock().getByRole("button", { name: "More" }));
+    expect(dock().getByRole("button", { name: "More" }).getAttribute("aria-expanded")).toBe("true");
+    const league = within(sheet("More").getByRole("region", { name: "League" }));
     expect(league.getAllByRole("button").map((b) => b.textContent)).toEqual(["Standings", "Broken"]);
-    expect(drawer().getByRole("button", { name: "Home" }).getAttribute("aria-current")).toBe("page");
 
     fireEvent.click(league.getByRole("button", { name: "Standings" }));
     expect(bar().textContent).toBe("League Standings");
     expect(window.location.search).toBe("?open=standings");
-    expect(screen.getByRole("button", { name: "Menu" }).getAttribute("aria-expanded")).toBe("false");
+    expect(dock().getByRole("button", { name: "More" }).getAttribute("aria-expanded")).toBe("false");
 
     fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
+    await waitFor(() => expect(bar().textContent).toBe("CLT Dynasty"));
+  });
+
+  it("marks More for a page off the tab bar", async () => {
+    window.history.replaceState(null, "", "/?open=broken");
+    await renderPhone();
+    expect(dock().getByRole("button", { name: "More" }).getAttribute("aria-current")).toBe("page");
+    expect(dock().getByRole("button", { name: "Home" }).getAttribute("aria-current")).toBeNull();
+  });
+
+  it("goes Home from the logo", async () => {
+    window.history.replaceState(null, "", "/?open=standings");
+    await renderPhone();
+    fireEvent.click(screen.getByRole("button", { name: "CLT Dynasty, home" }));
     await waitFor(() => expect(bar().textContent).toBe("CLT Dynasty"));
   });
 
@@ -199,29 +212,31 @@ describe("Buzz City phone", () => {
     expect(main.style.transform).toBe("");
   });
 
-  it("closes the menu on Escape and holds the theme toggle and sign-out", async () => {
+  it("holds the theme toggle and sign-out in the account sheet, which Escape closes", async () => {
     await renderPhone();
-    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(drawer().getByRole("group", { name: "Theme" })).toBeTruthy();
-    expect(drawer().getByRole("button", { name: "Sign out" })).toBeTruthy();
-    fireEvent.keyDown(screen.getByRole("dialog", { name: "Menu" }), { key: "Escape" });
-    expect(screen.getByRole("button", { name: "Menu" }).getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    expect(sheet("Account").getByText("Signed in as Roster 4")).toBeTruthy();
+    expect(sheet("Account").getByRole("group", { name: "Theme" })).toBeTruthy();
+    expect(sheet("Account").getByRole("button", { name: "Sign out" })).toBeTruthy();
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Account" }), { key: "Escape" });
+    expect(screen.getByRole("button", { name: "Account" }).getAttribute("aria-expanded")).toBe("false");
   });
 
   it("leaves Admin out for members", async () => {
     await renderPhone();
-    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(drawer().queryByRole("navigation", { name: "Admin" })).toBeNull();
-    expect(drawer().queryByRole("button", { name: "Members" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    expect(sheet("Account").queryByRole("navigation", { name: "Admin" })).toBeNull();
+    expect(sheet("Account").queryByRole("button", { name: "Members" })).toBeNull();
   });
 
-  it("files Admin under an admin's account, not the page groups", async () => {
+  it("files Admin under an admin's account, not under More", async () => {
     admin.on = true;
     await renderPhone();
-    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
-    expect(within(drawer().getByRole("navigation", { name: "Pages" })).queryByRole("button", { name: "Members" })).toBeNull();
-    const account = within(drawer().getByRole("region", { name: "Account" }));
-    fireEvent.click(within(account.getByRole("navigation", { name: "Admin" })).getByRole("button", { name: "Members" }));
+    fireEvent.click(dock().getByRole("button", { name: "More" }));
+    expect(sheet("More").queryByRole("button", { name: "Members" })).toBeNull();
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "More" }), { key: "Escape" });
+    fireEvent.click(screen.getByRole("button", { name: "Account" }));
+    fireEvent.click(within(sheet("Account").getByRole("navigation", { name: "Admin" })).getByRole("button", { name: "Members" }));
     expect(bar().textContent).toBe("Admin: Members");
   });
 
