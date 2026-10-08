@@ -23,7 +23,7 @@ import { ScoresWindow } from "@/components/windows/ScoresWindow";
 import { SearchWindow } from "@/components/windows/SearchWindow";
 import { SettingsWindow } from "@/components/windows/SettingsWindow";
 import { StandingsWindow } from "@/components/windows/StandingsWindow";
-import { TaxiWindow } from "@/components/windows/TaxiWindow";
+import { TAXI_TABS, TaxiWindow } from "@/components/windows/TaxiWindow";
 import { MyTeamWindow, TeamWindow } from "@/components/windows/TeamWindow";
 import { WorldCupWindow } from "@/components/windows/WorldCupWindow";
 import {
@@ -142,7 +142,16 @@ const SPECS = {
   },
   "world-cup": { group: "league", label: "World Cup", title: "World Cup", Icon: TrophyIcon, component: WorldCupWindow, defaultSize: { w: 640, h: 640 } },
   proposals: { group: "community", label: "Proposals", title: "Rule Proposals", Icon: BallotIcon, component: ProposalsWindow, defaultSize: { w: 600, h: 640 } },
-  taxi: { group: "draft", label: "Taxi Squads", title: "Taxi Squads", Icon: TaxiIcon, component: TaxiWindow, defaultSize: { w: 600, h: 640 } },
+  taxi: {
+    group: "draft",
+    label: "Taxi Squads",
+    title: "Taxi Squads",
+    Icon: TaxiIcon,
+    component: TaxiWindow,
+    defaultSize: { w: 720, h: 700 },
+    // `taxi:risk`: the view's tab.
+    link: (v) => ((TAXI_TABS as readonly string[]).includes(v) ? { tab: v } : null),
+  },
   "ai-review": { group: "community", label: "AI Review", title: "AI Review", Icon: NewsFeedIcon, component: AIReviewWindow, defaultSize: { w: 640, h: 640 } },
   "ai-report": {
     label: "AI Report",
