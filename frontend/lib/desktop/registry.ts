@@ -14,6 +14,7 @@ import { MatchupHistoryWindow } from "@/components/windows/MatchupHistoryWindow"
 import { MembersWindow } from "@/components/windows/MembersWindow";
 import { NflTeamsWindow, NflTeamWindow, nflTitle, readNflLink } from "@/components/windows/NflTeamWindow";
 import { PlayerWindow, playerTitle, readPlayerLink } from "@/components/windows/PlayerWindow";
+import { PlayersWindow } from "@/components/windows/PlayersWindow";
 import { PlayoffsWindow } from "@/components/windows/PlayoffsWindow";
 import { ProfileWindow } from "@/components/windows/ProfileWindow";
 import { ProposalsWindow } from "@/components/windows/ProposalsWindow";
@@ -38,6 +39,7 @@ import {
   FootballIcon,
   HomeIcon,
   JerseyIcon,
+  PlayersIcon,
   MembersIcon,
   NewsFeedIcon,
   NewspaperIcon,
@@ -55,6 +57,7 @@ import { LEAGUE_ID } from "@/lib/config";
 import { settled, settledVersion, subscribeSettled } from "@/lib/league/cache";
 import { teamOf } from "@/lib/league/use-league";
 import type { SleeperAccount, SleeperLeague, SleeperPlayer, SleeperRoster, SleeperUser } from "@/lib/sleeper/types";
+import { readPlayersLink } from "@/lib/players/params";
 import { readIdLink, readTeamLink } from "@/lib/team/links";
 
 import { useMember } from "@/lib/member/use-member";
@@ -108,6 +111,16 @@ const SPECS = {
   home: { label: "Home", title: "CLT Dynasty League", Icon: HomeIcon, component: HomeWindow, defaultSize: { w: 760, h: 700 } },
   standings: { group: "league", label: "Standings", title: "League Standings", Icon: StandingsIcon, component: StandingsWindow, defaultSize: { w: 640, h: 560 } },
   scores: { group: "league", label: "Scores", title: "Scores", Icon: ScoresIcon, component: ScoresWindow, defaultSize: { w: 560, h: 600 } },
+  players: {
+    group: "league",
+    label: "Players",
+    title: "Players",
+    Icon: PlayersIcon,
+    component: PlayersWindow,
+    defaultSize: { w: 980, h: 720 },
+    // `players:<tab>:<view>`: the filters, sort and scenario, so Back and a shared link restore them.
+    link: readPlayersLink,
+  },
   playoffs: { group: "league", label: "Playoffs", title: "Playoffs", Icon: BracketIcon, component: PlayoffsWindow, defaultSize: { w: 900, h: 620 } },
   history: { group: "history", label: "History", title: "League History", Icon: CalendarIcon, component: HistoryWindow, defaultSize: { w: 640, h: 600 } },
   "matchup-history": {
