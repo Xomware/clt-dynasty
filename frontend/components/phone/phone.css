@@ -327,3 +327,141 @@
     margin: -0.75rem -0.625rem -0.75rem auto;
   }
 }
+
+/* Search, full-screen: the field on a title bar, results as an Explorer list. */
+.m-spot .u-spot-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--xp-cream);
+}
+
+.m-spot .u-spot {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.m-spot .u-spot-field {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: calc(0.375rem + env(safe-area-inset-top)) 0.375rem 0.375rem 0.75rem;
+  color: var(--xp-text-inverse);
+  background: linear-gradient(var(--xp-title-light), var(--xp-title) 20%, var(--xp-title) 80%, var(--xp-title-dark));
+}
+
+.m-spot .u-spot-field input {
+  flex: 1;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--xp-title-dark);
+  border-radius: 2px;
+  color: var(--xp-text);
+  background: var(--xp-cream);
+  font-size: 1rem;
+}
+
+.m-spot .u-spot-field input:focus-visible {
+  outline: 2px solid var(--xp-gold);
+  outline-offset: 0;
+}
+
+.m-spot .u-spot-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 4px;
+}
+
+.m-spot .u-spot-close:active {
+  background: var(--xp-title-dark);
+}
+
+.m-spot .u-spot-close:focus-visible {
+  outline: 2px dotted var(--xp-text-inverse);
+  outline-offset: -3px;
+}
+
+.m-spot .u-spot-list {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+.m-spot .u-spot-group {
+  padding: 0.5rem 0.75rem;
+  color: var(--xp-text-inverse);
+  font: bold 0.875rem var(--xp-title-font);
+  background: linear-gradient(var(--xp-title-light), var(--xp-title-dark));
+}
+
+.m-spot .u-spot-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3rem;
+  padding: 0.25rem 0.75rem;
+  border-bottom: 1px solid var(--xp-face);
+}
+
+.m-spot .u-spot-option[aria-selected="true"] {
+  color: var(--xp-text-inverse);
+  background: var(--xp-select);
+}
+
+.m-spot .u-spot-avatar {
+  flex: none;
+}
+
+.m-spot .u-spot-name {
+  font-weight: bold;
+}
+
+.m-spot .u-spot-about {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.m-spot .u-spot-empty {
+  padding: 1.25rem 1rem;
+  text-align: center;
+}
+
+.m-spot .u-spot-option[aria-selected="true"] .nfl-hit-owner {
+  color: var(--xp-text);
+}
+
+/* Scrolling down tucks the title bar and taskbar away; scrolling up or
+   tabbing into one brings it back. */
+.m-bar,
+.m-window-bar,
+.m-taskbar {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.m-screens[data-tucked] :is(.m-bar, .m-window-bar):not(:focus-within) {
+  transform: translateY(calc(env(safe-area-inset-top) - 100%));
+}
+
+.m-taskbar[data-tucked]:not(:focus-within) {
+  transform: translateY(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-bar,
+  .m-window-bar,
+  .m-taskbar {
+    transition: none;
+  }
+}

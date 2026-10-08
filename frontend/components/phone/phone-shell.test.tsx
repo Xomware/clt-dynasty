@@ -157,6 +157,15 @@ describe("phone shell", () => {
     expect(window.location.search).toBe("?open=standings");
   });
 
+  it("searches full-screen from the title bar and opens the pick", async () => {
+    await renderPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Search" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "broken" } });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.getByRole("region", { name: "Broken" })).toBeTruthy();
+  });
+
   // Chromium's scrollTo returns a promise now; an effect handing it back as its
   // cleanup threw "destroy is not a function" on the next screen change.
   it("survives a scrollTo that returns a promise", async () => {
