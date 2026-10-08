@@ -7,6 +7,7 @@ import { gameLabel, InClt, loadPage, type Page, playerTitle, type Week, Weeks } 
 import { SilhouetteIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
 import { NflTeamLink } from "@/components/xp/NflTeamLink";
+import { PlayerRankChips } from "@/components/xp/RankChips";
 import type { WindowParams } from "@/lib/desktop/windows";
 import { nflLogo, nflTeam } from "@/lib/nfl/teams";
 import { heightLabel } from "@/lib/player/season";
@@ -66,6 +67,7 @@ export function BuzzPlayer({ params }: { params: WindowParams }) {
     <div className="bz-player">
       <Card key={id} page={page} />
       <div className="bz-player-side">
+        <PlayerRankChips id={id} className="bz-player-ranks" />
         <InClt page={page} />
         <Weeks page={page} />
       </div>
