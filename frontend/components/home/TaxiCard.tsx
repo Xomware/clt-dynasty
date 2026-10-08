@@ -1,5 +1,6 @@
 "use client";
 
+import { TaxiIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
 import { PlayerLink } from "@/components/xp/PlayerLink";
 import { TeamLink } from "@/components/xp/TeamLink";
@@ -8,6 +9,7 @@ import { listTaxiRequests } from "@/lib/api/taxi";
 import { usePlayers } from "@/lib/league/players";
 import type { Team } from "@/lib/league/use-league";
 import { useLoad } from "@/lib/use-load";
+import { CardAction } from "./CardAction";
 import { HomeCard } from "./HomeCard";
 
 const DATE = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
@@ -49,6 +51,9 @@ export function TaxiCard({ teamFor, myRosterId }: TaxiCardProps) {
           })}
         </ul>
       )}
+      <CardAction to={{ kind: "taxi", params: {} }} Icon={TaxiIcon}>
+        Steal a taxi player
+      </CardAction>
     </HomeCard>
   );
 }

@@ -82,11 +82,19 @@ describe("Buzz City Home", () => {
     expect(title.querySelector("img")?.getAttribute("srcset")).toMatch(/lockup.* 1x, .*lockup@2x.* 2x/);
   });
 
-  it("offers the weekly quick actions, lineups out to Sleeper", async () => {
+  it("sends lineups out to Sleeper", () => {
     renderHub();
     const actions = within(screen.getByRole("list", { name: "Quick actions" }));
     expect(actions.getByRole("link", { name: /Set your lineup in Sleeper/ }).getAttribute("href")).toBe(`https://sleeper.com/leagues/${LEAGUE_ID}/team`);
-    fireEvent.click(actions.getByRole("button", { name: "Steal a taxi player" }));
+  });
+
+  it("puts proposing a rule and stealing a taxi player on their own cards", async () => {
+    renderHub();
+    const proposals = within(screen.getByRole("region", { name: "Rule proposals" }));
+    fireEvent.click(proposals.getByRole("button", { name: "Propose a rule" }));
+    expect(go).toHaveBeenLastCalledWith({ kind: "proposals", params: {} });
+    const taxi = within(screen.getByRole("region", { name: "Taxi steal requests" }));
+    fireEvent.click(taxi.getByRole("button", { name: "Steal a taxi player" }));
     expect(go).toHaveBeenLastCalledWith({ kind: "taxi", params: {} });
   });
 
