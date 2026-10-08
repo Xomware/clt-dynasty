@@ -6,6 +6,7 @@ import { DrillLink } from "@/components/xp/DrillLink";
 import { LoadError } from "@/components/xp/LoadError";
 import { PlayerFace } from "@/components/xp/PlayerFace";
 import { PlayerLink } from "@/components/xp/PlayerLink";
+import { Tabs } from "@/components/xp/Tabs";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { type Player, playerName } from "@/lib/api/players";
 import { LEAGUE_ID } from "@/lib/config";
@@ -14,6 +15,7 @@ import { nflSchedule } from "@/lib/league/cache";
 import { refreshPlayers, usePlayers } from "@/lib/league/players";
 import { teamOf } from "@/lib/league/use-league";
 import { depthChart } from "@/lib/nfl/depth";
+import { useRanks } from "@/lib/nfl/use-ranks";
 import { NFL_TEAMS, type NflTeam, nflLogo, nflTeam, nflTeamName } from "@/lib/nfl/teams";
 import { nflLink } from "@/lib/player/links";
 import { byeWeek } from "@/lib/player/season";
@@ -21,6 +23,8 @@ import { rosterOf } from "@/lib/sleeper/rosters";
 import { type LeagueData, loadLeagueData, useMySleeperId } from "@/lib/team/data";
 import { injuryTag } from "@/lib/team/team";
 import { useLoad } from "@/lib/use-load";
+
+import { NflField, type Owner } from "./NflField";
 
 import "./nfl.css";
 import "./team.css";
@@ -51,7 +55,7 @@ export function NflTeamWindow({ params }: { params: WindowParams }) {
   if (load.status === "loading" || players.status === "loading") return <p role="status">Loading the depth chart...</p>;
   if (load.status === "error") return <LoadError what="the league from Sleeper" message={load.message} onRetry={retry} />;
   if (players.status === "error") return <LoadError what="NFL players" message={players.message} onRetry={refreshPlayers} />;
-  return <DepthChart team={team} players={players.players} data={load.value.data} bye={byeWeek(load.value.schedule, team.abbr)} />;
+  return <DepthChart team={team} players={players.players} data={load.value.data} bye={byeWeek(load.value.schedule, team.abbr)} tab={params.tab} />;
 }
 
 interface DepthChartProps {
@@ -59,14 +63,22 @@ interface DepthChartProps {
   players: Record<string, Player>;
   data: LeagueData;
   bye: number | null;
+  tab: WindowParams[string];
 }
 
-function DepthChart({ team, players, data, bye }: DepthChartProps) {
+function DepthChart({ team, players, data, bye, tab }: DepthChartProps) {
+  const ranks = useRanks();
   const me = useMySleeperId();
   const myRoster = me ? rosterOf(data.rosters, me) : null;
   const owners = new Map(data.rosters.flatMap((r) => (r.players ?? []).map((id) => [id, r.roster_id] as const)));
   const groups = depthChart(players, team.abbr);
   const owned = groups.flatMap((g) => [...g.charted, ...g.rest]).filter((p) => owners.has(p.player_id)).length;
+  const ownerOf = (id: string): Owner | null => {
+    const rosterId = owners.get(id);
+    if (rosterId === undefined) return null;
+    const roster = data.rosters.find((r) => r.roster_id === rosterId);
+    return { team: teamOf(data.users, roster, rosterId), mine: rosterId === myRoster };
+  };
 
   const row = (p: Player, rank: number | null) => {
     const rosterId = owners.get(p.player_id);
@@ -104,23 +116,8 @@ function DepthChart({ team, players, data, bye }: DepthChartProps) {
     );
   };
 
-  return (
+  const roster = () => (
     <div className="flex flex-col gap-3">
-      <section aria-label={nflTeamName(team)} className="team-head">
-        <span className="nfl-logo-tile" aria-hidden>
-          <Image src={nflLogo(team.abbr)} alt="" width={56} height={56} unoptimized />
-        </span>
-        <div className="team-who">
-          <h3 className="team-name">{nflTeamName(team)}</h3>
-          <p className="text-xs">
-            {team.division}
-            {bye && `, bye in week ${bye}`}
-          </p>
-        </div>
-        <p className="text-xs">
-          {owned} on CLT rosters
-        </p>
-      </section>
       {groups.map((g) =>
         g.charted.length + g.rest.length === 0 ? null : (
           <section key={g.position} className="xp-group" aria-label={POSITION_NAMES[g.position]}>
@@ -150,6 +147,34 @@ function DepthChart({ team, players, data, bye }: DepthChartProps) {
           </section>
         ),
       )}
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-3">
+      <section aria-label={nflTeamName(team)} className="team-head">
+        <span className="nfl-logo-tile" aria-hidden>
+          <Image src={nflLogo(team.abbr)} alt="" width={56} height={56} unoptimized />
+        </span>
+        <div className="team-who">
+          <h3 className="team-name">{nflTeamName(team)}</h3>
+          <p className="text-xs">
+            {team.division}
+            {bye && `, bye in week ${bye}`}
+          </p>
+        </div>
+        <p className="text-xs">
+          {owned} on CLT rosters
+        </p>
+      </section>
+      <Tabs
+        label="Depth chart views"
+        selected={tab}
+        tabs={[
+          { id: "field", label: "Depth chart", panel: () => <NflField team={team} players={players} ownerOf={ownerOf} ranks={ranks} /> },
+          { id: "roster", label: "Roster", panel: roster },
+        ]}
+      />
     </div>
   );
 }

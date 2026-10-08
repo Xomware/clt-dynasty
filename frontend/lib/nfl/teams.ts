@@ -46,3 +46,40 @@ export const nflLogo = (abbr: string) => `https://sleepercdn.com/images/team_log
 // A defense's player id is its team code, and its picture is the logo.
 export const headshot = (id: string, position?: string) =>
   position === "DEF" ? nflLogo(id) : `https://sleepercdn.com/content/nfl/players/thumb/${id}.jpg`;
+
+// End zone paint and lettering: the primary color, and whichever team color
+// reads on it (cream where neither does). Black is the near-black most teams print.
+export const NFL_COLORS: Record<string, [string, string]> = {
+  ARI: ["#97233f", "#ffb612"],
+  ATL: ["#a71930", "#f4f1e6"],
+  BAL: ["#241773", "#c9a227"],
+  BUF: ["#00338d", "#f4f1e6"],
+  CAR: ["#0085ca", "#101820"],
+  CHI: ["#0b162a", "#c83803"],
+  CIN: ["#fb4f14", "#101820"],
+  CLE: ["#311d00", "#ff3c00"],
+  DAL: ["#003594", "#f4f1e6"],
+  DEN: ["#fb4f14", "#002244"],
+  DET: ["#0076b6", "#f4f1e6"],
+  GB: ["#203731", "#ffb612"],
+  HOU: ["#03202f", "#e0334a"],
+  IND: ["#002c5f", "#f4f1e6"],
+  JAX: ["#006778", "#d7a22a"],
+  KC: ["#e31837", "#ffb81c"],
+  LV: ["#101820", "#a5acaf"],
+  LAC: ["#0080c6", "#ffc20e"],
+  LAR: ["#003594", "#ffa300"],
+  MIA: ["#008e97", "#f4f1e6"],
+  MIN: ["#4f2683", "#ffc62f"],
+  NE: ["#002244", "#f4f1e6"],
+  NO: ["#d3bc8d", "#101820"],
+  NYG: ["#0b2265", "#f4f1e6"],
+  NYJ: ["#125740", "#f4f1e6"],
+  PHI: ["#004c54", "#f4f1e6"],
+  PIT: ["#ffb612", "#101820"],
+  SF: ["#aa0000", "#f4f1e6"],
+  SEA: ["#002244", "#69be28"],
+  TB: ["#d50a0a", "#f4f1e6"],
+  TEN: ["#0c2340", "#4b92db"],
+  WAS: ["#5a1414", "#ffb612"],
+};

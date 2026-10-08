@@ -1,0 +1,137 @@
+.xp-ranks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.xp-rank {
+  padding: 0 0.375rem;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  color: var(--xp-text);
+  background: var(--xp-cream);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.xp-rank[data-kind="week"] {
+  border-color: var(--xp-button-border);
+  color: var(--xp-text-inverse);
+  background: var(--xp-select);
+}
+
+.xp-rank[data-kind="dynasty"] {
+  border-color: var(--xp-wood);
+  background: var(--xp-gold);
+}
+
+.xp-ranks[data-compact] {
+  justify-content: center;
+  gap: 0.125rem;
+}
+
+.xp-ranks[data-compact] .xp-rank {
+  padding: 0 0.1875rem;
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+
+[data-theme="buzz"] .xp-rank {
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  color: var(--bz-ink);
+  padding: 0.125rem 0.625rem;
+  background: var(--bz-paper);
+  font: 700 1rem var(--bz-jersey);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .xp-rank[data-kind="week"] {
+  background: var(--bz-teal-light);
+}
+
+[data-theme="buzz"] .xp-rank[data-kind="dynasty"] {
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+}
+
+[data-theme="buzz"] .xp-ranks[data-compact] .xp-rank {
+  padding: 0 0.25rem;
+  border-width: 1.5px;
+  font-size: 0.6875rem;
+  line-height: 1.25;
+}
+
+.player-ranks {
+  margin-top: 0.25rem;
+}
+
+.bz-player-ranks:has(.xp-ranks) {
+  padding: 0.5rem 0.75rem;
+  border: 3px solid var(--bz-ink);
+  border-radius: 12px;
+  background: var(--bz-paper-2);
+}
+
+/* The one-line strip a narrow token shows instead of the chips. */
+.xp-rank-strip {
+  display: none;
+  overflow: hidden;
+  border: 1px solid var(--xp-text);
+  border-radius: 3px;
+  font-size: 0.625rem;
+  font-weight: bold;
+  line-height: 1.5;
+}
+
+.xp-rank-strip > span {
+  min-width: 1.125rem;
+  padding: 0 0.1875rem;
+  text-align: center;
+}
+
+.xp-rank-strip > [data-kind="season"] {
+  color: var(--xp-text);
+  background: var(--xp-cream);
+}
+
+.xp-rank-strip > [data-kind="week"] {
+  color: var(--xp-text-inverse);
+  background: var(--xp-select);
+}
+
+.xp-rank-strip > [data-kind="dynasty"] {
+  color: var(--xp-text);
+  background: var(--xp-gold);
+}
+
+[data-theme="buzz"] .xp-rank-strip {
+  border: 1.5px solid var(--bz-ink);
+  border-radius: 999px;
+  font: 700 0.6875rem / 1.4 var(--bz-jersey);
+}
+
+[data-theme="buzz"] .xp-rank-strip > [data-kind="season"] {
+  background: var(--bz-paper);
+}
+
+[data-theme="buzz"] .xp-rank-strip > [data-kind="week"] {
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
+}
+
+[data-theme="buzz"] .xp-rank-strip > [data-kind="dynasty"] {
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+}
+
+.xp-rank-strip > span:first-child {
+  color: var(--xp-text-inverse);
+  background: var(--xp-text);
+}
+
+[data-theme="buzz"] .xp-rank-strip > span:first-child {
+  color: var(--bz-paper);
+  background: var(--bz-ink);
+}
