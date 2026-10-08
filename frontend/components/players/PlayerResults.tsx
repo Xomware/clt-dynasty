@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { InjuryBadge } from "@/components/xp/InjuryBadge";
 import { NflTeamLink } from "@/components/xp/NflTeamLink";
 import { PlayerFace } from "@/components/xp/PlayerFace";
@@ -34,9 +36,11 @@ interface PlayerResultsProps {
   showRos: boolean;
   // How each player not on my team measures up against it; null when it can't be judged.
   worth: ((id: string) => Worth | null) | null;
+  // The simulator's add or drop button for a row.
+  action: ((r: PlayerRow) => ReactNode) | null;
 }
 
-export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, showRos, worth }: PlayerResultsProps) {
+export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, showRos, worth, action }: PlayerResultsProps) {
   const columns: Column[] = [
     { sort: "age", label: "Age", title: "Age", cell: (r) => (r.age === null ? "-" : String(r.age)) },
     { sort: "pts", label: "Pts", title: "Season points", cell: (r) => pts(r.pts) },
@@ -73,6 +77,11 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                 For you
               </th>
             )}
+            {action && (
+              <th scope="col" className="pl-col-act">
+                <span className="sr-only">Simulator</span>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -94,6 +103,7 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                   <WorthBadge worth={worth(r.id)} />
                 </td>
               )}
+              {action && <td className="pl-col-act">{action(r)}</td>}
             </tr>
           ))}
         </tbody>
@@ -114,7 +124,12 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                 </div>
               ))}
             </dl>
-            {worth && <WorthBadge worth={worth(r.id)} />}
+            {(worth || action) && (
+              <div className="pl-card-foot">
+                {worth && <WorthBadge worth={worth(r.id)} />}
+                {action?.(r)}
+              </div>
+            )}
           </li>
         ))}
       </ul>
@@ -122,7 +137,7 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
   );
 }
 
-function Who({ row }: { row: PlayerRow }) {
+export function Who({ row }: { row: PlayerRow }) {
   const d = designation(row.player);
   return (
     <span className="pl-who">
@@ -171,7 +186,7 @@ function why(w: Worth): string {
   return w.verdict === "stash" ? `You have no ${w.position}` : "";
 }
 
-function WorthBadge({ worth }: { worth: Worth | null }) {
+export function WorthBadge({ worth }: { worth: Worth | null }) {
   if (!worth) return null;
   return (
     <span className="pl-worth">
