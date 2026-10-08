@@ -128,7 +128,8 @@ describe("Players window", () => {
     // 70 rush yards is 7.0 points, all of it over my RB2, who has no projection.
     await within(t).findAllByText("Starter upgrade");
     expect(cell("Free Agent").textContent).toBe("Starter upgrade+7.0 pts this week at RB");
-    expect(cell("Tetairoa McMillan").textContent).toMatch(/^Starter upgrade\+11\.0 pts this week at /);
+    // He's on roster 9's taxi squad, so he'd come by trade.
+    expect(cell("Tetairoa McMillan").textContent).toMatch(/^Trade target\+11\.0 pts this week at /);
     expect(cell("Ja'Tavion Sanders").textContent).toBe("Not worth it");
     expect(cell("Bryce Young").textContent).toBe("");
     fireEvent.click(screen.getByRole("checkbox", { name: "Only free agents worth adding to my team" }));

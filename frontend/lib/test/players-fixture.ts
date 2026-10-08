@@ -14,8 +14,21 @@ export const POOL: Record<string, [string, number, number, boolean?]> = {
   bnWr: ["WR", 5.0, 800], bnRb: ["RB", 4.0, 300], txWr: ["WR", 0, 2000], irTe: ["TE", 0, 1000],
   // Roster 9's three.
   r9qb: ["QB", 15.0, 3000], r9rb: ["RB", 8.0, 1000], r9wr: ["WR", 9.0, 1500],
+  // Roster 7's: a superstar QB, an aging RB who still produces, an aging WR who doesn't, a young WR.
+  r7star: ["QB", 22.0, 7000], r7vet: ["RB", 12.0, 1800], r7old: ["WR", 2.0, 400], r7young: ["WR", 3.0, 3500],
   // Free agents.
   faWr: ["WR", 12.1, 500], faRb: ["RB", 6.0, 200], faRb2: ["RB", 6.0, 1500], faTe: ["TE", 0, 3000], faK: ["K", 9.0, 50], faLate: ["WR", 20.0, 1500, true],
+  faVet: ["TE", 0, 3000], faRook: ["WR", 0, 100],
+};
+
+// id -> [age, years in the league]; everyone else is 26 with four years.
+const AGES: Record<string, [number, number]> = {
+  r7star: [31, 9], r7vet: [30, 8], r7old: [31, 10], r7young: [22, 1], faTe: [23, 1], faVet: [31, 9], faRook: [22, 0],
+};
+const OWNED = new Map(Object.keys(POOL).flatMap((id) => (id.startsWith("r9") ? [[id, 9]] : id.startsWith("r7") ? [[id, 7]] : [])));
+export const facts = (id: string) => {
+  const [age, yearsExp] = AGES[id] ?? [26, 4];
+  return { age, yearsExp, owned: OWNED.has(id) };
 };
 
 export const week = (id: string): PlayerWeek => {
