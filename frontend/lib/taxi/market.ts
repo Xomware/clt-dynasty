@@ -115,7 +115,8 @@ export function payWith(rounds: number[], owned: Pick[], picks: Values["picks"])
 export const listPrice = (rounds: number[], season: string, picks: Values["picks"]) =>
   rounds.reduce((sum, r) => sum + pickValue(picks, season, r), 0);
 
-export const roundsLabel = (rounds: number[]) => rounds.map((r) => ordinal(r)).join(" + ");
+// "a 2nd", "a 1st and a 2nd".
+export const roundsLabel = (rounds: number[]) => rounds.map((r) => `a ${ordinal(r)}`).join(" and ");
 
 export interface TaxiPlayer {
   id: string;
@@ -146,7 +147,8 @@ export function assess(p: TaxiPlayer, price: number): Assessment {
 // Points a game that start in CLT's lineups, where a taxi player has nothing to prove.
 const PRODUCING: Record<string, number> = { QB: 14, RB: 7, WR: 7, TE: 5 };
 
-export type Risk = "high" | "medium";
+// "requested": someone has already asked for him.
+export type Risk = "requested" | "high" | "medium";
 
 export interface AtRisk {
   player: TaxiPlayer;
@@ -159,20 +161,28 @@ const times = (ratio: number) => (ratio >= 1.95 ? `~${Math.round(ratio)}x` : `${
 
 // Why a manager would pay: depth chart, scoring, and value against the price.
 export function stealCase(p: TaxiPlayer, a: Assessment, rounds: number[]): string {
-  const parts = [p.depth, p.ppg !== null && p.ppg > 0 ? `${p.ppg.toFixed(1)} ppg` : null, `worth ${times(a.ratio)} a ${roundsLabel(rounds)}`];
+  const parts = [p.depth, p.ppg !== null && p.ppg > 0 ? `${p.ppg.toFixed(1)} ppg` : null, `worth ${times(a.ratio)} ${roundsLabel(rounds)}`];
   return parts.filter(Boolean).join(", ");
 }
 
-// My taxi players a rival would pay the price for: worth about the price or
-// more, or already scoring like a starter. Riskiest first.
-export function atRisk(list: { player: TaxiPlayer; assessment: Assessment; rounds: number[] }[]): AtRisk[] {
+const RISK_ORDER: Risk[] = ["requested", "high", "medium"];
+
+// My taxi players a rival would pay the price for: already requested, worth
+// about the price or more, or already scoring like a starter. Riskiest first.
+export function atRisk(list: { player: TaxiPlayer; assessment: Assessment; rounds: number[] }[], requested: Set<string>): AtRisk[] {
   return list
     .flatMap(({ player, assessment, rounds }) => {
       const producing = (player.ppg ?? 0) >= (PRODUCING[player.position] ?? Infinity);
-      const risk: Risk | null = assessment.ratio >= 1 ? "high" : assessment.ratio >= 0.75 || producing ? "medium" : null;
+      const risk: Risk | null = requested.has(player.id)
+        ? "requested"
+        : assessment.ratio >= 1
+          ? "high"
+          : assessment.ratio >= 0.75 || producing
+            ? "medium"
+            : null;
       return risk ? [{ player, assessment, risk, reason: stealCase(player, assessment, rounds) }] : [];
     })
-    .sort((a, b) => Number(b.risk === "high") - Number(a.risk === "high") || b.assessment.ratio - a.assessment.ratio);
+    .sort((a, b) => RISK_ORDER.indexOf(a.risk) - RISK_ORDER.indexOf(b.risk) || b.assessment.ratio - a.assessment.ratio);
 }
 
 // Other teams' taxi players worth clearly more than what I'd pay, biggest surplus first.

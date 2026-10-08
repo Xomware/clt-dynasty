@@ -1,0 +1,163 @@
+/* Taxi Squads: the steal market. Cards are the Players page's; this adds the
+   price block, the rule and the verdict colors. */
+.tx,
+.tx-sec {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.tx-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 0.5rem;
+}
+
+.tx [data-mine] {
+  box-shadow: inset 4px 0 var(--xp-gold);
+}
+
+.tx-meta,
+.tx-note,
+.tx-request {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.tx-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.375rem;
+  border-top: 1px solid var(--xp-face-shadow);
+}
+
+.pl-card-stats.tx-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tx-verdict .pl-why {
+  font-size: 0.75rem;
+}
+
+.tx-risk {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
+  border-left: 3px solid var(--xp-red);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  background: var(--xp-balloon);
+}
+
+.tx-risk a {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.tx-act {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.tx-act .xp-button {
+  min-height: 2.75rem;
+}
+
+.tx-request {
+  font-weight: bold;
+}
+
+.tx-empty {
+  font-weight: bold;
+}
+
+.tx-rule summary {
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.tx-rule summary:focus-visible {
+  outline: 1px dotted currentColor;
+  outline-offset: 2px;
+}
+
+.tx-rule[open] {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tx-rule-table {
+  max-width: 22rem;
+}
+
+.pl-verdict[data-verdict="bargain"] {
+  border-color: var(--xp-start-dark);
+  color: var(--xp-text-inverse);
+  background: var(--xp-start-dark);
+}
+
+.pl-verdict[data-verdict="fair"] {
+  border-color: var(--xp-wood);
+  background: var(--xp-gold);
+}
+
+.pl-verdict[data-verdict="overpay"] {
+  font-weight: normal;
+}
+
+.pl-verdict[data-verdict="requested"],
+.pl-verdict[data-verdict="high"] {
+  border-color: var(--xp-close-dark);
+  color: var(--xp-text-inverse);
+  background: var(--xp-close-dark);
+}
+
+.pl-verdict[data-verdict="medium"] {
+  border-color: var(--xp-wood);
+  background: var(--xp-gold);
+}
+
+[data-theme="buzz"] .tx [data-mine] {
+  box-shadow: inset 5px 0 var(--bz-amber);
+}
+
+[data-theme="buzz"] .tx-price {
+  border-top: 2px dashed var(--bz-ink);
+}
+
+[data-theme="buzz"] .tx-risk {
+  border: 2px solid var(--bz-ink);
+  border-left-width: 6px;
+  border-left-color: var(--bz-red-text);
+  border-radius: 8px;
+  background: var(--bz-paper);
+}
+
+[data-theme="buzz"] .tx-rule summary:focus-visible {
+  outline: 3px solid var(--bz-focus);
+}
+
+[data-theme="buzz"] .pl-verdict[data-verdict="bargain"] {
+  color: var(--bz-paper);
+  background: var(--bz-teal-deep);
+}
+
+[data-theme="buzz"] .pl-verdict:is([data-verdict="fair"], [data-verdict="medium"]) {
+  color: var(--bz-ink);
+  background: var(--bz-amber);
+}
+
+[data-theme="buzz"] .pl-verdict[data-verdict="overpay"] {
+  color: var(--bz-muted);
+  background: var(--bz-paper);
+}
+
+[data-theme="buzz"] .pl-verdict:is([data-verdict="requested"], [data-verdict="high"]) {
+  color: var(--bz-paper);
+  background: var(--bz-red-text);
+}

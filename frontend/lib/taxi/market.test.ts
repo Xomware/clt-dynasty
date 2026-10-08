@@ -125,12 +125,16 @@ describe("my taxi players at risk", () => {
   ];
 
   it("flags value at or over the price as high, close or producing as medium, riskiest first", () => {
-    const risks = atRisk(mine);
+    const risks = atRisk(mine, new Set());
     expect(risks.map((r) => [r.player.id, r.risk])).toEqual([
       ["big", "high"],
       ["noel", "medium"],
     ]);
     expect(risks[1].reason).toBe("WR3 on HOU, 7.3 ppg, worth 0.7x a 2nd");
+  });
+
+  it("puts a player someone already asked for first, whatever his value", () => {
+    expect(atRisk(mine, new Set(["coleman"])).map((r) => [r.player.id, r.risk])[0]).toEqual(["coleman", "requested"]);
   });
 
   it("writes the case with a rounded multiple once he's worth twice the price", () => {
