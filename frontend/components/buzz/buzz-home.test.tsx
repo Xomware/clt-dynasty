@@ -125,6 +125,8 @@ describe("Buzz City Home", () => {
     expect(rows).toHaveLength(12);
     expect(rows.find((r) => r.getAttribute("data-mine"))?.querySelector(".u-race-name")?.textContent).toBe("Team 4");
     expect(race.getAllByText(/^Seed \d$/)).toHaveLength(fixture.league.settings.playoff_teams);
+    const list = screen.getByRole("list", { name: "Standings by record" });
+    expect(document.getElementById(list.getAttribute("aria-describedby")!)?.textContent).toMatch(/^Bars: points for, against the league.s most \(\d+\.\d\)/);
   });
 
   it("leads with the latest weekly recap, the member's game called out, earlier weeks a tap away", async () => {
