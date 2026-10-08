@@ -51,7 +51,7 @@ const STREAKS = Array.from({ length: 10 }, (_, i) => (i / 10) * 360 + 9);
 // the crown drops on it, then the lockup slams down over them with a shake and
 // confetti, the ribbon unfurls, a glint runs and the slats wipe away. Server
 // rendered like the XP intro and shown by CSS only under data-theme="buzz", so
-// a stored Buzz City visitor gets it from the first frame.
+// a Buzz City visitor gets it from the first frame.
 // Its marks load lazily: every page carries this stage, and lazy images under
 // display:none are never fetched, so XP visitors don't download them.
 export function BuzzIntro() {

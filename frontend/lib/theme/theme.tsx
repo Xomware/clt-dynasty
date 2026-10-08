@@ -17,9 +17,9 @@ function read(): Theme {
   if (unsaved) return unsaved;
   try {
     const v = localStorage.getItem(THEME_KEY);
-    return isTheme(v) ? v : (LEGACY[v ?? ""] ?? "xp");
+    return isTheme(v) ? v : (LEGACY[v ?? ""] ?? "buzz");
   } catch {
-    return "xp";
+    return "buzz";
   }
 }
 
@@ -42,8 +42,8 @@ function subscribe(onChange: () => void) {
   };
 }
 
-// The prerendered HTML is always XP. Undefined marks the hydration pass, whose
-// guess must not reach <html> and undo what the head script set.
+// Undefined marks the hydration pass: the prerendered HTML can't know the
+// theme, so its guess must not reach <html> and undo what the head script set.
 const serverTheme = () => undefined;
 
 // Hydration drops attributes the head script put on <html>, so they are set
@@ -100,12 +100,12 @@ interface ThemeState {
   switching: boolean;
 }
 
-const ThemeContext = createContext<ThemeState>({ theme: "xp", setTheme: () => {}, switching: false });
+const ThemeContext = createContext<ThemeState>({ theme: "buzz", setTheme: () => {}, switching: false });
 
-/** This browser's theme, XP until a viewer picks Buzz City. */
+/** This browser's theme, Buzz City until a viewer picks Classic XP. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const stored = useStoredTheme();
-  const theme = stored ?? "xp";
+  const theme = stored ?? "buzz";
   const [playing, setPlaying] = useState<{ to: Theme; phase: "in" | "out"; snapshot: boolean } | null>(null);
   const [said, setSaid] = useState("");
   const busy = useRef(false);
@@ -166,7 +166,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeContext value={{ theme, setTheme, switching: playing !== null }}>
-      {(theme === "buzz" || playing?.to === "buzz") && <link rel="stylesheet" href={BUZZ_FONTS} precedence="default" />}
+      {(stored === "buzz" || playing?.to === "buzz") && <link rel="stylesheet" href={BUZZ_FONTS} precedence="default" />}
       {children}
       {playing && <ThemeTransition {...playing} />}
       <p role="status" className="sr-only">

@@ -1,10 +1,14 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HEAD_SCRIPT, SEEN_KEY } from "@/lib/intro/seen";
+import { THEME_KEY } from "@/lib/theme/script";
 import { Intro } from "./Intro";
 
+beforeEach(() => localStorage.setItem(THEME_KEY, "xp"));
+
 afterEach(() => {
+  localStorage.clear();
   vi.useRealTimers();
   sessionStorage.clear();
   delete document.documentElement.dataset.intro;

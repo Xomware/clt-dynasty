@@ -402,6 +402,7 @@ describe("Spotlight", () => {
 
 describe("AppShell themes", () => {
   it("swaps the XP desktop for Buzz City from the tray, and back from the account menu", async () => {
+    localStorage.setItem("clt.theme", "xp");
     render(
       <ThemeProvider>
         <MemberProvider>
