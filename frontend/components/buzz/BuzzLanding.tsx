@@ -12,53 +12,15 @@ import { refreshOverview, useOverview } from "@/lib/landing/overview";
 import { BrandMark } from "./BrandMark";
 import { BoardSeeds } from "./landing/BoardSeeds";
 import { ChampionCards } from "./landing/ChampionCards";
-import { TRIVIA } from "./trivia";
 
 import "./buzz.css";
 import "./buzz-skin.css";
 import "./buzz-landing.css";
 
-// Four of the trivia lines, each with its own sticker art.
-const CHARLOTTE: { title: string; fact: string; art: ReactNode }[] = [
-  {
-    title: "The Hornet's Nest",
-    fact: TRIVIA[0],
-    art: <BrandMark mark="head" alt="" className="bz-about-mark" />,
-  },
-  {
-    title: "Gold and the Mint",
-    fact: TRIVIA[3],
-    art: (
-      <svg viewBox="0 0 64 64" className="bz-about-coin" aria-hidden="true" focusable="false">
-        <circle cx="32" cy="32" r="28" />
-        <circle cx="32" cy="32" r="21" />
-        <path d="M32 17l4 9 10 1-7.5 6.6 2.1 9.8L32 38.4l-8.6 5 2.1-9.8L18 27l10-1z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Speedway country",
-    fact: TRIVIA[5],
-    art: (
-      <svg viewBox="0 0 64 64" className="bz-about-flag" aria-hidden="true" focusable="false">
-        <path d="M14 58V8" />
-        <path d="M16 10h38v26H16z" />
-        <path d="M16 10h9.5v6.5H16zM35 10h9.5v6.5H35zM25.5 16.5H35V23h-9.5zM44.5 16.5H54V23h-9.5zM16 23h9.5v6.5H16zM35 23h9.5v6.5H35zM25.5 29.5H35V36h-9.5zM44.5 29.5H54V36h-9.5z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Queen City",
-    fact: TRIVIA[1],
-    art: <BrandMark mark="crown" alt="" className="bz-about-mark" />,
-  },
-];
-
 // The signed-out page in Buzz City: the league's lockup on the road jersey,
 // the same facts and live Sleeper data as the XP landing on arena boards and
-// trading cards, and a little Charlotte history. The hero's entrance waits for
-// the first-load intro to leave; everything below the fold enters as it
-// scrolls in (`data-scroll`).
+// trading cards. The hero's entrance waits for the first-load intro to leave;
+// everything below the fold enters as it scrolls in (`data-scroll`).
 export function BuzzLanding({ onSignIn }: LandingProps) {
   const state = useOverview();
   const { root, go } = useScrollIn<HTMLDivElement>();
@@ -151,21 +113,6 @@ export function BuzzLanding({ onSignIn }: LandingProps) {
                 </span>
                 <h3>{name}</h3>
                 <p>{about}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section aria-labelledby="bz-about" className="bz-landing-section">
-          <h2 id="bz-about" className="bz-landing-heading" data-scroll>
-            About Charlotte
-          </h2>
-          <ul className="bz-about" data-scroll>
-            {CHARLOTTE.map(({ title, fact, art }, i) => (
-              <li key={title} style={{ "--i": i } as CSSProperties}>
-                <span className="bz-about-art">{art}</span>
-                <h3>{title}</h3>
-                <p>{fact}</p>
               </li>
             ))}
           </ul>

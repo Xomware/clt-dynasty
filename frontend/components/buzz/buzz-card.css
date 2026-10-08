@@ -305,24 +305,6 @@
   text-transform: uppercase;
 }
 
-.bz-back-fact {
-  margin-top: auto;
-  padding: 0.5rem 0.625rem;
-  border: 2px solid var(--bz-ink);
-  border-radius: 8px;
-  color: var(--bz-ink);
-  background: var(--bz-paper);
-  font: 600 0.8125rem / 1.4 var(--bz-body);
-}
-
-.bz-back-fact strong {
-  display: block;
-  color: var(--bz-purple);
-  font: italic 800 0.8125rem var(--bz-jersey);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .bz-player-side {
   display: grid;
   gap: 1.75rem;
