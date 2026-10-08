@@ -1,10 +1,12 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { BrandMark } from "@/components/buzz/BrandMark";
 import { BuzzLanding } from "@/components/buzz/BuzzLanding";
+import { useScrollIn } from "@/components/motion/use-scroll-in";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { Balloon } from "@/components/xp/Balloon";
 import { Window } from "@/components/xp/Window";
 import { FolderIcon, InfoIcon } from "@/components/xp/icons";
 import { useTheme } from "@/lib/theme/theme";
@@ -23,9 +25,13 @@ export function Landing(props: LandingProps) {
   return useTheme().theme === "buzz" ? <BuzzLanding {...props} /> : <XpLanding {...props} />;
 }
 
+// Windows open as they scroll into view, like XP restoring them.
+const OPENS = ".xp-window, .landing-cta";
+
 function XpLanding({ onSignIn }: LandingProps) {
+  const { root, go } = useScrollIn<HTMLDivElement>(OPENS);
   return (
-    <div className="landing">
+    <div ref={root} className="landing" data-go={go || undefined}>
       <main>
         <section aria-label="Welcome" className="xp-logon landing-hero">
           <div className="xp-logon-band landing-hero-top">
@@ -116,6 +122,8 @@ function XpLanding({ onSignIn }: LandingProps) {
         </section>
       </main>
 
+      {go && <TourBalloon />}
+
       <footer className="landing-taskbar">
         <span className="landing-taskbar-start">
           <BrandMark mark="crown" alt="" height={16} />
@@ -129,6 +137,38 @@ function XpLanding({ onSignIn }: LandingProps) {
           </a>
         </span>
       </footer>
+    </div>
+  );
+}
+
+const TOUR_DELAY_MS = 2500;
+const LEAVE_MS = 200;
+
+// XP's "Take a tour" balloon, up from the tray a moment after the Welcome
+// screen settles. Balloon dismisses itself after 8s; here it fades out first.
+function TourBalloon() {
+  const [phase, setPhase] = useState<"wait" | "up" | "leaving" | "gone">("wait");
+  useEffect(() => {
+    if (phase === "wait") {
+      const t = setTimeout(() => setPhase("up"), TOUR_DELAY_MS);
+      return () => clearTimeout(t);
+    }
+    if (phase === "leaving") {
+      const t = setTimeout(() => setPhase("gone"), LEAVE_MS);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
+  // Stable, or Balloon's own dismiss timer restarts on every render.
+  const leave = useCallback(() => setPhase("leaving"), []);
+  if (phase === "wait" || phase === "gone") return null;
+  return (
+    <div className="landing-balloon" data-leaving={phase === "leaving" || undefined}>
+      <Balloon
+        title="Take a tour of CLT Dynasty"
+        body="Scroll down for the league live from Sleeper: standings, the playoff picture and every champion."
+        icon="info"
+        onClose={leave}
+      />
     </div>
   );
 }

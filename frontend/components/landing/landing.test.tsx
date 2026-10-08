@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { draftNote, phaseOf } from "@/lib/landing/overview";
@@ -13,6 +13,21 @@ afterEach(() => {
 const down = () => new Response("{}", { status: 503 });
 
 describe("Landing", () => {
+  it("pops a tour balloon from the tray a moment in, which fades out on its X", () => {
+    vi.useFakeTimers();
+    stubSleeper();
+    render(<Landing onSignIn={() => {}} />);
+    expect(screen.queryByText("Take a tour of CLT Dynasty")).toBeNull();
+    act(() => vi.advanceTimersByTime(2500));
+    expect(screen.getByText("Take a tour of CLT Dynasty")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close notification" }));
+    expect(document.querySelector(".landing-balloon[data-leaving]")).not.toBeNull();
+    act(() => vi.advanceTimersByTime(200));
+    expect(screen.queryByText("Take a tour of CLT Dynasty")).toBeNull();
+    vi.useRealTimers();
+  });
+
   it("calls onSignIn from both sign-in tiles, and disables them without a handler", () => {
     stubSleeper();
     const onSignIn = vi.fn();

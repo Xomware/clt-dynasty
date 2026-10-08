@@ -16,11 +16,11 @@ function subscribe(onChange: () => void) {
 export const useAfterIntro = () => useSyncExternalStore(subscribe, () => !introPlaying(), () => false);
 
 /**
- * Marks each `[data-scroll]` inside the returned ref `data-in` the first time
- * it comes into view, once the intro is out of the way. CSS holds each one's
- * entrance until then. Under reduced motion every entrance is off anyway.
+ * Marks each element matching `selector` inside the returned ref `data-in` the
+ * first time it comes into view, once the intro is out of the way. CSS holds
+ * each one's entrance until then. Under reduced motion every entrance is off anyway.
  */
-export function useScrollIn<T extends HTMLElement>() {
+export function useScrollIn<T extends HTMLElement>(selector = "[data-scroll]") {
   const root = useRef<T>(null);
   const go = useAfterIntro();
   useEffect(() => {
@@ -38,7 +38,7 @@ export function useScrollIn<T extends HTMLElement>() {
       { rootMargin: "0px 0px -12% 0px" },
     );
     const scan = () => {
-      for (const target of el.querySelectorAll("[data-scroll]")) {
+      for (const target of el.querySelectorAll(selector)) {
         if (seen.has(target)) continue;
         seen.add(target);
         shown.observe(target);
@@ -52,6 +52,6 @@ export function useScrollIn<T extends HTMLElement>() {
       added.disconnect();
       shown.disconnect();
     };
-  }, [go]);
+  }, [go, selector]);
   return { root, go };
 }

@@ -110,6 +110,28 @@ describe("window history", () => {
     expect(historyOf(state[0]).views.map((v) => v.kind)).toEqual(["standings", "week"]);
   });
 
+  it("jumps straight to any page in the window's history", () => {
+    let state = nav(nav(openAll("standings"), "team", { rosterId: 6 }), "player", { playerId: "8121" });
+    state = desktopReducer(state, { type: "go", id: "standings", at: 0 });
+    expect(state[0]).toMatchObject({ kind: "standings", params: {} });
+    expect(historyOf(state[0]).views).toHaveLength(3);
+  });
+
+  it("goes Back from a drilled window's first page to the window it came from", () => {
+    let state = openAll("scores", "standings");
+    state = desktopReducer(state, { type: "open", kind: "team", params: { rosterId: 6 }, size, from: "scores" });
+    expect(byKind(state, "team").from).toBe("scores");
+    expect(activeWindow(state)?.kind).toBe("team");
+
+    state = desktopReducer(state, { type: "back", id: "team:6" });
+    expect(activeWindow(state)?.kind).toBe("scores");
+    expect(state).toHaveLength(3);
+
+    // Once the origin is closed, there is nothing to go back to.
+    state = desktopReducer(state, { type: "close", id: "scores" });
+    expect(desktopReducer(state, { type: "back", id: "team:6" })).toBe(state);
+  });
+
   it("opens a fresh window when the one with that id has navigated elsewhere", () => {
     let state = nav(openAll("standings"), "team", { rosterId: 6 });
     state = desktopReducer(state, { type: "open", kind: "standings", params: {}, size });
