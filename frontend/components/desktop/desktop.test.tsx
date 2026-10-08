@@ -129,10 +129,38 @@ describe("desktop", () => {
     expect(win.getAttribute("aria-label")).toBe("Team 6");
     expect(within(win).getByText("team 6")).toBeTruthy();
 
-    fireEvent.click(within(win).getByRole("button", { name: "Back" }));
+    const standings = within(win).getByRole("button", { name: "Team 6", hidden: true });
+    fireEvent.click(within(win).getByRole("button", { name: "Back to League Standings" }));
     expect(win.getAttribute("aria-label")).toBe("League Standings");
+    // The page was kept as it was left, not mounted again.
+    expect(within(win).getByRole("button", { name: "Team 6" })).toBe(standings);
+    expect(within(win).getByRole("button", { name: "Forward to Team 6" })).toBeTruthy();
     fireEvent.keyDown(document.body, { key: "ArrowRight", altKey: true });
     expect(win.getAttribute("aria-label")).toBe("Team 6");
+  });
+
+  it("shows the window's path in its Address bar, each step a jump back", async () => {
+    await renderShell();
+    launch("Standings");
+    const win = windowNamed("League Standings")!;
+    fireEvent.click(within(win).getByRole("button", { name: "Team 6" }));
+
+    const address = within(within(win).getByRole("navigation", { name: "Address" }));
+    expect(address.getAllByRole("listitem").map((li) => li.textContent)).toEqual(["League", "League Standings", "Team 6"]);
+    fireEvent.click(address.getByRole("button", { name: "League Standings" }));
+    expect(win.getAttribute("aria-label")).toBe("League Standings");
+  });
+
+  it("goes Back from a window opened out of another to the window it came from", async () => {
+    await renderShell();
+    launch("Standings");
+    const folder = windowNamed("League")!;
+    const standings = windowNamed("League Standings")!;
+    expect(standings.getAttribute("data-active")).toBe("true");
+
+    fireEvent.click(within(standings).getByRole("button", { name: "Back to League" }));
+    expect(folder.getAttribute("data-active")).toBe("true");
+    expect(windowNamed("League Standings")).not.toBeNull();
   });
 
   it("keeps the desktop up when one window crashes", async () => {
