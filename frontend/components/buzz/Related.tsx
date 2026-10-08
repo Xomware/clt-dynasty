@@ -1,6 +1,6 @@
 "use client";
 
-import type { MouseEvent } from "react";
+import { type MouseEvent, useId } from "react";
 
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { useLaunchers } from "@/lib/desktop/registry";
@@ -15,11 +15,13 @@ interface RelatedProps {
 // "Keep going": the pages that usually come next from this one.
 export function Related({ kind, onNav }: RelatedProps) {
   const launchers = useLaunchers();
+  // Several pages stay mounted at once, each with its own row.
+  const id = useId();
   const next = (RELATED[kind as keyof typeof RELATED] ?? []).flatMap((k) => launchers.filter((l) => l.kind === k));
   if (next.length === 0) return null;
   return (
-    <nav aria-labelledby="u-related" className="u-related">
-      <h2 id="u-related" className="u-related-title">
+    <nav aria-labelledby={id} className="u-related">
+      <h2 id={id} className="u-related-title">
         Keep going
       </h2>
       <ul>

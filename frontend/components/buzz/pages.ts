@@ -23,7 +23,7 @@ export const ABOUT: Partial<Record<WindowKind, string>> = {
   settings: "Your account, your Sleeper link and league settings.",
   proposals: "Pitch a rule change and vote on the rest.",
   "ai-review": "Weekly league recaps, written by AI.",
-  search: "Look up any Sleeper user or league.",
+  search: "Find an NFL player or team, or any Sleeper user or league.",
   members: "Who is on the roster, and their Sleeper links.",
   "admin-ai": "Write, review and publish the AI recaps.",
   "admin-announcements": "Post and retire announcements on Home.",

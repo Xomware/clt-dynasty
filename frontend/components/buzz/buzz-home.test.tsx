@@ -33,7 +33,7 @@ const report = (period: string, title: string) => ({
   created_at: `2026-09-${period.slice(-2)}T12:00:00Z`,
 });
 
-const PROJECTIONS = "https://api.sleeper.app/projections/nfl/2026/4?season_type=regular&position[]=QB&position[]=RB&position[]=TE&position[]=WR";
+const PROJECTIONS = "https://api.sleeper.com/projections/nfl/2026/4?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K";
 const SCHEDULE = "https://api.sleeper.com/schedule/nfl/regular/2026";
 
 const ROUTES = {

@@ -11,6 +11,7 @@ import { windowTitle } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { fantasyWeek } from "@/lib/player/season";
 import { SLEEPER_WEB } from "@/lib/sleeper/client";
+import { clearSharedResources } from "@/lib/shared-resource";
 import { fixture, stubSleeper } from "@/lib/test/league-mock";
 import { PlayerWindow } from "./PlayerWindow";
 
@@ -67,7 +68,10 @@ const routes = (extra: Record<string, unknown> = {}) => ({
 
 const navigate = vi.fn();
 beforeEach(() => navigate.mockReset());
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  clearSharedResources();
+});
 
 const open = (playerId = ID) =>
   render(
@@ -144,5 +148,31 @@ describe("Player window", () => {
     open();
     await screen.findByRole("heading", { name: /Test Starter/ });
     expect(windowTitle({ kind: "player", params: { playerId: ID } })).toBe("Test Starter");
+  });
+});
+
+describe("Player window ranks", () => {
+  const RANKED = "position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K";
+  const wr = (player_id: string, stats: Record<string, number>) => ({ player_id, stats, player: { position: "WR" } });
+
+  it("shows his season rank and week's projected rank in CLT scoring, and his dynasty rank", async () => {
+    stubSleeper(
+      routes({
+        [`${SLEEPER_WEB}/stats/nfl/2026?season_type=regular&${RANKED}`]: [wr("other", { rec: 30, rec_yd: 400 }), wr(ID, { rec: 17, rec_yd: 239, rec_td: 1 })],
+        [`${SLEEPER_WEB}/projections/nfl/2026/4?season_type=regular&${RANKED}`]: [wr(ID, { rec: 6, rec_yd: 70 }), wr("other", { rec: 5, rec_yd: 50 })],
+        "https://api.fantasycalc.com/values/current?isDynasty=true&numQbs=2&numTeams=12&ppr=1": [
+          { player: { sleeperId: "qb", position: "QB" }, value: 9000 },
+          { player: { sleeperId: ID, position: "WR" }, value: 6000 },
+        ],
+      }),
+    );
+    render(
+      <MemberProvider>
+        <PlayerWindow params={{ playerId: ID }} />
+      </MemberProvider>,
+    );
+    expect(await screen.findByText("Season WR2, 46.9 pts")).toBeTruthy();
+    expect(await screen.findByText("Week 4 proj WR1, 13.0 pts")).toBeTruthy();
+    expect(await screen.findByText("Dynasty WR1, #2 overall")).toBeTruthy();
   });
 });
