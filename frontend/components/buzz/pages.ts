@@ -8,6 +8,7 @@ export const ABOUT: Partial<Record<WindowKind, string>> = {
   home: "This week at a glance: your team, the matchups, the standings.",
   standings: "Records, points for and the division races.",
   scores: "Every matchup, live on game days, with full lineups.",
+  players: "Every player: search, filter, and whether he is worth adding to your team.",
   playoffs: "The six-team bracket, projected all season.",
   "world-cup": "The league inside the league: divisional games only.",
   "nfl-teams": "All 32 NFL teams, their depth charts and who owns each player.",
@@ -33,6 +34,7 @@ export const ABOUT: Partial<Record<WindowKind, string>> = {
 export const RELATED: Partial<Record<WindowKind, WindowKind[]>> = {
   standings: ["playoffs", "world-cup", "scores"],
   scores: ["standings", "matchup-history", "my-team"],
+  players: ["my-team", "analyzer", "nfl-teams"],
   playoffs: ["standings", "history", "world-cup"],
   "world-cup": ["standings", "scores", "history"],
   rules: ["proposals", "standings"],
