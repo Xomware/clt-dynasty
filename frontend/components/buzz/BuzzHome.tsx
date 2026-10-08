@@ -6,10 +6,10 @@ import { HomeCard } from "@/components/home/HomeCard";
 import { LeaguePulse } from "@/components/home/LeaguePulse";
 import { MovesCard } from "@/components/home/MovesCard";
 import { ProposalsCard } from "@/components/home/ProposalsCard";
-import { QuickActions } from "@/components/home/QuickActions";
 import { TaxiCard } from "@/components/home/TaxiCard";
+import { WeeklyRecap } from "@/components/home/WeeklyRecap";
+import { YourWeek } from "@/components/home/YourWeek";
 import { CupRace, StandingsRace } from "./home/Races";
-import { Recaps } from "./home/Recaps";
 import { Announcements } from "@/components/windows/HomeWindow";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { TeamAvatar } from "@/components/xp/TeamAvatar";
@@ -60,7 +60,6 @@ export function BuzzHome({ ref, phone = false }: BuzzHomeProps) {
           <Title ref={ref} tabIndex={-1} className="bz-hero-title">
             <BrandMark mark="lockup" alt="CLT Dynasty Fantasy Football" className="bz-hero-lockup" priority />
           </Title>
-          <QuickActions className="bz-actions" />
         </div>
         <div className="bz-hero-card">
           {!data || member.status === "loading" ? (
@@ -81,6 +80,8 @@ export function BuzzHome({ ref, phone = false }: BuzzHomeProps) {
         </div>
       </section>
       <div className="home bz-hub">
+        <WeeklyRecap data={data} {...league} />
+        <YourWeek data={data} myRosterId={myRosterId} memberLoading={member.status === "loading"} />
         <Announcements />
         <div className="bz-hub-grid">
           <StandingsRace {...league} data={data} />
@@ -105,7 +106,6 @@ export function BuzzHome({ ref, phone = false }: BuzzHomeProps) {
             <CupRace {...league} data={data} />
           </div>
         </div>
-        <Recaps />
         <div className="bz-hub-trio">
           <MovesCard week={movesWeek} live={live} {...league} />
           <ProposalsCard />

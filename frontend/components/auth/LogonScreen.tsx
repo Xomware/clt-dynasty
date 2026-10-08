@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { BrandMark } from "@/components/buzz/BrandMark";
 
 import "./logon.css";
+import "./logon-buzz.css";
 
 interface LogonScreenProps {
   children: ReactNode;

@@ -104,7 +104,7 @@ const ThemeContext = createContext<ThemeState>({ theme: "xp", setTheme: () => {}
 
 /** This browser's theme, XP until a viewer picks Buzz City. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const stored = useSyncExternalStore<Theme | undefined>(subscribe, read, serverTheme);
+  const stored = useStoredTheme();
   const theme = stored ?? "xp";
   const [playing, setPlaying] = useState<{ to: Theme; phase: "in" | "out"; snapshot: boolean } | null>(null);
   const [said, setSaid] = useState("");
@@ -177,3 +177,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 }
 
 export const useTheme = () => useContext(ThemeContext);
+
+/** The stored theme, or undefined during hydration, when the prerendered HTML must be matched. */
+export const useStoredTheme = () => useSyncExternalStore<Theme | undefined>(subscribe, read, serverTheme);

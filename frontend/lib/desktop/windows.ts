@@ -22,16 +22,20 @@ export interface WindowState {
   maximized: boolean;
   // Absent until the window first navigates; see historyOf.
   history?: { views: WindowView[]; at: number };
+  // The window a drill opened this one from: Back at the start of this
+  // window's history goes back to it.
+  from?: string;
 }
 
 export type WindowAction =
-  | { type: "open"; kind: string; params: WindowParams; size: { w: number; h: number } }
+  | { type: "open"; kind: string; params: WindowParams; size: { w: number; h: number }; from?: string }
   | { type: "close" | "focus" | "minimize" | "toggleMaximize"; id: string }
   | { type: "move"; id: string; x: number; y: number }
   | { type: "resize"; id: string; w: number; h: number }
   | { type: "navigate"; id: string; kind: string; params: WindowParams }
   | { type: "patch"; id: string; params: WindowParams }
   | { type: "back" | "forward"; id: string }
+  | { type: "go"; id: string; at: number }
   | { type: "restore"; windows: WindowState[] };
 
 // Matches --taskbar-height; windows live in the viewport above it.
@@ -67,13 +71,22 @@ function update(state: WindowState[], id: string, patch: Partial<WindowState>): 
   return state.map((w) => (w.id === id ? { ...w, ...patch } : w));
 }
 
-function go(state: WindowState[], id: string, step: number): WindowState[] {
+function go(state: WindowState[], id: string, to: number): WindowState[] {
   const w = state.find((w) => w.id === id);
   if (!w) return state;
-  const { views, at } = historyOf(w);
-  const view = views[at + step];
+  const { views } = historyOf(w);
+  const view = views[to];
   if (!view) return state;
-  return update(state, id, { ...view, history: { views, at: at + step } });
+  return update(state, id, { ...view, history: { views, at: to } });
+}
+
+// Where Back leads: a step back in the window, or from its first page to the
+// window it was opened from, if that is still open.
+export function backTarget(state: WindowState[], w: WindowState): { at: number } | { window: WindowState } | null {
+  const { at } = historyOf(w);
+  if (at > 0) return { at: at - 1 };
+  const origin = w.from ? state.find((o) => o.id === w.from) : undefined;
+  return origin ? { window: origin } : null;
 }
 
 export function desktopReducer(state: WindowState[], action: WindowAction): WindowState[] {
@@ -86,8 +99,8 @@ export function desktopReducer(state: WindowState[], action: WindowAction): Wind
       let id = base;
       for (let n = 2; state.some((w) => w.id === id); n++) id = `${base}#${n}`;
       const step = 32 * (state.length % 6);
-      const { kind, params, size } = action;
-      const opened = { id, kind, params, ...size, x: ICON_COLUMN + 48 + step, y: 16 + step };
+      const { kind, params, size, from } = action;
+      const opened = { id, kind, params, ...size, x: ICON_COLUMN + 48 + step, y: 16 + step, ...(from ? { from } : {}) };
       return [...state, { ...opened, z: topZ(state) + 1, minimized: false, maximized: false }];
     }
     case "close":
@@ -120,10 +133,18 @@ export function desktopReducer(state: WindowState[], action: WindowAction): Wind
       const params = patchParams(w.params, action.params);
       return update(state, w.id, { params, history: { views: views.map((v, i) => (i === at ? { kind: w.kind, params } : v)), at } });
     }
-    case "back":
-      return go(state, action.id, -1);
-    case "forward":
-      return go(state, action.id, 1);
+    case "back": {
+      const w = state.find((w) => w.id === action.id);
+      const target = w && backTarget(state, w);
+      if (!target) return state;
+      return "at" in target ? go(state, action.id, target.at) : desktopReducer(state, { type: "focus", id: target.window.id });
+    }
+    case "forward": {
+      const w = state.find((w) => w.id === action.id);
+      return w ? go(state, action.id, historyOf(w).at + 1) : state;
+    }
+    case "go":
+      return go(state, action.id, action.at);
     case "restore":
       return action.windows;
   }

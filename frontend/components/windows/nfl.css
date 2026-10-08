@@ -13,16 +13,77 @@
   object-fit: contain;
 }
 
-.nfl-table td {
+.xp-table.nfl-roster {
+  min-width: 46rem;
+  table-layout: auto;
+}
+
+.nfl-roster td {
   vertical-align: middle;
 }
 
-.nfl-owner-col {
-  width: 40%;
+.nfl-roster td:nth-child(3) .xp-team {
+  max-width: 11rem;
 }
 
-.nfl-table td:last-child .xp-team {
-  max-width: 100%;
+.nfl-roster-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.nfl-roster tr[data-sidelined] td {
+  color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+.nfl-roster-face[data-injured] .xp-face {
+  filter: grayscale(1);
+}
+
+.nfl-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  font: inherit;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.nfl-sort[data-numeric] {
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.nfl-sort abbr {
+  text-decoration: none;
+}
+
+.nfl-sort:focus-visible {
+  outline: 2px dotted currentColor;
+  outline-offset: 1px;
+}
+
+.nfl-sort-arrow {
+  width: 0.625rem;
+  font-size: 0.5625rem;
+}
+
+/* The player column stays put while the numbers scroll under it. */
+.nfl-roster .nfl-roster-player,
+.nfl-roster td:nth-child(2) {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 11rem;
+}
+
+.nfl-roster td:nth-child(2) {
+  background: var(--xp-cream);
+}
+
+[data-theme="buzz"] .nfl-roster td:nth-child(2) {
+  background: var(--bz-paper);
 }
 
 .nfl-meta {
@@ -38,14 +99,6 @@
 .nfl-fa {
   font-style: italic;
   white-space: nowrap;
-}
-
-.nfl-rest td {
-  padding-top: 0.5rem;
-  font-size: 0.6875rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .nfl-divisions {
@@ -78,28 +131,5 @@
 @media (hover: hover) {
   .nfl-team-tile:hover {
     background: var(--xp-cream);
-  }
-}
-
-@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
-  /* Fixed columns, so long player and team names truncate instead of crushing the owner column. */
-  .xp-table.nfl-table {
-    table-layout: fixed;
-  }
-
-  .nfl-table th:first-child {
-    width: 2.25rem;
-  }
-
-  .nfl-owner-col {
-    width: 36%;
-  }
-
-  .nfl-table .team-player-name {
-    white-space: normal;
-  }
-
-  .nfl-rest td {
-    font-size: 0.75rem;
   }
 }

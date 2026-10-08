@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("aws-amplify/auth", () => ({
@@ -10,7 +10,7 @@ import { API_BASE } from "@/lib/config";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { NavigateContext } from "@/lib/desktop/navigation";
 import { stubSleeper } from "@/lib/test/league-mock";
-import { AIHeadline, AIReportWindow, AIReviewWindow, readReportLink } from "./AIReviewWindow";
+import { AIReportWindow, AIReviewWindow, readReportLink } from "./AIReviewWindow";
 import { DraftHistoryWindow } from "./DraftHistoryWindow";
 
 const report = (type: ReportType, period: string, patch: Partial<AIReport> = {}): AIReport => ({
@@ -144,28 +144,5 @@ describe("Draft History: Recap and Mocks", () => {
     fireEvent.click(screen.getByRole("button", { name: "Wildcard" }));
     expect(await screen.findByText("Wild Pick")).toBeTruthy();
     expect(screen.queryByText("Older Run")).toBeNull();
-  });
-});
-
-describe("Home: AI headline", () => {
-  it("shows the newest review's heading and first paragraph, skipping mocks", async () => {
-    stubSleeper({
-      [url("list")]: list([
-        report("mock", "2027-bpa", { body_markdown: "## Mock" }),
-        report("weekly", "2026W04", { body_markdown: "# Week 4: **Chaos**\n\n- a list\n\nTeam 6 had a *big* week." }),
-      ]),
-    });
-    render(<AIHeadline />);
-    expect(await screen.findByText("Week 4: Chaos")).toBeTruthy();
-    expect(screen.getByText("Team 6 had a big week.")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Read the full review" })).toBeTruthy();
-  });
-
-  it("stays out of the way until there is a review", async () => {
-    stubSleeper({ [url("list")]: list([report("mock", "2027-bpa")]) });
-    const { container } = render(<AIHeadline />);
-    await waitFor(() => expect(vi.mocked(fetch)).toHaveBeenCalled());
-    await new Promise((r) => setTimeout(r, 0));
-    expect(container.innerHTML).toBe("");
   });
 });

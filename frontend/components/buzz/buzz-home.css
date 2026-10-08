@@ -23,13 +23,7 @@
   filter: drop-shadow(0 10px 14px rgb(8 4 24 / 0.5));
 }
 
-.bz-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.buzz .bz-actions .xp-button {
+.buzz .bz-hub .yw-action {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -49,16 +43,16 @@
     box-shadow 0.12s;
 }
 
-.buzz .bz-actions li:first-child .xp-button {
+.buzz .bz-hub .yw-action:first-child {
   background: var(--bz-teal-light);
 }
 
-.buzz .bz-actions .xp-button:hover {
+.buzz .bz-hub .yw-action:hover {
   box-shadow: 5px 5px 0 var(--bz-ink);
   transform: translate(-2px, -2px);
 }
 
-.buzz .bz-actions .xp-button:active {
+.buzz .bz-hub .yw-action:active {
   box-shadow: 1px 1px 0 var(--bz-ink);
   transform: translate(2px, 2px);
 }
@@ -377,6 +371,91 @@
   border-bottom-color: var(--bz-paper-3);
 }
 
+/* Your week: the member's to-do list, a clipboard of sticker rows. */
+.buzz .bz-hub .yw {
+  box-shadow: 6px 6px 0 var(--bz-teal);
+}
+
+.buzz .bz-hub .yw-grid {
+  gap: 1rem;
+}
+
+.buzz .bz-hub .yw-sec {
+  gap: 0.75rem;
+  padding: 0.875rem 1rem 1rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 10px;
+  background: var(--bz-paper-2);
+}
+
+.buzz .bz-hub .yw-title {
+  color: var(--bz-purple);
+  font: italic 800 1.0625rem var(--bz-jersey);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.buzz .bz-hub .yw-total strong {
+  color: var(--bz-purple);
+  font: italic 400 1.375rem / 1 var(--bz-display);
+}
+
+.buzz .bz-hub .yw-gain {
+  color: var(--bz-teal-deep);
+  font: italic 800 1rem var(--bz-jersey);
+}
+
+.buzz .bz-hub .yw-item {
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  padding: 0.5rem 0;
+  border-top: 2px dashed var(--bz-paper-3);
+}
+
+.buzz .bz-hub .yw-slot {
+  justify-self: stretch;
+  padding: 0.125rem 0;
+  border: 2px solid var(--bz-ink);
+  border-radius: 6px;
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
+  font: italic 800 0.75rem var(--bz-jersey);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.buzz .bz-hub .yw-item[data-kind="warn"] .yw-slot {
+  background: var(--bz-amber);
+}
+
+.buzz .bz-hub .yw-pts {
+  font-weight: 700;
+  color: var(--bz-purple);
+}
+
+.buzz .bz-hub .yw-item[data-kind="trade"] .yw-slot {
+  background: var(--bz-amber);
+}
+
+.buzz .bz-hub .yw-side-label {
+  color: var(--bz-teal-deep);
+  font: italic 800 0.75rem var(--bz-jersey);
+  letter-spacing: 0.06em;
+}
+
+.buzz .bz-hub .yw-closed {
+  border: 2px solid var(--bz-ink);
+  border-radius: 8px;
+  background: var(--bz-amber-light);
+}
+
+.buzz .bz-hub .yw-item[data-kind="add"] .yw-slot {
+  background: var(--bz-purple-light);
+}
+
+.buzz .bz-hub .yw-note {
+  color: var(--bz-muted);
+}
+
 /* Standings race: the arena's leaderboard, LED segments for points for. */
 .buzz .bz-hub .u-race {
   color: var(--bz-paper);
@@ -515,6 +594,39 @@
   text-align: right;
 }
 
+/* What the bars measure, with a sample bar as the key. */
+.buzz .u-race-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: -0.25rem 0 0.75rem;
+  color: var(--bz-paper-2);
+  font-size: 0.875rem;
+}
+
+.buzz .u-cup .u-race-legend {
+  margin: 0;
+  color: var(--bz-text);
+}
+
+.buzz .u-race-key {
+  position: relative;
+  flex: none;
+  width: 2.5rem;
+  height: 0.4375rem;
+  overflow: hidden;
+  border-radius: 2px;
+  --share: 0.75;
+}
+
+.buzz .u-race-key .u-race-fill {
+  animation: none;
+}
+
+.buzz .u-cup .u-race-key .u-race-fill {
+  background: repeating-linear-gradient(90deg, var(--bz-teal) 0 6px, transparent 6px 8px);
+}
+
 /* World Cup race */
 
 .buzz .u-cup-divs {
@@ -610,44 +722,15 @@
   background: none;
 }
 
-/* Recaps: a row of trading cards to swipe or step through. */
-
-.buzz .u-recaps-body {
-  position: relative;
-}
-
-.buzz .u-recaps-row {
-  display: grid;
-  grid-auto-columns: minmax(16rem, 20rem);
-  grid-auto-flow: column;
-  gap: 1.25rem;
-  padding: 0.25rem 0.5rem 0.75rem 0.25rem;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-.buzz .u-recap {
-  position: relative;
+/* Weekly recap: the lead story on a foil card, earlier weeks as a row of stubs. */
+.buzz .bz-hub .wr-feature {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  min-height: 13rem;
-  padding: 1rem 1.125rem;
-  border: 3px solid var(--bz-ink);
-  border-radius: 12px;
-  background:
-    linear-gradient(var(--bz-paper), var(--bz-paper)) padding-box,
-    var(--bz-ink) border-box;
-  box-shadow: 4px 4px 0 var(--bz-teal);
-  scroll-snap-align: start;
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* The newest is the foil card of the pack. */
-.buzz .u-recap:first-child {
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem 1.5rem;
   border: 6px solid transparent;
+  border-radius: 14px;
   background:
     linear-gradient(var(--bz-paper), var(--bz-paper)) padding-box,
     var(--bz-foil) border-box;
@@ -656,87 +739,66 @@
     6px 6px 0 var(--bz-ink);
 }
 
-@media (hover: hover) {
-  .buzz .u-recap:hover {
-    transform: translateY(-3px) rotate(-0.6deg);
-  }
-}
-
-.buzz .u-recap-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.buzz .bz-hub .wr-kicker {
   color: var(--bz-muted);
-  font: 700 0.8125rem var(--bz-jersey);
+  font: 700 0.875rem var(--bz-jersey);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.buzz .u-recap-title {
-  display: -webkit-box;
-  overflow: hidden;
+.buzz .bz-hub .wr-title {
   color: var(--bz-purple);
-  font: italic 900 1.375rem / 1.15 var(--bz-jersey);
-  text-transform: uppercase;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  font: italic 400 clamp(2rem, 4.5vw, 3.25rem) / 1 var(--bz-display);
+  text-shadow: 3px 3px 0 var(--bz-teal-light);
 }
 
-.buzz .u-recap-excerpt {
-  display: -webkit-box;
-  overflow: hidden;
-  color: var(--bz-text);
-  font-size: 0.875rem;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+.buzz .bz-hub .wr-lede {
+  max-width: 62ch;
+  font-size: 1.125rem;
+  line-height: 1.55;
 }
 
-.buzz .u-recap-read {
-  align-self: flex-start;
-  margin-top: auto;
-  color: var(--bz-teal-deep);
-  font: italic 800 0.9375rem var(--bz-jersey);
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-transform: uppercase;
-}
-
-.buzz .u-recap-read::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-}
-
-.buzz .u-recaps-steps {
-  position: absolute;
-  top: -3.375rem;
-  right: 7.5rem;
-  display: flex;
-  gap: 0.375rem;
-}
-
-.buzz .u-step {
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 2px solid var(--bz-ink);
-  border-radius: 999px;
-  background: var(--bz-paper);
-  box-shadow: 2px 2px 0 var(--bz-ink);
-}
-
-.buzz .u-step:hover:not(:disabled) {
+.buzz .bz-hub .wr-mine {
+  border: 3px solid var(--bz-ink);
+  border-radius: 10px;
   background: var(--bz-teal-light);
+  box-shadow: 4px 4px 0 var(--bz-purple);
 }
 
-.buzz .u-step:active:not(:disabled) {
-  box-shadow: none;
-  transform: translate(2px, 2px);
+.buzz .bz-hub .wr-mine-label {
+  color: var(--bz-purple);
+  font: italic 800 0.875rem var(--bz-jersey);
+  letter-spacing: 0.08em;
 }
 
-.buzz .u-step:disabled {
-  opacity: 0.35;
-  box-shadow: none;
+.buzz .bz-hub .wr-strip {
+  grid-auto-columns: minmax(11rem, 13rem);
+  gap: 1rem;
+  padding: 0.25rem 0.5rem 0.75rem 0.25rem;
+}
+
+.buzz .bz-hub .wr-chip {
+  padding: 0.75rem 0.875rem;
+  border: 3px solid var(--bz-ink);
+  border-radius: 10px;
+  background: var(--bz-paper);
+  box-shadow: 4px 4px 0 var(--bz-teal);
+  transition: transform 0.15s;
+}
+
+.buzz .bz-hub .wr-chip:hover {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.buzz .bz-hub .wr-chip-week {
+  color: var(--bz-purple);
+  font: italic 800 1rem var(--bz-jersey);
+  text-transform: uppercase;
+}
+
+.buzz .bz-hub .wr-chip-title {
+  font-size: 0.875rem;
 }
 
 /* Did you know */
@@ -803,11 +865,7 @@
     gap: 1.75rem;
   }
 
-  .bz-actions {
-    gap: 0.5rem;
-  }
-
-  .buzz .bz-actions .xp-button {
+  .buzz .bz-hub .yw-action {
     padding: 0 0.75rem;
     font-size: 0.8125rem;
   }
@@ -828,10 +886,6 @@
 
   .buzz .bz-hub .home-pulse {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .buzz .u-recaps-steps {
-    display: none;
   }
 
   .buzz .u-race-row {
@@ -887,8 +941,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .buzz .u-recap,
-  .buzz .bz-actions .xp-button {
+  .buzz .bz-hub .wr-chip,
+  .buzz .bz-hub .yw-action {
     transition: none;
   }
 }
