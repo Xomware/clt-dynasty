@@ -12,7 +12,7 @@ import type { WindowParams } from "@/lib/desktop/windows";
 import type { PlayerWeek } from "@/lib/home/projections";
 import { cleanQuery, decode, encode, readView, type View, writeView } from "@/lib/players/params";
 import type { PlayerRow } from "@/lib/players/rows";
-import { limitsOf, readScenario, type Scenario, type SimFor, simulate, writeScenario } from "@/lib/players/simulate";
+import { limitsOf, MOVE_KINDS, type MoveKind, moveCount, readScenario, type Scenario, type SimFor, simulate, writeScenario } from "@/lib/players/simulate";
 import { type PlayerBoard, usePlayerBoard } from "@/lib/players/use-player-board";
 import { type Worth, worthFor } from "@/lib/players/worth";
 import { ViewParamsContext } from "@/lib/view-params";
@@ -38,16 +38,17 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
   const simFor = useSimulation(board);
 
   // A player is in the scenario once: adding a dropped player undoes the drop.
-  const toggle = (kind: keyof Scenario, id: string) =>
+  const toggle = (kind: MoveKind, id: string) =>
     setScenario((s) => {
       const on = s[kind].includes(id);
-      const rest = { adds: s.adds.filter((x) => x !== id), drops: s.drops.filter((x) => x !== id), ir: s.ir.filter((x) => x !== id) };
+      const rest = { ...s };
+      for (const k of MOVE_KINDS) rest[k] = s[k].filter((x) => x !== id);
       return on ? rest : { ...rest, [kind]: [...rest[kind], id] };
     });
 
   if (board.error) return <LoadError what="players and rosters" message={board.error} onRetry={board.retry} />;
 
-  const moves = scenario.adds.length + scenario.drops.length + scenario.ir.length;
+  const moves = moveCount(scenario);
   const pick = (tab: string) => setParams?.({ tab });
   return (
     <div className="pl">
