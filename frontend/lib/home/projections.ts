@@ -1,5 +1,5 @@
 import type { Player } from "@/lib/api/players";
-import type { SleeperGame, SleeperProjection } from "@/lib/sleeper/types";
+import type { SleeperGame, SleeperStatRow } from "@/lib/sleeper/types";
 
 // Statuses that keep a player out of the game; Questionable and Doubtful still project.
 const OUT = new Set(["Out", "IR", "PUP", "Sus", "NA", "DNR", "COV"]);
@@ -28,7 +28,7 @@ export const isOut = (w: PlayerWeek) => w.bye || (w.injury !== null && OUT.has(w
 // Every player's week: projection, injury (the projection's is fresher than
 // the nightly player list), bye and kickoff from that week's schedule.
 export function weekBoard(
-  rows: SleeperProjection[],
+  rows: SleeperStatRow[],
   players: Record<string, Player>,
   scoring: Record<string, number>,
   games: SleeperGame[],

@@ -8,7 +8,7 @@ import { usePlayers } from "@/lib/league/players";
 import type { LeagueData } from "@/lib/league/use-league";
 import { startingSlots } from "@/lib/league/use-week-games";
 import { useLoad } from "@/lib/use-load";
-import { checkLineup, type LineupCheck, slotPositions } from "./lineup";
+import { checkLineup, type LineupCheck } from "./lineup";
 import { type PlayerWeek, weekBoard } from "./projections";
 
 export type LineupState =
@@ -23,11 +23,10 @@ export function useWeekBoard(data: LeagueData | null) {
   const week = data && inSeason ? leagueWeek(data.league, data.nfl) : null;
   const season = data?.league.season ?? "";
   const slots = useMemo(() => startingSlots(data?.league.roster_positions ?? []), [data]);
-  const positions = [...new Set(slots.flatMap(slotPositions))].sort();
   const players = usePlayers();
   const [load, retry] = useLoad(
-    () => (week === null ? Promise.resolve(null) : Promise.all([projections(season, week, positions), nflSchedule(season)])),
-    `${season}/${week}/${positions.join(",")}`,
+    () => (week === null ? Promise.resolve(null) : Promise.all([projections(season, week), nflSchedule(season)])),
+    `${season}/${week}`,
   );
 
   const board = useMemo(() => {

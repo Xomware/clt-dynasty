@@ -106,10 +106,7 @@ export const seasonStats = (season: string) => cached(`season-stats/${season}`, 
 export const projections = (season: string, week: number) => cached(`projections/${season}/${week}`, () => getProjections(season, week), NFL_TTL);
 export const nflSchedule = (season: string) => cached(`schedule/${season}`, () => getSchedule(season), NFL_TTL);
 
-// Projections and injuries change through the week, and a lineup changes in
-// Sleeper whenever its manager taps, so both go stale fast.
-export const projections = (season: string, week: number, positions: string[]) =>
-  cached(`projections/${season}/${week}/${positions.join(",")}`, () => getProjections(season, week, positions), NFL_TTL);
+// A lineup changes in Sleeper whenever its manager taps.
 export function currentRosters(fresh = false) {
   if (fresh) entries.delete("rosters-now");
   return cached("rosters-now", () => getRosters(LEAGUE_ID), LIVE_TTL);
