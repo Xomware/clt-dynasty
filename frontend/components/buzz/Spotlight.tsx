@@ -75,6 +75,14 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
     },
     [opener],
   );
+  // A phone's search covers the page, which would otherwise scroll under the finger.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = "";
+    };
+  }, []);
 
   // With a query, the section holding the best match comes first, so Enter takes it.
   const teams: Option[] = (data?.rosters ?? []).map((r) => {

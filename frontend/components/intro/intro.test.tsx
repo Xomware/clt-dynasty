@@ -4,20 +4,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HEAD_SCRIPT, SEEN_KEY } from "@/lib/intro/seen";
 import { play } from "@/lib/sound/sound";
 import { stubSleeper } from "@/lib/test/league-mock";
+import { THEME_KEY } from "@/lib/theme/script";
 import { Intro } from "./Intro";
 
 vi.mock("@/lib/sound/sound", () => ({ play: vi.fn() }));
 
 beforeEach(() => {
   HTMLImageElement.prototype.decode ??= () => Promise.resolve();
+  localStorage.setItem(THEME_KEY, "xp");
   stubSleeper();
 });
 
 afterEach(() => {
+  localStorage.clear();
   vi.useRealTimers();
   vi.mocked(play).mockClear();
   sessionStorage.clear();
-  localStorage.clear();
   delete document.documentElement.dataset.intro;
   delete document.documentElement.dataset.booted;
 });

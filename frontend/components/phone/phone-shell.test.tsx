@@ -18,6 +18,8 @@ import { AlertsProvider } from "@/lib/alerts/alerts";
 import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
+import { THEME_KEY } from "@/lib/theme/script";
+import { ThemeProvider } from "@/lib/theme/theme";
 import { PHONE } from "@/lib/use-media-query";
 
 registerTestWindows();
@@ -47,11 +49,13 @@ const phone = (on: boolean) =>
 
 const mount = () =>
   render(
-    <MemberProvider>
-      <AlertsProvider>
-        <AppShell />
-      </AlertsProvider>
-    </MemberProvider>,
+    <ThemeProvider>
+      <MemberProvider>
+        <AlertsProvider>
+          <AppShell />
+        </AlertsProvider>
+      </MemberProvider>
+    </ThemeProvider>,
   );
 
 const renderPhone = async () => {
@@ -66,6 +70,7 @@ const openStandings = () => {
 };
 
 beforeEach(() => {
+  localStorage.setItem(THEME_KEY, "xp");
   phone(true);
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
 });
@@ -81,6 +86,12 @@ describe("phone shell", () => {
     await renderPhone();
     expect(programs().getAllByRole("button").map((b) => b.textContent)).toEqual(["Home", "LeagueStandings, Broken"]);
     expect(screen.queryByRole("list", { name: "Desktop" })).toBeNull();
+  });
+
+  it("greets with the phone's directions, not the desktop's double-click", async () => {
+    await renderPhone();
+    expect(await screen.findByText(/Every program is under Start/)).toBeTruthy();
+    expect(screen.queryByText(/double-click/)).toBeNull();
   });
 
   it("lists Admin under an admin's account, apart from Programs", async () => {
@@ -150,6 +161,15 @@ describe("phone shell", () => {
     expect(taskbar().getByRole("button", { name: "Standings" }).getAttribute("aria-current")).toBe("page");
     fireEvent.click(taskbar().getByRole("button", { name: "Standings" }));
     expect(window.location.search).toBe("?open=standings");
+  });
+
+  it("searches full-screen from the title bar and opens the pick", async () => {
+    await renderPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Search" }));
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "broken" } });
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Enter" });
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.getByRole("region", { name: "Broken" })).toBeTruthy();
   });
 
   // Chromium's scrollTo returns a promise now; an effect handing it back as its

@@ -1,29 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { BrandMark } from "./BrandMark";
-import { TRIVIA } from "./trivia";
 
 import "./buzz-loader.css";
 
-const EVERY = 3600;
-
 // The hornet buzzes in along a zig-zag, the crown drops onto its head and the
 // wordmark slaps on under it, a glint running over it now and then, all on the
-// road jersey.
-// Charlotte trivia rotates underneath while the app loads. BrandLoader draws it
-// beside XP's, and CSS shows the one for the theme on <html>, so the
-// prerendered page is already right before hydration.
+// road jersey. BrandLoader draws it beside XP's, and CSS shows the one for the
+// theme on <html>, so the prerendered page is already right before hydration.
 export function BuzzLoader({ label }: { label: string }) {
-  const still = useReducedMotion();
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setN((i) => (i + 1) % TRIVIA.length), still ? EVERY * 2 : EVERY);
-    return () => clearInterval(t);
-  }, [still]);
-
   return (
     <div className="bz-loader">
       <div className="bz-ld-stage" aria-hidden="true">
@@ -49,10 +34,6 @@ export function BuzzLoader({ label }: { label: string }) {
       <p className="bz-loader-label" aria-hidden="true">
         {label}
       </p>
-      <figure key={n} className="bz-fact">
-        <figcaption>Did you know</figcaption>
-        <p>{TRIVIA[n]}</p>
-      </figure>
     </div>
   );
 }

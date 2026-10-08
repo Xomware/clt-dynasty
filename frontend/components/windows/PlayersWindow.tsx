@@ -11,10 +11,9 @@ import { valueOf } from "@/lib/analyzer/values";
 import type { WindowParams } from "@/lib/desktop/windows";
 import type { PlayerWeek } from "@/lib/home/projections";
 import { cleanQuery, decode, encode, readView, type View, writeView } from "@/lib/players/params";
-import type { PlayerRow } from "@/lib/players/rows";
 import { limitsOf, MOVE_KINDS, type MoveKind, moveCount, readScenario, type Scenario, type SimFor, simulate, writeScenario } from "@/lib/players/simulate";
 import { type PlayerBoard, usePlayerBoard } from "@/lib/players/use-player-board";
-import { type Worth, worthFor } from "@/lib/players/worth";
+import { eliteValue, type PlayerFacts, type Worth, worthFor } from "@/lib/players/worth";
 import { ViewParamsContext } from "@/lib/view-params";
 
 import "./players-page.css";
@@ -92,18 +91,24 @@ export function PlayersWindow({ params }: { params: WindowParams }) {
   );
 }
 
-// The worth-adding check for every player not on my team, judged once per
-// data change. Players with no projection and no value are never worth it.
+// The worth check for every player not on my team, judged once per data
+// change. Players with no projection and no value are never worth it.
 function useWorth({ rows, rosters, myRosterId, board, slots, values }: PlayerBoard) {
   return useMemo(() => {
     const roster = rosters?.find((r) => r.roster_id === myRosterId);
     if (!rows || !roster || !board || !values) return null;
-    const judge = worthFor({ slots, roster, week: board, value: (id) => valueOf(values, id) });
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    const facts = (id: string): PlayerFacts => {
+      const r = byId.get(id);
+      return { age: r?.age ?? null, yearsExp: r?.player.years_exp ?? null, owned: r?.owner != null };
+    };
+    const elite = eliteValue([...values.players.values()].map((v) => v.value));
+    const judge = worthFor({ slots, roster, week: board, value: (id) => valueOf(values, id), facts, elite });
     const verdicts = new Map<string, Worth>();
-    const none = (r: PlayerRow): Worth => ({ verdict: "none", position: r.position, gain: 0, slot: null, floor: null, valueDelta: 0 });
     for (const r of rows) {
       if (r.owner === myRosterId) continue;
-      verdicts.set(r.id, (r.proj ?? 0) > 0 || r.value > 0 ? judge(r.id) : none(r));
+      const none: Worth = { verdict: r.owner === null ? "none" : "nofit", position: r.position, gain: 0, slot: null, floor: null, valueDelta: 0, age: r.age, points: 0 };
+      verdicts.set(r.id, (r.proj ?? 0) > 0 || r.value > 0 ? judge(r.id) : none);
     }
     return (id: string) => verdicts.get(id) ?? null;
   }, [rows, rosters, myRosterId, board, slots, values]);

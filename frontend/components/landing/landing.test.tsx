@@ -1,13 +1,18 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { draftNote, phaseOf } from "@/lib/landing/overview";
 import type { SleeperDraft, SleeperLeague, SleeperNflState } from "@/lib/sleeper/types";
 import { fixture, stubSleeper } from "@/lib/test/league-mock";
+import { THEME_KEY } from "@/lib/theme/script";
+import { ThemeProvider } from "@/lib/theme/theme";
 import { Landing } from "./Landing";
+
+beforeEach(() => localStorage.setItem(THEME_KEY, "xp"));
 
 afterEach(() => {
   vi.restoreAllMocks();
+  localStorage.clear();
 });
 
 const down = () => new Response("{}", { status: 503 });
@@ -16,7 +21,7 @@ describe("Landing", () => {
   it("pops a tour balloon from the tray a moment in, which fades out on its X", () => {
     vi.useFakeTimers();
     stubSleeper();
-    render(<Landing onSignIn={() => {}} />);
+    render(<Landing onSignIn={() => {}} />, { wrapper: ThemeProvider });
     expect(screen.queryByText("Take a tour of CLT Dynasty")).toBeNull();
     act(() => vi.advanceTimersByTime(2500));
     expect(screen.getByText("Take a tour of CLT Dynasty")).toBeTruthy();
@@ -31,20 +36,20 @@ describe("Landing", () => {
   it("calls onSignIn from both sign-in tiles, and disables them without a handler", () => {
     stubSleeper();
     const onSignIn = vi.fn();
-    const { unmount } = render(<Landing onSignIn={onSignIn} />);
+    const { unmount } = render(<Landing onSignIn={onSignIn} />, { wrapper: ThemeProvider });
     const tiles = screen.getAllByRole("button", { name: "Sign in with Google" });
     expect(tiles).toHaveLength(2);
     tiles.forEach((t) => fireEvent.click(t));
     expect(onSignIn).toHaveBeenCalledTimes(2);
     unmount();
 
-    render(<Landing />);
+    render(<Landing />, { wrapper: ThemeProvider });
     for (const t of screen.getAllByRole("button", { name: "Sign in with Google" })) expect((t as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("shows the live week, the playoff seeds and every past champion from Sleeper", async () => {
     stubSleeper();
-    render(<Landing onSignIn={() => {}} />);
+    render(<Landing onSignIn={() => {}} />, { wrapper: ThemeProvider });
 
     const status = screen.getByRole("region", { name: "League Status" });
     expect(within(status).getByRole("status", { name: "Loading league status" })).toBeTruthy();
@@ -67,7 +72,7 @@ describe("Landing", () => {
 
   it("keeps the static landing and offers a retry when Sleeper is down", async () => {
     const fetch = stubSleeper({ "/state/nfl": down });
-    render(<Landing onSignIn={() => {}} />);
+    render(<Landing onSignIn={() => {}} />, { wrapper: ThemeProvider });
 
     expect((await screen.findByRole("alert")).textContent).toMatch(/Couldn’t load the league from Sleeper: Sleeper \/state\/nfl: 503/);
     expect(screen.getByRole("heading", { level: 1, name: "CLT Dynasty" })).toBeTruthy();

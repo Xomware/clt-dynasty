@@ -13,7 +13,6 @@ import { nflLogo, nflTeam } from "@/lib/nfl/teams";
 import { heightLabel } from "@/lib/player/season";
 import { injuryTag } from "@/lib/team/team";
 import { useLoad } from "@/lib/use-load";
-import { TRIVIA } from "./trivia";
 
 import "@/components/windows/player.css";
 import "./buzz-card.css";
@@ -49,7 +48,6 @@ const COLUMNS: Record<string, [string, (s: Stats) => number][]> = {
 };
 
 // The same fact for a player every visit.
-const factFor = (id: string) => TRIVIA[[...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7) % TRIVIA.length];
 
 // Sleeper's full-size headshot; the thumb the rest of the site uses is too small for a card.
 const portrait = (id: string, position: string | null) => (position === "DEF" ? nflLogo(id) : `https://sleepercdn.com/content/nfl/players/${id}.jpg`);
@@ -139,9 +137,6 @@ function Card({ page }: { page: Page }) {
             </div>
           </div>
           <BackStats position={player.position} weeks={weeks} season={data.league.season} />
-          <p className="bz-back-fact">
-            <strong>Buzz fact</strong> {factFor(player.player_id)}
-          </p>
         </section>
       </div>
       <button type="button" className="bz-sticker-btn bz-flip-btn" aria-pressed={flipped} onClick={() => setFlipped((f) => !f)}>

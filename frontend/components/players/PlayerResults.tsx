@@ -173,17 +173,34 @@ function Owner({ row, mine, teamFor }: { row: PlayerRow; mine: number | null; te
 export const VERDICT_LABELS: Record<Verdict, string> = {
   starter: "Starter upgrade",
   depth: "Depth upgrade",
-  stash: "Dynasty stash",
+  stash: "Stash",
   none: "Not worth it",
+  cornerstone: "Cornerstone",
+  target: "Trade target",
+  rental: "Rental",
+  nofit: "Not a fit",
 };
 
 const pos = (n: number) => `${n > 0 ? "+" : ""}${Math.round(n).toLocaleString("en-US")}`;
+const startsAt = (w: Worth) => `+${w.gain.toFixed(1)} pts this week at ${slotLabel(w.slot ?? "")}`;
 
 function why(w: Worth): string {
-  if (w.verdict === "starter") return `+${w.gain.toFixed(1)} pts this week at ${slotLabel(w.slot ?? "")}`;
-  if (w.verdict === "depth") return `Out-projects your weakest bench ${w.position}`;
-  if (w.floor) return `Value ${pos(w.valueDelta)} vs your lowest ${w.position}`;
-  return w.verdict === "stash" ? `You have no ${w.position}` : "";
+  switch (w.verdict) {
+    case "starter":
+      return startsAt(w);
+    case "depth":
+      return `Out-projects your weakest bench ${w.position}`;
+    case "stash":
+      return w.floor ? `Young, value ${pos(w.valueDelta)} vs your lowest ${w.position}` : `Young, and you have no ${w.position}`;
+    case "cornerstone":
+      return "Top-24 dynasty value: his team won't sell cheap";
+    case "rental":
+      return `${w.age === null ? "Aging" : `Age ${w.age}`}, ${w.slot ? startsAt(w) : `${w.points.toFixed(1)} pts projected`}`;
+    case "target":
+      return w.slot ? startsAt(w) : `Value ${pos(w.valueDelta)} over your weakest starting ${w.position}`;
+    default:
+      return "";
+  }
 }
 
 export function WorthBadge({ worth }: { worth: Worth | null }) {
@@ -193,7 +210,7 @@ export function WorthBadge({ worth }: { worth: Worth | null }) {
       <span className="pl-verdict" data-verdict={worth.verdict}>
         {VERDICT_LABELS[worth.verdict]}
       </span>
-      {worth.verdict !== "none" && <span className="pl-why">{why(worth)}</span>}
+      {why(worth) && <span className="pl-why">{why(worth)}</span>}
     </span>
   );
 }
