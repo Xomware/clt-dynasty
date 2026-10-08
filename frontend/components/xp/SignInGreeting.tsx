@@ -6,6 +6,7 @@ import { useAlerts } from "@/lib/alerts/alerts";
 import { useMember } from "@/lib/member/use-member";
 import { playWhenAllowed } from "@/lib/sound/sound";
 import { useTheme } from "@/lib/theme/theme";
+import { PHONE, useMediaQuery } from "@/lib/use-media-query";
 
 // Runs once per signed-in load: the startup chime and a welcome balloon.
 export function SignInGreeting() {
@@ -14,6 +15,7 @@ export function SignInGreeting() {
   const member = state.status === "member" ? state.me.member : null;
   const greeted = useRef(false);
   const buzz = useTheme().theme === "buzz";
+  const phone = useMediaQuery(PHONE);
 
   useEffect(() => {
     playWhenAllowed("startup");
@@ -26,10 +28,12 @@ export function SignInGreeting() {
       title: member.displayName ? `Welcome back, ${member.displayName}` : "Welcome to CLT Dynasty",
       body: buzz
         ? "Every page is a tap away in the nav, and search finds any team or player."
-        : "Everything in the league is a double-click away: open a folder or the Start menu.",
+        : phone
+          ? "Every program is under Start, and search finds any team or player."
+          : "Everything in the league is a double-click away: open a folder or the Start menu.",
       icon: "info",
     });
-  }, [member, notify, buzz]);
+  }, [member, notify, buzz, phone]);
 
   return null;
 }
