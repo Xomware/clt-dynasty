@@ -14,10 +14,14 @@ import helmet from "@/public/brand/helmet.webp";
 import helmet2 from "@/public/brand/helmet@2x.webp";
 import lockup from "@/public/brand/lockup.webp";
 import lockup2 from "@/public/brand/lockup@2x.webp";
+import lockupTop from "@/public/brand/lockup-top.webp";
+import lockupTop2 from "@/public/brand/lockup-top@2x.webp";
 import monogram from "@/public/brand/monogram.webp";
 import monogram2 from "@/public/brand/monogram@2x.webp";
 import pennant from "@/public/brand/pennant.webp";
 import pennant2 from "@/public/brand/pennant@2x.webp";
+import ribbon from "@/public/brand/ribbon.webp";
+import ribbon2 from "@/public/brand/ribbon@2x.webp";
 import seal from "@/public/brand/seal.webp";
 import seal2 from "@/public/brand/seal@2x.webp";
 import wordmark from "@/public/brand/wordmark.webp";
@@ -34,8 +38,11 @@ const MARKS = {
   "head-crowned": [headCrowned, headCrowned2],
   helmet: [helmet, helmet2],
   lockup: [lockup, lockup2],
+  // The lockup split at its FANTASY FOOTBALL ribbon, each on the full lockup canvas.
+  "lockup-top": [lockupTop, lockupTop2],
   monogram: [monogram, monogram2],
   pennant: [pennant, pennant2],
+  ribbon: [ribbon, ribbon2],
   seal: [seal, seal2],
   wordmark: [wordmark, wordmark2],
 } satisfies Record<string, [StaticImageData, StaticImageData]>;
