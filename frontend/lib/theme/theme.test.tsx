@@ -3,8 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { TIMING } from "@/components/theme/ThemeTransition";
+import { play } from "@/lib/sound/sound";
 import { THEME_KEY, THEME_SCRIPT } from "./script";
 import { ThemeProvider, useTheme } from "./theme";
+
+vi.mock("@/lib/sound/sound", async (orig) => ({ ...(await orig<typeof import("@/lib/sound/sound")>()), play: vi.fn() }));
 
 const html = document.documentElement;
 const themeColor = () => document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.content;
@@ -31,6 +34,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.clearAllMocks();
   vi.useRealTimers();
   vi.restoreAllMocks();
   localStorage.clear();
@@ -116,6 +120,27 @@ describe("ThemeProvider", () => {
     expect(html.style.backgroundColor).toBe("");
     expect(themeColor()).toBeUndefined();
     expect(localStorage.getItem(THEME_KEY)).toBe("xp");
+  });
+
+  it("powers down to XP's boot and Welcome screens, lifting them with the startup chime", () => {
+    localStorage.setItem(THEME_KEY, "buzz");
+    renderToggle();
+    fireEvent.click(screen.getByRole("button", { name: "Classic XP" }));
+    expect(overlay()?.getAttribute("data-crt")).toBe("shutter");
+    expect(overlay()?.querySelector(".tt-boot img")?.getAttribute("srcset")).toMatch(/seal/);
+
+    act(() => vi.advanceTimersByTime(TIMING.xp.covered));
+    expect(screen.getByTestId("theme").textContent).toBe("xp");
+    // The cover holds through the boot and Welcome screens.
+    act(() => vi.advanceTimersByTime(TIMING.xp.hold - TIMING.xp.covered - 50));
+    expect(overlay()?.getAttribute("data-phase")).toBe("in");
+    expect(play).not.toHaveBeenCalled();
+
+    act(() => vi.advanceTimersByTime(50));
+    expect(overlay()?.getAttribute("data-phase")).toBe("out");
+    expect(play).toHaveBeenCalledWith("startup");
+    act(() => vi.advanceTimersByTime(TIMING.xp.out));
+    expect(overlay()).toBeNull();
   });
 
   it("reads a stored Uptown choice as Buzz City", () => {

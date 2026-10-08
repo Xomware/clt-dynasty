@@ -9,11 +9,15 @@ import "@/components/buzz/buzz-loader.css";
 import "./transition.css";
 
 // Milliseconds from mount: `covered` is when the overlay hides the whole
-// screen and the theme swaps under it; `total` is when it is removed. The
-// keyframe delays in transition.css are written against these.
-export const TIMING: Record<Theme, { covered: number; total: number }> = {
-  buzz: { covered: 640, total: 1500 },
-  xp: { covered: 540, total: 1450 },
+// screen and the theme swaps under it. The cover holds at least until `hold`,
+// and on until the new shell has mounted and the frames run smooth again
+// (`settle` at most), then plays its `out` and goes. `total` is the latest it
+// can be gone. The keyframe delays in transition.css are written against these.
+const SETTLE = 400;
+const timing = (covered: number, hold: number, out: number) => ({ covered, hold, out, total: hold + SETTLE + out });
+export const TIMING: Record<Theme, ReturnType<typeof timing>> = {
+  buzz: timing(640, 1040, 560),
+  xp: timing(900, 1800, 500),
 };
 
 // XP to Buzz City: the desktop loses tracking like a VHS tape, slats of the
@@ -42,15 +46,31 @@ function TapeIn() {
   );
 }
 
-// Buzz City to XP: sunrise floods up from the horizon into XP's Welcome screen,
-// which dissolves onto the desktop.
-function WelcomeBack() {
+// Buzz City to XP, the way a 2003 PC came back: the arena powers down like
+// a CRT, squeezed to a line that shrinks to a dot, then the boot screen with
+// the league's seal and the green progress blocks, the Welcome screen with a
+// light sweeping across it, and the desktop coming up under the startup chime.
+// With View Transitions it is the page itself that squeezes; without, black
+// shutters close over it.
+function PowerCycle() {
   return (
     <>
-      <i className="tt-dawn" />
+      <i className="tt-crt" />
+      <i className="tt-crt-flash" />
+      <i className="tt-crt-line" />
+      <div className="tt-boot">
+        <BrandMark mark="seal" alt="" className="tt-boot-seal" priority />
+        <p className="tt-boot-name">
+          CLT Dynasty<span>League</span>
+        </p>
+        <div className="tt-boot-bar">
+          <i />
+        </div>
+      </div>
       <div className="tt-welcome">
         <i className="tt-band" />
         <div className="tt-welcome-body">
+          <i className="tt-sweep" />
           <p className="tt-welcome-word">welcome</p>
         </div>
         <i className="tt-band tt-band-foot" />
@@ -59,11 +79,25 @@ function WelcomeBack() {
   );
 }
 
+interface ThemeTransitionProps {
+  to: Theme;
+  // "out" once the new shell has settled under the cover.
+  phase: "in" | "out";
+  // The old page was captured by a View Transition and squeezes itself.
+  snapshot: boolean;
+}
+
 // Drawn over everything, and takes the pointer so nothing hidden under it gets clicked.
-export function ThemeTransition({ to }: { to: Theme }) {
+export function ThemeTransition({ to, phase, snapshot }: ThemeTransitionProps) {
   return (
-    <div className="theme-transition skyline-palette" data-to={to} aria-hidden="true">
-      {to === "buzz" ? <TapeIn /> : <WelcomeBack />}
+    <div
+      className="theme-transition skyline-palette"
+      data-to={to}
+      data-phase={phase}
+      data-crt={to === "xp" ? (snapshot ? "snapshot" : "shutter") : undefined}
+      aria-hidden="true"
+    >
+      {to === "buzz" ? <TapeIn /> : <PowerCycle />}
     </div>
   );
 }
