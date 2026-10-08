@@ -11,9 +11,11 @@ import { LEAGUE_ID } from "@/lib/config";
 import type { Flag, LineupCheck } from "@/lib/home/lineup";
 import type { PlayerWeek } from "@/lib/home/projections";
 import { useLineup } from "@/lib/home/use-lineup";
+import { useWaivers } from "@/lib/home/use-waivers";
+import type { Candidate, Pickup } from "@/lib/home/waivers";
 import { usePlayers } from "@/lib/league/players";
 import type { LeagueData } from "@/lib/league/use-league";
-import { slotLabel } from "@/lib/team/team";
+import { ordinal, slotLabel } from "@/lib/team/team";
 import { HomeCard } from "./HomeCard";
 
 // Sleeper owns lineups and moves. On a phone Sleeper sends this link on to
@@ -29,7 +31,7 @@ interface YourWeekProps {
 }
 
 // The signed-in member's to-do list for the week: their lineup against this
-// week's projections, then (later sections) pickups and trades.
+// week's projections, then free agents worth picking up.
 export function YourWeek({ data, myRosterId, memberLoading }: YourWeekProps) {
   const unlinked = data !== null && !memberLoading && myRosterId === null;
   return (
@@ -44,6 +46,7 @@ export function YourWeek({ data, myRosterId, memberLoading }: YourWeekProps) {
       ) : (
         <div className="yw-grid">
           <LineupSection data={data} rosterId={memberLoading ? null : myRosterId} />
+          <WaiverSection data={data} rosterId={memberLoading ? null : myRosterId} />
         </div>
       )}
     </HomeCard>
@@ -177,3 +180,64 @@ function LineupBody({ check, player, name }: BodyProps) {
 }
 
 const reason = (w: PlayerWeek) => (w.bye ? "on bye" : (w.injury ?? "").toLowerCase());
+
+const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
+
+function WaiverSection({ data, rosterId }: { data: LeagueData | null; rosterId: number | null }) {
+  const { state, retry } = useWaivers(data, rosterId);
+  const players = usePlayers();
+  const name = (id: string) => playerName(players.status === "ok" ? players.players[id] : undefined, id);
+  const link = (id: string) => (
+    <PlayerLink id={id} className="yw-player">
+      {name(id)}
+    </PlayerLink>
+  );
+
+  return (
+    <Section title="Waiver wire">
+      {state.status === "off" && <p>Pickup ideas start when the season does.</p>}
+      {state.status === "loading" && <p role="status">Sizing up the free agents...</p>}
+      {state.status === "error" && <LoadError what="free agents and player values" message={state.message} onRetry={retry} />}
+      {state.status === "ok" && (
+        <div aria-live="polite" className="yw-body">
+          {state.closed && (
+            <p className="yw-closed">
+              {state.closed === "season"
+                ? "Add/drops closed at the end of the regular season."
+                : "Adds are closed: this week's first game has kicked off. These are for next week."}
+            </p>
+          )}
+          {state.picks.length === 0 ? (
+            <p className="yw-ok">No free agent clearly beats the bottom of your bench right now.</p>
+          ) : (
+            <ul className="yw-list" aria-label="Suggested pickups">
+              {state.picks.map((p) => (
+                <li key={p.add.id} className="yw-item" data-kind="add">
+                  <span className="yw-slot">{p.add.position}</span>
+                  <span className="yw-line">
+                    Add {link(p.add.id)}
+                    {p.drop ? <>, drop {link(p.drop.id)}</> : ", into your open roster spot"}
+                    <span className="yw-why yw-why-block">{why(p, players.status === "ok" ? players.players[p.add.id]?.team : undefined)}</span>
+                    {p.drop && <span className="yw-why yw-why-block">{dropWhy(p.drop)}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      <p className="yw-note">
+        Free agents are players on no CLT roster, ranked by FantasyCalc dynasty value plus this week&rsquo;s projection
+        and weighted toward your thinnest positions. Drops come from your bench, never your lineup, taxi squad or IR.
+      </p>
+    </Section>
+  );
+}
+
+function why({ add, need }: Pickup, team: string | undefined): string {
+  const depth = `${add.position} depth ${ordinal(need.valueRank)} of ${need.teams} by value, ${ordinal(need.weekRank)} this week`;
+  const week = !team ? "no NFL team" : add.points > 0 ? `projects ${pts(add.points)} this week` : "no projection this week";
+  return `${depth}. ${week[0].toUpperCase()}${week.slice(1)}, dynasty value ${fmt(add.value)}.`;
+}
+
+const dropWhy = (d: Candidate) => `Your weakest bench player: value ${fmt(d.value)}, projects ${pts(d.points)}.`;

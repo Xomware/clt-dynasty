@@ -35,8 +35,10 @@ export function useWeekBoard(data: LeagueData | null) {
     return weekBoard(rows, players.players, data.league.scoring_settings, games, week);
   }, [data, week, load, players]);
 
+  // The rules close adds once the week's first game starts.
+  const kickedOff = load.status === "ok" && !!load.value && load.value[1].some((g) => g.week === week && g.status !== "pre_game" && g.status !== "canceled");
   const error = load.status === "error" ? load.message : players.status === "error" ? players.message : null;
-  return { week, slots, board, players: players.status === "ok" ? players.players : null, error, retry };
+  return { week, slots, board, kickedOff, players: players.status === "ok" ? players.players : null, error, retry };
 }
 
 // The member's lineup as Sleeper has it right now, against this week's projections.

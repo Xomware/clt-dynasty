@@ -420,6 +420,27 @@
   font-size: 0.75rem;
 }
 
+.yw-why-block {
+  display: block;
+}
+
+.yw-closed {
+  padding: 0.25rem 0.5rem;
+  border-left: 3px solid var(--xp-gold);
+  background: var(--xp-balloon);
+}
+
+@container home (min-width: 52rem) {
+  .yw-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .yw-grid > :first-child {
+    grid-row: span 2;
+  }
+}
+
 .yw-actions {
   display: flex;
   flex-wrap: wrap;
