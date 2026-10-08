@@ -46,3 +46,5 @@ class NoopObserver {
 }
 globalThis.ResizeObserver ??= NoopObserver as unknown as typeof ResizeObserver;
 globalThis.IntersectionObserver ??= NoopObserver as unknown as typeof IntersectionObserver;
+// Nor the Web Animations API; with nothing running, there is nothing to list.
+Element.prototype.getAnimations ??= () => [];
