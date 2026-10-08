@@ -269,7 +269,24 @@
   background: var(--xp-gold);
 }
 
-.pl-verdict[data-verdict="none"] {
+.pl-verdict[data-verdict="cornerstone"] {
+  border-color: var(--xp-title-dark);
+  color: var(--xp-text-inverse);
+  background: var(--xp-title-dark);
+}
+
+.pl-verdict[data-verdict="target"] {
+  border-color: var(--xp-start-dark);
+  background: var(--xp-start-light);
+}
+
+.pl-verdict[data-verdict="rental"] {
+  border-color: var(--xp-bronze);
+  background: var(--xp-balloon);
+}
+
+.pl-verdict[data-verdict="none"],
+.pl-verdict[data-verdict="nofit"] {
   font-weight: normal;
 }
 
@@ -285,15 +302,16 @@
 }
 
 .pl-col-player {
-  width: 30%;
+  width: 26%;
 }
 
 .pl-col-team {
-  width: 19%;
+  width: 17%;
 }
 
 .pl-col-worth {
   width: 9.5rem;
+  padding-left: 0.75rem;
 }
 
 .pl-table td.pl-col-team {
@@ -494,7 +512,23 @@
   background: var(--bz-amber);
 }
 
-[data-theme="buzz"] .pl-verdict[data-verdict="none"] {
+[data-theme="buzz"] .pl-verdict[data-verdict="cornerstone"] {
+  color: var(--bz-amber);
+  background: var(--bz-ink);
+}
+
+[data-theme="buzz"] .pl-verdict[data-verdict="target"] {
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
+}
+
+[data-theme="buzz"] .pl-verdict[data-verdict="rental"] {
+  color: var(--bz-purple-deep);
+  background: var(--bz-paper);
+}
+
+[data-theme="buzz"] .pl-verdict[data-verdict="none"],
+[data-theme="buzz"] .pl-verdict[data-verdict="nofit"] {
   color: var(--bz-muted);
   background: var(--bz-paper);
 }
