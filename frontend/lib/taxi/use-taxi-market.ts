@@ -6,11 +6,12 @@ import { pastDrafts } from "@/components/windows/DraftHistoryWindow";
 import { listTaxiRequests, type TaxiRequest } from "@/lib/api/taxi";
 import { tradedPicks } from "@/lib/league/cache";
 import type { PlayerRow } from "@/lib/players/rows";
-import { usePlayerBoard } from "@/lib/players/use-player-board";
+import type { PlayerBoard } from "@/lib/players/use-player-board";
 import { useLoad } from "@/lib/use-load";
 import {
   type Assessment,
   assess,
+  atRisk,
   type Cost,
   draftSpots,
   type DraftSpot,
@@ -20,6 +21,7 @@ import {
   paySeasons,
   payWith,
   stealCost,
+  stealTargets,
   type TaxiPlayer,
 } from "./market";
 
@@ -47,8 +49,7 @@ function depthOf(row: PlayerRow): string | null {
 // Every taxi player with his steal price, his case and any request on him.
 // Prices need the drafts and traded picks; values need FantasyCalc and fill
 // in when it answers.
-export function useTaxiMarket() {
-  const board = usePlayerBoard(false);
+export function useTaxiMarket(board: PlayerBoard) {
   const { rows, rosters, values, data, myRosterId } = board;
   const past = pastDrafts.use();
   const [traded, retryTraded] = useLoad(() => tradedPicks(), "traded");
@@ -75,14 +76,23 @@ export function useTaxiMarket() {
         const spot = spots.get(id) ?? null;
         const cost = stealCost(spot);
         const fc = values?.players.get(id);
-        const assessment = values ? assess(player, listPrice(cost.rounds, seasons[0], values.picks)) : null;
+        // FantasyCalc without pick values can't price a steal.
+        const list = values ? listPrice(cost.rounds, seasons[0], values.picks) : 0;
+        const assessment = list > 0 ? assess(player, list) : null;
         const payment = values && held && r.roster_id !== myRosterId ? payWith(cost.rounds, held, values.picks) : null;
-        const mine = payment && payment.missing.length === 0 ? assess(player, payment.value) : null;
+        const mine = payment && payment.missing.length === 0 && payment.value > 0 ? assess(player, payment.value) : null;
         const request = requests.find((q) => q.playerId === id);
         return [{ player, row, spot, cost, assessment, payment, mine, rank: fc?.rank ?? null, trend: fc?.trend ?? null, request }];
       }),
     );
-    return { entries, seasons };
+    const mine = entries.filter((e) => e.player.rosterId === myRosterId);
+    const risks = atRisk(
+      mine.flatMap((e) => (e.assessment ? [{ player: e.player, assessment: e.assessment, rounds: e.cost.rounds }] : [])),
+      new Set(mine.flatMap((e) => (e.request ? [e.player.id] : []))),
+    );
+    // Other teams' players priced at what I'd actually pay.
+    const priced = entries.flatMap((e) => (e.mine && e.player.rosterId !== myRosterId ? [{ ...e, assessment: e.mine }] : []));
+    return { entries, seasons, risks, priced, targets: stealTargets(priced) };
   }, [rows, rosters, data, past, traded, values, myRosterId, requests]);
 
   const error =
@@ -96,7 +106,6 @@ export function useTaxiMarket() {
   };
 
   return {
-    board,
     market,
     error,
     retry,

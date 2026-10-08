@@ -551,9 +551,16 @@
     align-items: start;
   }
 
-  .yw-grid > :first-child {
+  .yw-grid > :first-child,
+  .yw-grid > .yw-taxi {
     grid-column: 1 / -1;
   }
+}
+
+.yw-taxi-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
 }
 
 .yw-actions {

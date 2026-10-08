@@ -154,7 +154,7 @@ export function PlayerFilters({ view, onChange, query, onQuery, teams, mine, inS
           <select id={`${id}-slot`} className="xp-select" value={view.slot} onChange={(e) => onChange({ slot: e.target.value as Slot })}>
             <option value="any">Any</option>
             <option value="active">Active roster</option>
-            <option value="taxi">Taxi squad</option>
+            <option value="taxi">On a taxi squad</option>
             <option value="ir">Injured reserve</option>
           </select>
         </div>

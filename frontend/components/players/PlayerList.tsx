@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { type ReactNode, useDeferredValue, useMemo, useState } from "react";
 
 import { cleanQuery, naturalDesc, type SortKey, type View } from "@/lib/players/params";
 import { filterRows, type PlayerRow, sortRows } from "@/lib/players/rows";
@@ -20,12 +20,13 @@ interface PlayerListProps {
   query: string;
   onQuery: (q: string) => void;
   worth: ((id: string) => Worth | null) | null;
+  taxi: ((id: string) => ReactNode) | null;
   scenario: Scenario;
   onToggle: (kind: MoveKind, id: string) => void;
   onSimulate: () => void;
 }
 
-export function PlayerList({ board, view, onView, query, onQuery, worth, scenario, onToggle, onSimulate }: PlayerListProps) {
+export function PlayerList({ board, view, onView, query, onQuery, worth, taxi, scenario, onToggle, onSimulate }: PlayerListProps) {
   const [shown, setShown] = useState(PAGE);
   const deferredQuery = useDeferredValue(query);
   const { rows, players, myRosterId, teamFor, rosters } = board;
@@ -118,6 +119,7 @@ export function PlayerList({ board, view, onView, query, onQuery, worth, scenari
               showRos={view.sort === "ros"}
               worth={worth}
               action={action}
+              taxi={taxi}
             />
           )}
           {found.length > shown && (
