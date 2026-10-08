@@ -1,34 +1,84 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HEAD_SCRIPT, SEEN_KEY } from "@/lib/intro/seen";
+import { play } from "@/lib/sound/sound";
+import { stubSleeper } from "@/lib/test/league-mock";
 import { THEME_KEY } from "@/lib/theme/script";
 import { Intro } from "./Intro";
 
-beforeEach(() => localStorage.setItem(THEME_KEY, "xp"));
+vi.mock("@/lib/sound/sound", () => ({ play: vi.fn() }));
+
+beforeEach(() => {
+  HTMLImageElement.prototype.decode ??= () => Promise.resolve();
+  localStorage.setItem(THEME_KEY, "xp");
+  stubSleeper();
+});
 
 afterEach(() => {
   localStorage.clear();
   vi.useRealTimers();
+  vi.mocked(play).mockClear();
   sessionStorage.clear();
   delete document.documentElement.dataset.intro;
+  delete document.documentElement.dataset.booted;
 });
 
 const overlay = (c: HTMLElement) => c.querySelector(".intro");
 
-// jsdom has no AnimationEvent, so React listens for the webkit-prefixed name there.
-function animationEnd(el: Element, animationName: string) {
-  const e = Object.assign(new Event("webkitAnimationEnd", { bubbles: true }), { animationName });
+// jsdom has no AnimationEvent, so React listens for the webkit-prefixed names there.
+function animation(el: Element, type: "Start" | "End", animationName: string) {
+  const e = Object.assign(new Event(`webkitAnimation${type}`, { bubbles: true }), { animationName });
   act(() => void el.dispatchEvent(e));
 }
 
 describe("Intro", () => {
-  it("fades out on Skip, then unmounts and remembers it was seen", () => {
+  it("checks the league on the POST screen once Sleeper answers", async () => {
+    const { container } = render(<Intro />);
+    expect(container.querySelector(".xpi-post")?.textContent).toContain("Detecting teams");
+
+    await waitFor(() => expect(container.querySelector(".xpi-post")?.textContent).toContain("BIG10, SEC, ACC"));
+    expect(container.querySelector(".xpi-post")?.textContent).toContain("Loading Week 4 matchups");
+  });
+
+  it("signs in the league's teams on the Welcome screen, lighting yours", async () => {
+    localStorage.setItem("clt.intro.me", "u7");
+    const { container } = render(<Intro />);
+
+    await waitFor(() => expect(container.querySelectorAll(".xpi-tiles li")).toHaveLength(12));
+    expect(container.querySelector("[data-me] .xpi-tile-name")?.textContent).toBe("Team 7");
+    expect(container.querySelector(".xpi-welcome-mine")?.textContent).toBe("Team 7");
+  });
+
+  it("lights no tile for a visitor it doesn't know", async () => {
+    const { container } = render(<Intro />);
+    await waitFor(() => expect(container.querySelectorAll(".xpi-tiles li")).toHaveLength(12));
+    expect(container.querySelector("[data-me]")).toBeNull();
+  });
+
+  it("chimes as the Welcome screen comes up, not before", () => {
+    const { container } = render(<Intro />);
+    animation(container.querySelector(".xpi-boot")!, "Start", "xpi-boot");
+    expect(play).not.toHaveBeenCalled();
+
+    animation(container.querySelector(".xpi-welcome")!, "Start", "xpi-welcome");
+    expect(play).toHaveBeenCalledWith("startup");
+  });
+
+  it("starts the page under it, desktop icons included, as it begins to fade", () => {
+    const { container } = render(<Intro />);
+    animation(overlay(container)!, "Start", "xpi-exit");
+    expect(overlay(container)?.getAttribute("data-phase")).toBe("leave");
+    expect(document.documentElement.dataset.booted).toBe("");
+  });
+
+  it("fades out on Skip with the chime, then unmounts and remembers it was seen", () => {
     vi.useFakeTimers();
     const { container } = render(<Intro />);
     fireEvent.click(screen.getByRole("button", { name: "Skip intro" }));
 
     expect(overlay(container)?.getAttribute("data-phase")).toBe("skip");
+    expect(play).toHaveBeenCalledWith("startup");
     act(() => vi.advanceTimersByTime(250));
     expect(overlay(container)).toBeNull();
     expect(sessionStorage.getItem(SEEN_KEY)).toBe("1");
@@ -47,11 +97,11 @@ describe("Intro", () => {
 
   it("ends when the stage's own exit animation does, not a child's", () => {
     const { container } = render(<Intro />);
-    animationEnd(container.querySelector(".intro-crown")!, "intro-exit");
-    animationEnd(overlay(container)!, "intro-lights");
+    animation(container.querySelector(".xpi-welcome")!, "End", "xpi-exit");
+    animation(overlay(container)!, "End", "xpi-welcome");
     expect(overlay(container)).not.toBeNull();
 
-    animationEnd(overlay(container)!, "intro-exit");
+    animation(overlay(container)!, "End", "xpi-exit");
     expect(overlay(container)).toBeNull();
     expect(sessionStorage.getItem(SEEN_KEY)).toBe("1");
   });
@@ -63,10 +113,12 @@ describe("Intro", () => {
     expect(overlay(container)).toBeNull();
   });
 
-  it("renders nothing once the head script has marked it skipped", () => {
+  it("renders nothing and asks Sleeper nothing once the head script has marked it skipped", () => {
     document.documentElement.dataset.intro = "skip";
+    vi.mocked(fetch).mockClear();
     const { container } = render(<Intro />);
     expect(overlay(container)).toBeNull();
+    expect(fetch).not.toHaveBeenCalled();
   });
 });
 

@@ -9,6 +9,7 @@ import {
 } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 
+import { forgetMe } from "@/lib/intro/me";
 import { authConfigured } from "./amplify";
 import { rememberNextPath } from "./next-path";
 
@@ -79,6 +80,7 @@ export function useAuth() {
     refresh,
     signOut: async () => {
       await amplifySignOut();
+      forgetMe();
       await refresh();
     },
     signInWithGoogle: async () => {

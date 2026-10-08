@@ -4,6 +4,7 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useS
 
 import { ApiError } from "@/lib/api/client";
 import { type CltMe, getCltMe } from "@/lib/api/clt";
+import { rememberMe } from "@/lib/intro/me";
 
 export type MemberState =
   | { status: "loading" }
@@ -25,7 +26,10 @@ const MemberContext = createContext<MemberContextValue>({ state: { status: "load
 
 const settle = (p: Promise<CltMe>): Promise<MemberState> =>
   p.then(
-    (me): MemberState => ({ status: "member", me }),
+    (me): MemberState => {
+      rememberMe(me.linkedSleeperUserId || me.member.sleeperUserId);
+      return { status: "member", me };
+    },
     (e: Error): MemberState =>
       e instanceof ApiError && e.status === 403 ? { status: "not-member" } : { status: "error", message: e.message },
   );
