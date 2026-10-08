@@ -55,7 +55,8 @@
   animation: intro-exit 0.45s ease-in 3.95s forwards;
 }
 
-html[data-intro="skip"] .intro {
+html[data-intro="skip"] .intro,
+html[data-theme="buzz"] .intro {
   display: none;
 }
 
