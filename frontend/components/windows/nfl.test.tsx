@@ -110,6 +110,9 @@ describe("NFL Team field", () => {
     expect(x.getAttribute("aria-label")).toContain("Quentin Charger, Questionable: Chest");
     expect(x.querySelector("[data-injured]")).toBeTruthy();
     expect(x.querySelector("[data-sidelined]")).toBeNull();
+    expect(within(field).getByRole("img", { name: "Offensive line: Sleeper doesn't chart linemen" })).toBeTruthy();
+    // The 2nd string reads under the starter without a tap.
+    expect(within(field).getAllByText("Charger", { selector: ".nfl-depth li", exact: false }).map((li) => li.textContent)).toEqual(["2 Charger", "2 Charger"]);
     // Off the chart, so not on the field.
     expect(within(field).queryByRole("button", { name: /Practice/ })).toBeNull();
     expect(within(screen.getByRole("region", { name: "Injury designations" })).getByText("Injured reserve", { selector: "dd" })).toBeTruthy();

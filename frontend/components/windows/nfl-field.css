@@ -1,9 +1,18 @@
-/* The depth chart on a field: end zone painted in the team's colors at the top,
-   the offense lined up below it facing down. */
+/* The depth chart as an offense at the line of scrimmage, attacking the end
+   zone at the top. Everything is placed in yards (--yard) down from the top
+   and token rows (--row-h) behind the line, so the shape holds at any width. */
 .nfl-field-wrap {
   --nfl-turf: #3f8a2c;
   --nfl-turf-2: #377d26;
   --nfl-chalk: rgb(246 244 232 / 0.85);
+  --nfl-los: #4b8ff0;
+  --nfl-first-down: #f5d34a;
+  --yard: 0.5rem;
+  --ez-h: calc(7 * var(--yard));
+  /* The ball sits on the 12, so the first-down line is on the 2. */
+  --los: calc(var(--ez-h) + 12 * var(--yard));
+  --row-h: 7.5rem;
+  --token-w: 4.25rem;
   container-type: inline-size;
   display: flex;
   flex-direction: column;
@@ -12,51 +21,25 @@
 
 .nfl-field {
   position: relative;
-  aspect-ratio: 9 / 20;
+  /* The deepest spot (the RB, 1.15 rows) plus a token row and his backups' names. */
+  height: calc(var(--los) + 2.4 * var(--row-h));
   border: 2px solid var(--nfl-chalk);
   border-radius: 3px;
-  /* Mowed stripes every five yards below the end zone. */
   background:
-    repeating-linear-gradient(to bottom, var(--nfl-turf) 0 11%, var(--nfl-turf-2) 11% 22%) 0 12% / 100% 100% no-repeat,
+    /* Yard lines every five yards from the goal line, the goal line heavier. */
+    linear-gradient(var(--nfl-chalk), var(--nfl-chalk)) 0 calc(var(--ez-h) - 2px) / 100% 4px no-repeat,
+    repeating-linear-gradient(to bottom, var(--nfl-chalk) 0 2px, transparent 2px calc(5 * var(--yard))) 0 calc(var(--ez-h) + 5 * var(--yard)) / 100% 100%
+      no-repeat,
+    /* Hash marks every yard, on both sidelines and between the hashes. */
+    repeating-linear-gradient(to bottom, var(--nfl-chalk) 0 1px, transparent 1px var(--yard)) 2% var(--ez-h) / 3% 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--nfl-chalk) 0 1px, transparent 1px var(--yard)) 38% var(--ez-h) / 2% 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--nfl-chalk) 0 1px, transparent 1px var(--yard)) 62% var(--ez-h) / 2% 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--nfl-chalk) 0 1px, transparent 1px var(--yard)) 98% var(--ez-h) / 3% 100% no-repeat,
+    /* Mowed stripes, five yards each. */
+    repeating-linear-gradient(to bottom, var(--nfl-turf) 0 calc(5 * var(--yard)), var(--nfl-turf-2) calc(5 * var(--yard)) calc(10 * var(--yard))) 0
+      var(--ez-h) / 100% 100% no-repeat,
     var(--nfl-turf);
   outline: 4px solid var(--nfl-turf-2);
-}
-
-@container (min-width: 30rem) {
-  .nfl-field {
-    aspect-ratio: 4 / 5;
-  }
-}
-
-/* Past a phone, the field stops growing: tokens stay legible instead of lost on the turf. */
-@container (min-width: 46rem) {
-  .nfl-field {
-    width: 100%;
-    max-width: 48rem;
-    aspect-ratio: 1 / 1;
-    margin-inline: auto;
-  }
-}
-
-.nfl-field-lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.nfl-field-lines line {
-  stroke: var(--nfl-chalk);
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
-.nfl-field-lines line[data-goal] {
-  stroke-width: 4;
-}
-
-.nfl-field-lines .nfl-hash {
-  stroke-width: 1.5;
 }
 
 .nfl-endzone {
@@ -65,7 +48,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 12%;
+  height: var(--ez-h);
   padding: 0 4%;
   color: var(--ez-ink);
   background: var(--ez);
@@ -73,53 +56,146 @@
 
 .nfl-endzone-logo {
   width: auto;
-  height: 70%;
+  height: 75%;
   object-fit: contain;
 }
 
 .nfl-endzone-name {
-  font: italic 900 clamp(1.25rem, 7cqi, 3rem) / 1 var(--xp-title-font);
+  font: italic 900 clamp(1.125rem, 6cqi, 2.5rem) / 1 var(--xp-title-font);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .nfl-yard-number {
   position: absolute;
-  left: 1.5%;
+  top: calc(var(--ez-h) + var(--yd) * var(--yard));
+  left: 5.5%;
   translate: 0 -50%;
-  rotate: -90deg;
   color: var(--nfl-chalk);
-  font: bold clamp(0.875rem, 4cqi, 1.75rem) / 1 var(--xp-title-font);
+  font: bold clamp(0.875rem, 3.5cqi, 1.5rem) / 1 var(--xp-title-font);
+  text-shadow: 0 1px 0 var(--nfl-turf-2);
 }
 
-.nfl-spots {
+.nfl-los,
+.nfl-first-down {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  translate: 0 -50%;
+}
+
+.nfl-los {
+  top: var(--los);
+  background: var(--nfl-los);
+  box-shadow: 0 0 0 1px rgb(16 24 32 / 0.25);
+}
+
+.nfl-first-down {
+  top: calc(var(--los) - 10 * var(--yard));
+  background: var(--nfl-first-down);
+}
+
+/* The ball at the snap, laces up, on the line just ahead of the center. */
+.nfl-ball {
+  position: absolute;
+  top: calc(var(--los) - 1.1rem);
+  z-index: 1;
+  width: 0.875rem;
+  height: 1.375rem;
+  translate: -50% 0;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--nfl-chalk), var(--nfl-chalk)) 50% 50% / 1.5px 45% no-repeat,
+    repeating-linear-gradient(to bottom, transparent 0 2px, var(--nfl-chalk) 2px 3px) 50% 50% / 45% 40% no-repeat,
+    radial-gradient(ellipse at 35% 30%, #a0602f, #6b3a16);
+  box-shadow: 0 1px 2px rgb(16 24 32 / 0.5);
+}
+
+/* Five unnamed linemen, helmets in the team's paint, on the line. */
+.nfl-line {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.nfl-lineman {
+  position: absolute;
+  top: var(--los);
+  display: grid;
+  place-items: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  translate: -50% 15%;
+  border: 2px solid var(--ez-ink);
+  border-radius: 45% 45% 30% 30%;
+  color: var(--ez-ink);
+  background: var(--ez);
+  box-shadow: 0 2px 3px rgb(16 24 32 / 0.4);
+  font-size: 0.4375rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.nfl-spots,
+.nfl-special ul {
   position: absolute;
   inset: 0;
 }
 
 .nfl-spot {
   position: absolute;
-  z-index: 1;
+  top: calc(var(--los) + 0.375rem + var(--row) * var(--row-h));
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 6.5rem;
+  left: var(--x);
+  width: var(--token-w);
   translate: -50% 0;
 }
 
 .nfl-spot[data-open] {
-  z-index: 3;
+  z-index: 4;
+}
+
+.nfl-card {
+  position: relative;
+  width: 100%;
 }
 
 .nfl-spot-code {
-  margin-bottom: 0.125rem;
-  padding: 0 0.375rem;
+  position: absolute;
+  top: -0.375rem;
+  left: -0.375rem;
+  padding: 0 0.3125rem;
   border-radius: 999px;
-  color: var(--nfl-turf-2);
-  background: var(--nfl-chalk);
-  font-size: 0.625rem;
+  color: var(--xp-text-inverse);
+  background: var(--xp-text);
+  font-size: 0.5625rem;
   font-weight: bold;
-  line-height: 1.4;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.nfl-spot-more {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.375rem;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0 0.25rem;
+  border: 1px solid var(--nfl-chalk);
+  border-radius: 999px;
+  color: var(--nfl-chalk);
+  background: rgb(16 24 32 / 0.7);
+  font-size: 0.6875rem;
+  font-weight: bold;
+}
+
+.nfl-spot-more:focus-visible {
+  outline: 2px solid var(--nfl-chalk);
+  outline-offset: 2px;
 }
 
 .nfl-token {
@@ -129,11 +205,11 @@
   gap: 0.125rem;
   width: 100%;
   min-height: 2.75rem;
-  padding: 0.25rem;
+  padding: 0.25rem 0.1875rem;
   border: 1px solid var(--xp-face-shadow);
   border-radius: 4px;
   color: var(--xp-text);
-  background: rgb(251 248 236 / 0.94);
+  background: rgb(251 248 236 / 0.95);
   box-shadow: 0 2px 4px rgb(16 24 32 / 0.35);
   text-align: center;
 }
@@ -159,8 +235,8 @@
 }
 
 .nfl-token-face .xp-face {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 50%;
 }
 
@@ -174,20 +250,20 @@
 
 .nfl-token-face .xp-injury {
   position: absolute;
-  right: -0.375rem;
+  right: -0.5rem;
   bottom: -0.125rem;
 }
 
 .nfl-token-number {
   position: absolute;
-  top: -0.25rem;
-  left: -0.5rem;
-  min-width: 1.25rem;
+  top: -0.125rem;
+  left: -0.75rem;
+  min-width: 1.125rem;
   padding: 0 0.125rem;
   border-radius: 3px;
   color: var(--xp-text-inverse);
-  background: var(--xp-text);
-  font-size: 0.625rem;
+  background: var(--xp-select);
+  font-size: 0.5625rem;
   font-weight: bold;
   line-height: 1.5;
 }
@@ -195,7 +271,7 @@
 .nfl-token-name {
   max-width: 100%;
   overflow: hidden;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: bold;
   line-height: 1.2;
   text-overflow: ellipsis;
@@ -209,7 +285,7 @@
   border-radius: 3px;
   color: var(--xp-text-inverse);
   background: var(--xp-select);
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -220,34 +296,53 @@
   background: var(--xp-gold);
 }
 
-/* Tucked under the token's bottom edge, so the spot stays short. */
-.nfl-spot-more {
-  position: relative;
-  min-width: 2.75rem;
-  min-height: 1.75rem;
-  margin-top: -0.5rem;
-  border: 1px solid var(--nfl-chalk);
-  border-radius: 999px;
+.nfl-token .xp-rank-strip {
+  font-size: 0.5625rem;
+}
+
+.nfl-token .xp-rank-strip > span {
+  min-width: 0.875rem;
+  padding: 0 0.125rem;
+}
+
+/* The 2nd and 3rd string, faint under the starter. */
+.nfl-depth {
+  max-width: calc(100% + 1rem);
+  margin-top: 0.1875rem;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 3px;
   color: var(--nfl-chalk);
-  background: rgb(16 24 32 / 0.45);
-  font-size: 0.6875rem;
+  background: rgb(16 24 32 / 0.5);
+  font-size: 0.625rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.nfl-depth li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nfl-depth-inj {
+  color: var(--nfl-first-down);
   font-weight: bold;
 }
 
-.nfl-spot-more:focus-visible {
-  outline: 2px solid var(--nfl-chalk);
-  outline-offset: 2px;
+.nfl-depth-n {
+  font-weight: bold;
 }
 
 .nfl-backups {
+  position: absolute;
+  top: calc(100% + 0.25rem);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  width: 8.5rem;
-  margin-top: 0.25rem;
+  width: 9rem;
   padding: 0.25rem;
   border-radius: 4px;
-  background: rgb(16 24 32 / 0.6);
+  background: rgb(16 24 32 / 0.8);
 }
 
 .nfl-backups .nfl-token {
@@ -257,9 +352,8 @@
   text-align: left;
 }
 
-.nfl-backups .nfl-token-face .xp-face {
-  width: 2.5rem;
-  height: 2.5rem;
+.nfl-backups .nfl-token-face {
+  margin-left: 0.5rem;
 }
 
 .nfl-backups .nfl-token-name {
@@ -275,11 +369,44 @@
   flex-basis: 100%;
 }
 
+/* Kickers (and punters, if the list ever carries them) off the field. */
+.nfl-special {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--xp-face-shadow);
+  border-radius: 3px;
+  background: var(--xp-cream);
+}
+
+.nfl-special-title {
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nfl-special ul {
+  position: static;
+  display: flex;
+  gap: 1rem;
+}
+
+.nfl-special .nfl-spot {
+  position: relative;
+  top: auto;
+  translate: none;
+}
+
+.nfl-special .nfl-depth {
+  color: var(--xp-text);
+  background: none;
+  opacity: 0.75;
+}
+
 .nfl-legend {
   display: flex;
-  width: 100%;
-  max-width: 48rem;
-  margin-inline: auto;
   flex-direction: column;
   gap: 0.375rem;
   font-size: 0.75rem;
@@ -289,7 +416,8 @@
   font-weight: bold;
 }
 
-.nfl-legend dl {
+.nfl-legend dl,
+.nfl-legend-ranks {
   display: flex;
   flex-wrap: wrap;
   gap: 0.375rem 0.875rem;
@@ -299,136 +427,6 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-}
-
-/* Below a wide window, a token's ranks shrink to the one-line strip. */
-@container (max-width: 45.99rem) {
-  .nfl-token .xp-ranks[data-compact] {
-    display: none;
-  }
-
-  .nfl-token .xp-rank-strip {
-    display: inline-flex;
-  }
-}
-
-/* A phone-width field: smaller tokens, still a 44px-wide tap target. */
-@container (max-width: 29.99rem) {
-  .nfl-spot {
-    width: 5.5rem;
-  }
-
-  .nfl-token {
-    padding: 0.1875rem;
-  }
-
-  .nfl-token-face .xp-face {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-
-  .nfl-token-name {
-    font-size: 0.6875rem;
-  }
-
-  .nfl-backups {
-    width: 7.5rem;
-  }
-
-  .nfl-spot-code {
-    font-size: 0.5625rem;
-  }
-}
-
-/* Buzz City: chunky ink outlines on the same turf. */
-[data-theme="buzz"] .nfl-field-wrap {
-  --nfl-turf: #2f8a4c;
-  --nfl-turf-2: #277a41;
-}
-
-[data-theme="buzz"] .nfl-field {
-  border: 3px solid var(--bz-ink);
-  border-radius: 16px;
-  outline: none;
-  box-shadow: 6px 6px 0 var(--bz-teal);
-}
-
-[data-theme="buzz"] .nfl-endzone-name {
-  font: 400 clamp(1.25rem, 7cqi, 3rem) / 1 var(--bz-display);
-}
-
-[data-theme="buzz"] .nfl-token {
-  border: 2px solid var(--bz-ink);
-  border-radius: 12px;
-  color: var(--bz-text);
-  background: var(--bz-paper);
-  box-shadow: 3px 3px 0 var(--bz-ink);
-}
-
-[data-theme="buzz"] .nfl-token:focus-visible {
-  outline: 3px solid var(--bz-focus);
-}
-
-@media (hover: hover) {
-  [data-theme="buzz"] .nfl-token:hover {
-    background: var(--bz-teal-light);
-  }
-}
-
-[data-theme="buzz"] .nfl-token-face .xp-face {
-  border-width: 2px;
-}
-
-[data-theme="buzz"] .nfl-token-name {
-  font: 700 0.875rem / 1.1 var(--bz-jersey);
-  text-transform: uppercase;
-}
-
-[data-theme="buzz"] .nfl-token-number {
-  background: var(--bz-purple);
-  font-family: var(--bz-jersey);
-}
-
-[data-theme="buzz"] .nfl-owner {
-  border-radius: 999px;
-  background: var(--bz-purple);
-  font: 700 0.6875rem var(--bz-jersey);
-  text-transform: uppercase;
-}
-
-[data-theme="buzz"] .nfl-owner[data-owner="mine"] {
-  color: var(--bz-ink);
-  background: var(--bz-amber);
-}
-
-[data-theme="buzz"] .nfl-spot-code {
-  color: var(--bz-paper);
-  background: var(--bz-ink);
-  font-family: var(--bz-jersey);
-}
-
-[data-theme="buzz"] .nfl-spot-more {
-  border: 2px solid var(--bz-ink);
-  color: var(--bz-ink);
-  background: var(--bz-amber);
-  font-family: var(--bz-jersey);
-}
-
-[data-theme="buzz"] .nfl-backups {
-  background: rgb(23 13 49 / 0.75);
-  border-radius: 12px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nfl-token:active {
-    translate: none;
-  }
-}
-
-.nfl-legend-ranks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem 0.875rem;
 }
 
 .xp-rank-key {
@@ -454,6 +452,153 @@
   background: var(--xp-gold);
 }
 
+/* Wider windows: bigger yards and tokens, the field capped so it fits a laptop screen. */
+@container (min-width: 34rem) {
+  .nfl-field-wrap {
+    --yard: 0.625rem;
+    --row-h: 8.5rem;
+    --token-w: 5.25rem;
+  }
+
+  .nfl-token-face .xp-face {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .nfl-token-name {
+    font-size: 0.75rem;
+  }
+
+  .nfl-owner {
+    font-size: 0.625rem;
+  }
+
+  .nfl-token .xp-rank-strip {
+    font-size: 0.625rem;
+  }
+
+  .nfl-lineman {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.5rem;
+  }
+
+  .nfl-spots .nfl-spot {
+    left: var(--x-wide);
+  }
+}
+
+@container (min-width: 50rem) {
+  .nfl-field,
+  .nfl-special,
+  .nfl-legend {
+    width: 100%;
+    max-width: 50rem;
+    margin-inline: auto;
+  }
+}
+
+/* Buzz City: chunky ink outlines on the same turf. */
+[data-theme="buzz"] .nfl-field-wrap {
+  --nfl-turf: #2f8a4c;
+  --nfl-turf-2: #277a41;
+}
+
+[data-theme="buzz"] .nfl-field {
+  border: 3px solid var(--bz-ink);
+  border-radius: 16px;
+  outline: none;
+  box-shadow: 6px 6px 0 var(--bz-teal);
+}
+
+[data-theme="buzz"] .nfl-endzone {
+  border-radius: 13px 13px 0 0;
+}
+
+[data-theme="buzz"] .nfl-endzone-name {
+  font: 400 clamp(1.125rem, 6cqi, 2.5rem) / 1 var(--bz-display);
+}
+
+[data-theme="buzz"] .nfl-token {
+  border: 2px solid var(--bz-ink);
+  border-radius: 10px;
+  color: var(--bz-text);
+  background: var(--bz-paper);
+  box-shadow: 2px 2px 0 var(--bz-ink);
+}
+
+[data-theme="buzz"] .nfl-token:focus-visible {
+  outline: 3px solid var(--bz-focus);
+}
+
+@media (hover: hover) {
+  [data-theme="buzz"] .nfl-token:hover {
+    background: var(--bz-teal-light);
+  }
+}
+
+[data-theme="buzz"] .nfl-token-face .xp-face {
+  border-width: 2px;
+}
+
+[data-theme="buzz"] .nfl-token-name {
+  font: 700 0.8125rem / 1.1 var(--bz-jersey);
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .nfl-token-number {
+  background: var(--bz-purple);
+  font-family: var(--bz-jersey);
+}
+
+[data-theme="buzz"] .nfl-owner {
+  border-radius: 999px;
+  background: var(--bz-purple);
+  font: 700 0.625rem var(--bz-jersey);
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .nfl-owner[data-owner="mine"] {
+  color: var(--bz-ink);
+  background: var(--bz-amber);
+}
+
+[data-theme="buzz"] .nfl-spot-code {
+  color: var(--bz-paper);
+  background: var(--bz-ink);
+  font-family: var(--bz-jersey);
+}
+
+[data-theme="buzz"] .nfl-spot-more {
+  border: 2px solid var(--bz-ink);
+  color: var(--bz-ink);
+  background: var(--bz-amber);
+  font-family: var(--bz-jersey);
+}
+
+[data-theme="buzz"] .nfl-depth {
+  font-family: var(--bz-jersey);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+}
+
+[data-theme="buzz"] .nfl-backups {
+  background: rgb(23 13 49 / 0.85);
+  border-radius: 12px;
+}
+
+[data-theme="buzz"] .nfl-special {
+  border: 3px solid var(--bz-ink);
+  border-radius: 14px;
+  background: var(--bz-paper-2);
+}
+
+[data-theme="buzz"] .nfl-special-title {
+  color: var(--bz-purple);
+  font: italic 800 0.875rem var(--bz-jersey);
+  letter-spacing: 0.14em;
+}
+
 [data-theme="buzz"] .xp-rank-key::before {
   border: 1.5px solid var(--bz-ink);
   border-radius: 50%;
@@ -466,4 +611,10 @@
 
 [data-theme="buzz"] .xp-rank-key[data-kind="dynasty"]::before {
   background: var(--bz-purple);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nfl-token:active {
+    translate: none;
+  }
 }

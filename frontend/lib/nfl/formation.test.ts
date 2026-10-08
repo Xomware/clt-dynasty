@@ -34,13 +34,13 @@ const slots = (players: Player[]) => Object.fromEntries(formation(map(players), 
 describe("formation", () => {
   it("puts receivers in Sleeper's slots, starter first, and everyone else at his position", () => {
     expect(slots(LAC)).toEqual({
-      RB: ["hampton", "mitchell"],
-      K: ["dicker"],
-      QB: ["herbert", "lance"],
       X: ["johnston", "mvs"],
       TE: ["gadsden"],
-      SLOT: ["mcconkey", "davis"],
       Z: ["harris", "thompson"],
+      QB: ["herbert", "lance"],
+      SLOT: ["mcconkey", "davis"],
+      RB: ["hampton", "mitchell"],
+      K: ["dicker"],
     });
   });
 
@@ -51,7 +51,7 @@ describe("formation", () => {
 
   it("drops a spot nobody is charted at", () => {
     const ids = formation(map(LAC.filter((x) => x.position !== "K" && x.position !== "TE")), "LAC").map((s) => s.id);
-    expect(ids).toEqual(["RB", "QB", "X", "SLOT", "Z"]);
+    expect(ids).toEqual(["X", "Z", "QB", "SLOT", "RB"]);
     expect(formation(map(LAC), "NYJ")).toEqual([]);
   });
 });
