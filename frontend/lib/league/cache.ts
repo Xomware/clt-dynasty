@@ -8,6 +8,7 @@ import {
   getNflState,
   getPlayer,
   getPlayerStats,
+  getProjections,
   getRosters,
   getSchedule,
   getTradedPicks,
@@ -100,6 +101,15 @@ export const transactions = (week: number, live: boolean) =>
 export const player = (id: string) => cached(`player/${id}`, () => getPlayer(id), NFL_TTL);
 export const playerStats = (id: string, season: string) => cached(`stats/${season}/${id}`, () => getPlayerStats(id, season), NFL_TTL);
 export const nflSchedule = (season: string) => cached(`schedule/${season}`, () => getSchedule(season), NFL_TTL);
+
+// Projections and injuries change through the week, and a lineup changes in
+// Sleeper whenever its manager taps, so both go stale fast.
+export const projections = (season: string, week: number, positions: string[]) =>
+  cached(`projections/${season}/${week}/${positions.join(",")}`, () => getProjections(season, week, positions), NFL_TTL);
+export function currentRosters(fresh = false) {
+  if (fresh) entries.delete("rosters-now");
+  return cached("rosters-now", () => getRosters(LEAGUE_ID), LIVE_TTL);
+}
 
 export function clearLeagueCache() {
   entries.clear();

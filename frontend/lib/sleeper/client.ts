@@ -8,6 +8,7 @@ import type {
   SleeperMatchup,
   SleeperNflState,
   SleeperPlayer,
+  SleeperProjection,
   SleeperRoster,
   SleeperTradedPick,
   SleeperTransaction,
@@ -58,3 +59,11 @@ export const getPlayer = (id: string) => get<SleeperPlayer | null>(`/players/nfl
 export const getPlayerStats = (id: string, season: string) =>
   get<Record<string, SleeperWeekStats | null>>(`/stats/nfl/player/${id}?season_type=regular&season=${season}&grouping=week`, SLEEPER_WEB);
 export const getSchedule = (season: string) => get<SleeperGame[]>(`/schedule/nfl/regular/${season}`, SLEEPER_WEB);
+
+// Neither under v1 nor documented; Sleeper's own app reads it, CORS open to any
+// origin. Every position is 5.7 MB, so ask only for the ones a lineup can start.
+export const getProjections = (season: string, week: number, positions: string[]) =>
+  get<SleeperProjection[]>(
+    `/projections/nfl/${season}/${week}?season_type=regular&${positions.map((p) => `position[]=${p}`).join("&")}`,
+    "https://api.sleeper.app",
+  );

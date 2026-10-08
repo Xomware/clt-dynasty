@@ -341,17 +341,91 @@
   margin-top: 0.75rem;
 }
 
-/* Quick actions: lineup in Sleeper. */
-.home-actions {
+/* Your week: the member's lineup, pickups and trades. */
+.yw-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.yw-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--xp-face-shadow);
+  background: var(--xp-cream);
+}
+
+.yw-title {
+  font-weight: bold;
+  color: var(--xp-title-dark);
+}
+
+.yw-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.yw-total {
+  font-variant-numeric: tabular-nums;
+}
+
+.yw-gain {
+  font-weight: bold;
+  color: var(--clt-navy);
+}
+
+.yw-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.yw-item {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  border-top: 1px solid var(--xp-face);
+}
+
+.yw-slot {
+  justify-self: start;
+  padding: 0 0.25rem;
+  border: 1px solid var(--xp-face-shadow);
+  font-size: 0.6875rem;
+  font-weight: bold;
+  background: var(--xp-face);
+}
+
+.yw-item[data-kind="warn"] .yw-slot {
+  border-color: var(--xp-red);
+  color: var(--xp-text-inverse);
+  background: var(--xp-red);
+}
+
+.yw-player {
+  font-weight: bold;
+}
+
+.yw-pts {
+  font-variant-numeric: tabular-nums;
+}
+
+.yw-why,
+.yw-note {
+  font-size: 0.75rem;
+}
+
+.yw-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
-.home-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  min-height: 2.25rem;
+.yw-action {
   text-decoration: none;
 }
