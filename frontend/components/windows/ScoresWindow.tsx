@@ -5,6 +5,7 @@ import { useId, useState } from "react";
 import { MatchupCard } from "@/components/views/matchup-card";
 import { useDefaultWeek } from "@/lib/league/default-week";
 import { useWeekGames } from "@/lib/league/use-week-games";
+import { useViewLabel } from "@/lib/nav/label";
 
 import "./league.css";
 
@@ -22,6 +23,7 @@ export function ScoresWindow() {
   const picker = useId();
   const { data, games, current, error, teamFor, myRosterId } = useWeekGames(week);
   const initial = useDefaultWeek(data);
+  useViewLabel(week === undefined ? null : `Week ${week} Scores`);
   if (!picked && initial !== undefined && week !== initial) setWeek(initial);
   const pick = (w: number) => {
     setPicked(true);
