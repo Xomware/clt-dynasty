@@ -337,7 +337,11 @@
   }
 }
 
-/* Quick actions: lineup in Sleeper, a rule proposal, a taxi steal. */
+.home-card-action {
+  margin-top: 0.75rem;
+}
+
+/* Quick actions: lineup in Sleeper. */
 .home-actions {
   display: flex;
   flex-wrap: wrap;

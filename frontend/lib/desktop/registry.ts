@@ -157,14 +157,14 @@ const SPECS = {
   search: {
     group: "community",
     label: "Search",
-    title: "Search Sleeper",
+    title: "Search",
     Icon: SearchIcon,
     component: SearchWindow,
-    defaultSize: { w: 460, h: 360 },
-    // `search:user:<name>` or `search:league:<id>`, the search Back returns to.
+    defaultSize: { w: 480, h: 560 },
+    // `search:nfl:<name>`, `search:user:<name>` or `search:league:<id>`, the search Back returns to.
     link: (v) => {
       const [mode, ...q] = v.split(":");
-      return mode === "user" || mode === "league" ? { mode, q: q.join(":") } : null;
+      return mode === "nfl" || mode === "user" || mode === "league" ? { mode, q: q.join(":") } : null;
     },
   },
   team: {

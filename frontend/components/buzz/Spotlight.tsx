@@ -2,22 +2,30 @@
 
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 
+import { NflTeamHit, PlayerHit } from "@/components/xp/NflHit";
 import { TeamAvatar } from "@/components/xp/TeamAvatar";
 import { LEAGUE_ID } from "@/lib/config";
 import type { WindowLink } from "@/lib/desktop/deep-link";
 import { type Launcher, useLauncherGroups } from "@/lib/desktop/registry";
 import { useLeague } from "@/lib/league/use-league";
+import { type NflTeam, nflTeamName } from "@/lib/nfl/teams";
+import { nflLink, playerLink } from "@/lib/player/links";
+import { type PlayerResult, useNflSearch } from "@/lib/search/use-nfl-search";
 import { teamLink } from "@/lib/team/links";
 import { LINE, LineIcon } from "./line-icons";
 import { ABOUT } from "./pages";
 
-// A page, or a team, as one row of results.
+// A page, a team, an NFL player or an NFL team as one row of results.
 interface Option {
   key: string;
   label: string;
   about?: string;
   avatar?: string | null;
   to: WindowLink;
+  // NFL results draw their own row and come already scored.
+  player?: PlayerResult;
+  nflTeam?: NflTeam;
+  score?: number;
 }
 
 interface Section {
@@ -53,6 +61,7 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
   const { pinned, groups } = useLauncherGroups();
   const { data, teamFor } = useLeague();
   const [query, setQuery] = useState("");
+  const nfl = useNflSearch(query, 6);
   const [at, setAt] = useState(0);
   const id = useId();
   const box = useRef<HTMLDivElement>(null);
@@ -72,14 +81,34 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
     const team = teamFor(r.roster_id);
     return { key: `team-${r.roster_id}`, label: team.name, avatar: team.avatarUrl, about: "Team profile", to: teamLink(LEAGUE_ID, r.roster_id) };
   });
+  const players: Option[] = nfl.players.map((h) => ({
+    key: `player-${h.item.player_id}`,
+    label: h.description,
+    to: playerLink(h.item.player_id),
+    player: h,
+    score: h.score,
+  }));
+  const nflTeams: Option[] = nfl.teams.slice(0, 3).map((h) => ({
+    key: `nfl-${h.item.abbr}`,
+    label: nflTeamName(h.item),
+    to: nflLink(h.item.abbr),
+    nflTeam: h.item,
+    score: h.score,
+  }));
   const sections: Section[] = [
     { id: "start", label: "Start", items: pinned.map(page) },
     ...groups.map((g) => ({ id: g.id, label: g.label, items: g.items.map(page) })),
-    // Teams only once something is typed, so the empty palette stays a page list.
-    ...(query.trim() ? [{ id: "teams", label: "Teams", items: teams }] : []),
+    // Teams and players only once something is typed, so the empty palette stays a page list.
+    ...(query.trim()
+      ? [
+          { id: "teams", label: "Teams", items: teams },
+          { id: "players", label: "NFL players", items: players },
+          { id: "nfl", label: "NFL teams", items: nflTeams },
+        ]
+      : []),
   ]
     .map((s) => {
-      const scored = s.items.map((l) => ({ l, at: query.trim() ? score(query, l, s.label) : 1 })).filter((x) => x.at > 0);
+      const scored = s.items.map((l) => ({ l, at: query.trim() ? (l.score ?? score(query, l, s.label)) : 1 })).filter((x) => x.at > 0);
       return { ...s, best: Math.max(0, ...scored.map((x) => x.at)), items: scored.sort((a, b) => b.at - a.at).map((x) => x.l) };
     })
     .filter((s) => s.items.length > 0)
@@ -125,7 +154,7 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
         <div className="u-spot-field">
           <LineIcon d={LINE.search} />
           <label id={`${id}-label`} htmlFor={`${id}-input`} className="sr-only">
-            Search pages and teams
+            Search pages, teams and NFL players
           </label>
           <input
             id={`${id}-input`}
@@ -136,7 +165,7 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
             autoCapitalize="off"
             spellCheck={false}
             enterKeyHint="go"
-            placeholder="Standings, taxi, a team name..."
+            placeholder="Standings, a team, a player..."
             aria-expanded={flat.length > 0}
             aria-controls={`${id}-list`}
             aria-autocomplete="list"
@@ -152,7 +181,7 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
             <LineIcon d={LINE.close} size={18} />
           </button>
         </div>
-        <div id={`${id}-list`} role="listbox" aria-label="Pages" className="u-spot-list">
+        <div id={`${id}-list`} role="listbox" aria-label="Results" className="u-spot-list">
           {sections.map((s) => (
             <div key={s.id} role="group" aria-labelledby={`${id}-${s.id}`}>
               <div role="presentation" id={`${id}-${s.id}`} className="u-spot-group">
@@ -169,14 +198,23 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
                     aria-label={l.label}
                     className="u-spot-option"
                     data-team={l.avatar !== undefined || undefined}
+                    data-nfl={l.player || l.nflTeam ? "" : undefined}
                     // Keeps focus, and so the active option, in the input.
                     onMouseDown={(e) => e.preventDefault()}
                     onMouseMove={() => i !== index && setAt(i)}
                     onClick={() => pick(l)}
                   >
-                    {l.avatar !== undefined && <TeamAvatar name={l.label} url={l.avatar} size={32} className="u-spot-avatar" />}
-                    <span className="u-spot-name">{l.label}</span>
-                    {l.about && <span className="u-spot-about">{l.about}</span>}
+                    {l.player ? (
+                      <PlayerHit player={l.player.item} owner={l.player.owner} />
+                    ) : l.nflTeam ? (
+                      <NflTeamHit team={l.nflTeam} />
+                    ) : (
+                      <>
+                        {l.avatar !== undefined && <TeamAvatar name={l.label} url={l.avatar} size={32} className="u-spot-avatar" />}
+                        <span className="u-spot-name">{l.label}</span>
+                        {l.about && <span className="u-spot-about">{l.about}</span>}
+                      </>
+                    )}
                   </div>
                 );
               })}
@@ -185,7 +223,7 @@ export function Spotlight({ onClose, onGo }: SpotlightProps) {
         </div>
         {flat.length === 0 && (
           <p role="status" className="u-spot-empty">
-            No page matches &ldquo;{query.trim()}&rdquo;.
+            No page, team or player matches &ldquo;{query.trim()}&rdquo;{nfl.status === "loading" ? " yet; NFL players are still loading" : ""}.
           </p>
         )}
       </div>

@@ -351,7 +351,7 @@ describe("Spotlight", () => {
   it("opens on Ctrl+K, filters every page by group, and opens the pick", async () => {
     await renderShell();
     fireEvent.keyDown(document, { key: "k", ctrlKey: true });
-    const dialog = within(screen.getByRole("dialog", { name: "Search pages and teams" }));
+    const dialog = within(screen.getByRole("dialog", { name: "Search pages, teams and NFL players" }));
     expect(dialog.getByRole("group", { name: "Start" })).toBeTruthy();
     expect(dialog.getByRole("option", { name: "Home" })).toBeTruthy();
     expect(within(dialog.getByRole("group", { name: "League" })).getAllByRole("option").map((o) => o.getAttribute("aria-label"))).toEqual([
@@ -372,7 +372,7 @@ describe("Spotlight", () => {
     league.rosters = [{ roster_id: 3 }, { roster_id: 8 }];
     await renderShell();
     fireEvent.keyDown(document, { key: "k", ctrlKey: true });
-    const dialog = within(screen.getByRole("dialog", { name: "Search pages and teams" }));
+    const dialog = within(screen.getByRole("dialog", { name: "Search pages, teams and NFL players" }));
     expect(dialog.queryByRole("group", { name: "Teams" })).toBeNull();
 
     fireEvent.change(dialog.getByRole("combobox"), { target: { value: "queen 8" } });
@@ -392,7 +392,7 @@ describe("Spotlight", () => {
     expect(screen.getByRole("option", { selected: true }).getAttribute("aria-label")).toBe("Standings");
 
     fireEvent.change(box, { target: { value: "zzz" } });
-    expect(within(screen.getByRole("dialog")).getByRole("status").textContent).toContain("No page matches");
+    expect(within(screen.getByRole("dialog")).getByRole("status").textContent).toContain("No page, team or player matches");
 
     fireEvent.keyDown(box, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
