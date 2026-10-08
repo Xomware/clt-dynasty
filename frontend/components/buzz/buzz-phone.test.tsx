@@ -146,11 +146,29 @@ describe("Buzz City phone", () => {
     expect(dock().getByRole("button", { name: "Home" }).getAttribute("aria-current")).toBeNull();
   });
 
-  it("goes Home from the logo", async () => {
+  it("shows the logo on Home and Back in its place on other screens", async () => {
     window.history.replaceState(null, "", "/?open=standings");
     await renderPhone();
-    fireEvent.click(screen.getByRole("button", { name: "CLT Dynasty, home" }));
+    expect(screen.queryByRole("button", { name: "CLT Dynasty, home" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Back to Home" }));
     await waitFor(() => expect(bar().textContent).toBe("CLT Dynasty"));
+    expect(screen.getByRole("button", { name: "CLT Dynasty, home" })).toBeTruthy();
+  });
+
+  it("tucks both bars away on a scroll down and back on a scroll up", async () => {
+    await renderPhone();
+    const top = () => document.querySelector(".bz-phone-top")!;
+    const scrollTo = async (y: number) => {
+      Object.defineProperty(window, "scrollY", { configurable: true, value: y });
+      fireEvent.scroll(window);
+      await new Promise((r) => requestAnimationFrame(r));
+    };
+    await scrollTo(400);
+    await waitFor(() => expect(top().hasAttribute("data-tucked")).toBe(true));
+    expect(dock().getByRole("button", { name: "More" }).closest("nav")!.hasAttribute("data-tucked")).toBe(true);
+    await scrollTo(300);
+    await waitFor(() => expect(top().hasAttribute("data-tucked")).toBe(false));
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
   });
 
   it("drills inside a screen and backs out a step at a time", async () => {

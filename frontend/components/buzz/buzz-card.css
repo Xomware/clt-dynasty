@@ -332,11 +332,22 @@
 @media (max-width: 767.98px) {
   .bz-player {
     grid-template-columns: minmax(0, 1fr);
-    gap: 2rem;
+    gap: 1.25rem;
   }
 
   .bz-pcard-wrap {
+    gap: 0.875rem;
     padding: 0 0.5rem;
+  }
+
+  /* A squatter card on a phone, so the rank chips and stats start on the first screen. */
+  .bz-pcard {
+    aspect-ratio: 5 / 6;
+  }
+
+  .bz-pcard-face {
+    padding: 0.5rem;
+    border-width: 9px;
   }
 }
 
