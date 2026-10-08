@@ -8,9 +8,9 @@ import { MovesCard } from "@/components/home/MovesCard";
 import { MyTeamCard } from "@/components/home/MyTeamCard";
 import { ProposalsCard } from "@/components/home/ProposalsCard";
 import { TaxiCard } from "@/components/home/TaxiCard";
+import { WeeklyRecap } from "@/components/home/WeeklyRecap";
 import { WorldCupCard } from "@/components/home/WorldCupCard";
 import { YourWeek } from "@/components/home/YourWeek";
-import { AIHeadline } from "@/components/windows/AIReviewWindow";
 import { DrillLink } from "@/components/xp/DrillLink";
 import { WarningIcon } from "@/components/xp/icons";
 import { LoadError } from "@/components/xp/LoadError";
@@ -43,6 +43,7 @@ export function HomeWindow() {
   return (
     <div className="home">
       <LeaguePulse data={data} week={week} error={error} />
+      <WeeklyRecap data={data} {...league} />
       <YourWeek data={data} myRosterId={myRosterId} memberLoading={member.status === "loading"} />
       <Announcements />
       <MyTeamCard data={data} games={games} week={week} live={live} memberLoading={member.status === "loading"} {...league} />
@@ -71,7 +72,6 @@ export function HomeWindow() {
           </HomeCard>
         </div>
         <div className="home-col">
-          <AIHeadline />
           <WorldCupCard data={data} {...league} />
           <ProposalsCard />
           <TaxiCard {...league} />

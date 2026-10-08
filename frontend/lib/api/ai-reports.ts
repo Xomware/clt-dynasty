@@ -46,11 +46,13 @@ export interface ReportPage {
   next_cursor: string | null;
 }
 
-// Newest first. `cursor` is the opaque next_cursor from the previous page.
-export function listReports(type?: ReportType, cursor?: string | null): Promise<ReportPage> {
+// Newest first. `cursor` is the opaque next_cursor from the previous page;
+// the API pages 20 by default, 50 at most.
+export function listReports(type?: ReportType, cursor?: string | null, limit?: number): Promise<ReportPage> {
   const qs = new URLSearchParams();
   if (type) qs.set("type", type);
   if (cursor) qs.set("cursor", cursor);
+  if (limit) qs.set("limit", String(limit));
   const query = qs.toString();
   return request<ReportPage>(`/ai-reports/list${query ? `?${query}` : ""}`).then((page) => ({
     ...page,
