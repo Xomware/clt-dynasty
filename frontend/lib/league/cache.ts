@@ -11,6 +11,7 @@ import {
   getProjections,
   getRosters,
   getSchedule,
+  getSeasonStats,
   getTradedPicks,
   getTransactions,
   getUserLeagues,
@@ -100,6 +101,9 @@ export const transactions = (week: number, live: boolean) =>
 // Injuries, depth charts and stat lines move during the week; five minutes is fresh enough for a profile.
 export const player = (id: string) => cached(`player/${id}`, () => getPlayer(id), NFL_TTL);
 export const playerStats = (id: string, season: string) => cached(`stats/${season}/${id}`, () => getPlayerStats(id, season), NFL_TTL);
+// League-wide totals and projections, for positional ranks. Home's lineup check reads the same projections.
+export const seasonStats = (season: string) => cached(`season-stats/${season}`, () => getSeasonStats(season), NFL_TTL);
+export const projections = (season: string, week: number) => cached(`projections/${season}/${week}`, () => getProjections(season, week), NFL_TTL);
 export const nflSchedule = (season: string) => cached(`schedule/${season}`, () => getSchedule(season), NFL_TTL);
 
 // Projections and injuries change through the week, and a lineup changes in

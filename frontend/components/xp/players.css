@@ -50,3 +50,50 @@
     display: none;
   }
 }
+
+/* An injury designation: amber for questionable, red for doubtful, filled red once he's out. */
+.xp-injury {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1rem;
+  padding: 0 0.25rem;
+  border: 1px solid var(--xp-red);
+  border-radius: 3px;
+  color: var(--xp-red);
+  background: var(--xp-cream);
+  font-size: 0.625rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.xp-injury[data-level="q"] {
+  border-color: var(--xp-wood);
+  color: var(--xp-text);
+  background: var(--xp-gold);
+}
+
+.xp-injury[data-level="out"] {
+  color: var(--xp-text-inverse);
+  background: var(--xp-red);
+}
+
+[data-theme="buzz"] .xp-injury {
+  border: 2px solid var(--bz-ink);
+  border-radius: 999px;
+  color: var(--bz-paper);
+  background: var(--bz-red-text);
+  font-family: var(--bz-jersey);
+  font-size: 0.6875rem;
+}
+
+[data-theme="buzz"] .xp-injury[data-level="q"] {
+  color: var(--bz-ink);
+  background: var(--bz-amber);
+}
+
+[data-theme="buzz"] .xp-injury[data-level="d"] {
+  color: var(--bz-red-text);
+  background: var(--bz-paper);
+}
