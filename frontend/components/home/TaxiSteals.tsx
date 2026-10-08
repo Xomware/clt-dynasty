@@ -9,7 +9,7 @@ import { usePlayerBoard } from "@/lib/players/use-player-board";
 import { useTaxiMarket } from "@/lib/taxi/use-taxi-market";
 import { ordinal } from "@/lib/team/team";
 
-const RISK_TEXT = { requested: "Requested", high: "High risk", medium: "Watch" } as const;
+const RISK_TEXT = { requested: "Steal requested", high: "At risk", medium: "Watch" } as const;
 
 // Your week's taxi to-do: my players someone would steal, and the steals worth making.
 export function TaxiSteals({ rosterId }: { rosterId: number | null }) {
@@ -36,10 +36,9 @@ export function TaxiSteals({ rosterId }: { rosterId: number | null }) {
             <ul className="yw-list" aria-label="At risk on your taxi">
               {market.risks.slice(0, 3).map((r) => (
                 <li key={r.player.id} className="yw-item" data-kind={r.risk === "medium" ? "risk" : "warn"}>
-                  <span className="yw-slot">
-                    {RISK_TEXT[r.risk]}
-                  </span>
+                  <span className="yw-slot">{r.player.position}</span>
                   <span className="yw-line">
+                    <strong>{RISK_TEXT[r.risk]}:</strong>{" "}
                     <PlayerLink id={r.player.id} className="yw-player">
                       {names.get(r.player.id) ?? r.player.id}
                     </PlayerLink>

@@ -23,8 +23,8 @@ describe("Your week: taxi steals", () => {
     );
     const risks = await screen.findByRole("list", { name: "At risk on your taxi" });
     expect(within(risks).getAllByRole("listitem").map((li) => li.textContent)).toEqual([
-      "RequestedMike Washington worth 1.1x a 2nd. Promote him before Thursday 12pm ET to keep him.",
-      "WatchFernando Mendoza worth 0.8x a 1st and a 2nd. Promote him before Thursday 12pm ET to keep him.",
+      "RBSteal requested: Mike Washington worth 1.1x a 2nd. Promote him before Thursday 12pm ET to keep him.",
+      "QBWatch: Fernando Mendoza worth 0.8x a 1st and a 2nd. Promote him before Thursday 12pm ET to keep him.",
     ]);
     const targets = screen.getByRole("list", { name: "Steal targets" });
     expect(within(targets).getAllByRole("listitem")[0].textContent).toBe("RBJeremiyah Love from Team 6 for 2027 1st + 2027 2nd, worth 1.3x the picks");
