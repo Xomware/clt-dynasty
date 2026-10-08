@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { SleeperGame, SleeperProjection } from "@/lib/sleeper/types";
+import type { SleeperGame, SleeperStatRow } from "@/lib/sleeper/types";
 import { checkLineup } from "./lineup";
 import { type PlayerWeek, scoreProjection, weekBoard } from "./projections";
 
@@ -112,7 +112,7 @@ describe("projected points", () => {
   });
 
   it("reads byes and kickoffs from the schedule and zeroes players ruled out", () => {
-    const rows: SleeperProjection[] = [
+    const rows: SleeperStatRow[] = [
       { player_id: "te1", team: "ARI", stats: { rec: 6, bonus_rec_te: 6 }, player: { position: "TE", injury_status: null } },
       { player_id: "wr1", team: "KC", stats: {}, player: { position: "WR", injury_status: null } },
       { player_id: "wr2", team: "DET", stats: { rec: 5 }, player: { position: "WR", injury_status: "Out" } },

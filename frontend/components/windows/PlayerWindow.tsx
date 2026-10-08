@@ -3,6 +3,7 @@
 import { LoadError } from "@/components/xp/LoadError";
 import { NflTeamLink } from "@/components/xp/NflTeamLink";
 import { PlayerFace } from "@/components/xp/PlayerFace";
+import { PlayerRankChips } from "@/components/xp/RankChips";
 import { TeamLink } from "@/components/xp/TeamLink";
 import { LEAGUE_ID } from "@/lib/config";
 import type { WindowParams } from "@/lib/desktop/windows";
@@ -109,6 +110,7 @@ function PlayerHead({ player }: { player: SleeperPlayer }) {
           {player.position && <span className="font-bold">{player.position}</span>}
           {player.team ? <NflTeamLink team={player.team} long /> : <span>Free agent</span>}
         </p>
+        <PlayerRankChips id={player.player_id} className="player-ranks" />
       </div>
     </section>
   );

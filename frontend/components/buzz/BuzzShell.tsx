@@ -1,83 +1,61 @@
 "use client";
 
-import { type MouseEvent, useEffect, useRef, useState } from "react";
+import { type MouseEvent, useCallback, useEffect, useState } from "react";
 
 import { WindowBoundary } from "@/components/desktop/DesktopWindow";
 import { REVEAL, useReveal } from "@/components/motion/use-reveal";
 import { AccountMenu } from "./AccountMenu";
 import { BrandMark } from "./BrandMark";
 import { LINE, LineIcon } from "./line-icons";
-import { groupOf, HOME, urlOf } from "./pages";
+import { type Crumb, Crumbs } from "./Crumbs";
+import { HOME, urlOf } from "./pages";
 import { Related } from "./Related";
 import { Spotlight } from "./Spotlight";
-import { parseOpen, type WindowLink } from "@/lib/desktop/deep-link";
+import type { WindowLink } from "@/lib/desktop/deep-link";
 import { ADMIN, type GroupId } from "@/lib/desktop/groups";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY, settledTeam, useLauncherGroups, useWindowTitle } from "@/lib/desktop/registry";
-import { patchParams, viewKey, windowId, type WindowParams } from "@/lib/desktop/windows";
+import type { WindowParams } from "@/lib/desktop/windows";
+import { ViewLabelContext } from "@/lib/nav/label";
 import { ViewParamsContext } from "@/lib/view-params";
 import { BODIES } from "./bodies";
 import { BuzzHome } from "./BuzzHome";
 import { BuzzTicker } from "./BuzzTicker";
 import { PageHead } from "./PageHead";
+import { type Dir, type Route, useTrail } from "./use-trail";
 
 import "./buzz.css";
 import "./buzz-skin.css";
 
-// The XP desktop's link names several windows; the last is the one it had in front.
-const fromUrl = (): WindowLink => parseOpen(window.location.search).at(-1) ?? HOME;
-
-export type Dir = "next" | "back" | "in";
+// A page behind the current one never changes its own link.
+const ignore = () => {};
 
 const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform);
 
 // Buzz City on a desktop: one page at a time on the pinstriped jersey, under
 // an arena header that files every window by the XP desktop's groups.
 export function BuzzShell() {
-  const [{ view, group, dir }, setNav] = useState(() => {
-    const view = fromUrl();
-    return { view, group: groupOf(view, null), dir: "in" as Dir };
-  });
+  const main = useReveal<HTMLElement>(REVEAL);
+  const trail = useTrail(main);
+  const { entry, routes, current, labelOf } = trail;
+  const view = current.view;
+  const group = current.group;
   const [searching, setSearching] = useState(false);
   const { groups, admin } = useLauncherGroups();
   const windowTitle = useWindowTitle();
-  const heading = useRef<HTMLHeadingElement>(null);
-  const main = useReveal<HTMLElement>(REVEAL);
-  const id = windowId(view.kind, view.params);
-  const title = windowTitle(view);
-  const Page = BODIES[view.kind] ?? REGISTRY[view.kind].component;
   // Admin pages get their group's sub-nav too, though the main nav leaves them out.
   const sections = [...groups, { ...ADMIN, items: admin }];
   const section = sections.find((g) => g.id === group);
   const pages = section?.items ?? [];
 
-  // The clicked link went with the old page, so the new title takes focus. A
-  // tab switch stays on the page, so it is keyed without the tab.
-  const page = viewKey(view.kind, view.params);
-  const shown = useRef(page);
   useEffect(() => {
-    if (shown.current === page) return;
-    shown.current = page;
-    heading.current?.focus({ preventScroll: true });
-  }, [page]);
-
-  useEffect(() => {
-    const onPop = () =>
-      setNav((nav) => {
-        const view = fromUrl();
-        return { view, group: groupOf(view, nav.group), dir: "back" };
-      });
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() !== "k" || !(e.metaKey || e.ctrlKey)) return;
       e.preventDefault();
       setSearching(true);
     };
-    window.addEventListener("popstate", onPop);
     document.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("popstate", onPop);
-      document.removeEventListener("keydown", onKey);
-    };
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
 
   // Pages slide the way the nav reads; a drill to a team or report zooms in.
@@ -89,18 +67,10 @@ export function BuzzShell() {
     if (a === -1) return "back";
     return b > a ? "next" : "back";
   };
-  const go = (to: WindowLink) => {
-    if (windowId(to.kind, to.params) === id) return;
-    setNav({ view: to, group: groupOf(to, group), dir: direction(view, to) });
-    window.history.pushState(null, "", urlOf(to));
-    window.scrollTo(0, 0);
-  };
-  // A tab or filter switch stays on the page, so it replaces the history entry.
-  const patch = (params: WindowParams) => {
-    const to = { kind: view.kind, params: patchParams(view.params, params) };
-    setNav((nav) => ({ ...nav, view: to }));
-    window.history.replaceState(null, "", urlOf(to));
-  };
+  // Links inside a page drill, adding to the path; the header, the sub-nav,
+  // Spotlight and Keep going jump, starting a new one.
+  const drill = (to: WindowLink) => trail.go(to, { drill: true, dir: "in" });
+  const go = (to: WindowLink) => trail.go(to, { drill: false, dir: direction(view, to) });
   const onNav = (e: MouseEvent, to: WindowLink) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
@@ -110,7 +80,16 @@ export function BuzzShell() {
     const kind = groups.find((x) => x.id === g)?.items[0]?.kind;
     return kind ? { kind, params: {} } : { kind: "folder", params: { id: g } };
   };
-  const crumb = section && group !== null ? { label: section.label, to: first(group) } : null;
+  const link = (label: string, to: WindowLink): Crumb => ({ label, href: urlOf(to), onSelect: () => go(to) });
+  const parent = section && group !== null ? link(section.label, first(group)) : link("Home", HOME);
+  // The path taken, Home first. A path that set out from Home walks back to
+  // it like any other stop, rather than listing it twice.
+  const stops = entry.trail.map((s): Crumb => ({ label: s.label, href: urlOf(s.view), onSelect: () => trail.jump(s) }));
+  const fromHome = entry.trail[0]?.view.kind === "home";
+  const crumbs = entry.trail.length ? [...(fromHome ? [] : [link("Home", HOME)]), ...stops] : [link("Home", HOME), ...(parent.label === "Home" ? [] : [parent])];
+  // Back is the browser's Back when there is a page behind this one; a page
+  // opened from a link goes up to its group instead.
+  const back = entry.prev ? { label: entry.prev.label, run: () => window.history.back() } : { label: parent.label, run: parent.onSelect };
 
   return (
     <div className="buzz">
@@ -143,7 +122,7 @@ export function BuzzShell() {
           >
             <LineIcon d={LINE.search} size={18} />
             <span className="bz-search-text">
-              Search<span className="bz-search-hint"> pages and teams</span>
+              Search<span className="bz-search-hint"> pages, teams and players</span>
             </span>
             <kbd aria-hidden>{isMac() ? "⌘K" : "Ctrl K"}</kbd>
           </button>
@@ -152,6 +131,15 @@ export function BuzzShell() {
         <DrillContext value={go}>
           <BuzzTicker />
         </DrillContext>
+        {view.kind !== "home" && (
+          <div className="bz-trail">
+            <button type="button" className="bz-back" onClick={back.run}>
+              <LineIcon d={LINE.back} size={18} />
+              <span className="truncate">Back to {back.label}</span>
+            </button>
+            <Crumbs items={crumbs} here={labelOf(current)} />
+          </div>
+        )}
       </div>
       {pages.length > 0 && (
         <nav aria-label={`${section?.label} pages`} className="bz-subnav">
@@ -165,39 +153,64 @@ export function BuzzShell() {
           })}
         </nav>
       )}
-      <DrillContext value={go}>
-        <NavigateContext value={go}>
+      <DrillContext value={drill}>
+        <NavigateContext value={drill}>
           <main ref={main} className="bz-page">
-            <div key={page} className="bz-route" data-dir={dir}>
-              {view.kind === "home" ? (
-                <WindowBoundary key={id}>
-                  <BuzzHome ref={heading} />
-                </WindowBoundary>
-              ) : (
-                <>
-                  <PageHead
-                    title={title}
-                    Icon={REGISTRY[view.kind].Icon}
-                    team={view.kind === "team" ? settledTeam(view.params) : null}
-                    group={crumb}
-                    headingRef={heading}
-                    onNav={onNav}
-                  />
-                  <section className="bz-panel" data-kind={view.kind} aria-label={title}>
-                    <WindowBoundary key={page}>
-                      <ViewParamsContext value={patch}>
-                        <Page params={view.params} />
-                      </ViewParamsContext>
-                    </WindowBoundary>
-                  </section>
-                  <Related kind={view.kind} onNav={onNav} />
-                </>
-              )}
-            </div>
+            {routes.map((r) => (
+              <BuzzRoute
+                key={trail.keyOf(r)}
+                route={r}
+                hidden={r !== current}
+                title={windowTitle(r.view)}
+                onNav={onNav}
+                onPatch={r === current ? trail.patch : ignore}
+                setLabel={trail.setLabel}
+              />
+            ))}
           </main>
         </NavigateContext>
       </DrillContext>
       {searching && <Spotlight onClose={() => setSearching(false)} onGo={go} />}
+    </div>
+  );
+}
+
+interface BuzzRouteProps {
+  route: Route;
+  hidden: boolean;
+  title: string;
+  onNav: (e: MouseEvent, to: WindowLink) => void;
+  onPatch: (params: WindowParams) => void;
+  setLabel: (depth: number, label: string | null) => void;
+}
+
+// One page of the stack. The ones behind the current page stay mounted but
+// hidden, so Back shows them exactly as they were left.
+function BuzzRoute({ route, hidden, title, onNav, onPatch, setLabel }: BuzzRouteProps) {
+  const { view, depth } = route;
+  const Page = BODIES[view.kind] ?? REGISTRY[view.kind].component;
+  const label = useCallback((l: string | null) => setLabel(depth, l), [depth, setLabel]);
+  return (
+    <div className="bz-route" data-dir={route.dir} data-restored={route.restored || undefined} hidden={hidden}>
+      <ViewLabelContext value={label}>
+        {view.kind === "home" ? (
+          <WindowBoundary>
+            <BuzzHome />
+          </WindowBoundary>
+        ) : (
+          <>
+            <PageHead title={title} Icon={REGISTRY[view.kind].Icon} team={view.kind === "team" ? settledTeam(view.params) : null} />
+            <section className="bz-panel" data-kind={view.kind} aria-label={title}>
+              <WindowBoundary>
+                <ViewParamsContext value={onPatch}>
+                  <Page params={view.params} />
+                </ViewParamsContext>
+              </WindowBoundary>
+            </section>
+            <Related kind={view.kind} onNav={onNav} />
+          </>
+        )}
+      </ViewLabelContext>
     </div>
   );
 }
