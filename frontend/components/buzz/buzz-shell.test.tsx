@@ -1,4 +1,5 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { useContext } from "react";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 const admin = vi.hoisted(() => ({ on: false }));
@@ -43,7 +44,9 @@ import { AppShell } from "@/components/AppShell";
 import { TIMING } from "@/components/theme/ThemeTransition";
 import { MembersIcon } from "@/components/xp/icons";
 import { AlertsProvider } from "@/lib/alerts/alerts";
+import { NavigateContext } from "@/lib/desktop/navigation";
 import { REGISTRY } from "@/lib/desktop/registry";
+import { useViewLabel } from "@/lib/nav/label";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
 import { ThemeProvider } from "@/lib/theme/theme";
@@ -206,6 +209,141 @@ describe("BuzzShell", () => {
     expect(menu.getByRole("button", { name: "Sign out" })).toBeTruthy();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("navigation", { name: "Account" })).toBeNull();
+  });
+});
+
+describe("back stack", () => {
+  // The stand-in team page drills on to a player who names himself, and the
+  // player page on to an NFL team.
+  const realTeam = { ...REGISTRY.team };
+  beforeAll(() => {
+    REGISTRY.team = {
+      ...REGISTRY.team,
+      component: function TeamBody({ params }) {
+        const navigate = useContext(NavigateContext);
+        return (
+          <button type="button" onClick={() => navigate?.({ kind: "player", params: { playerId: "9" } })}>
+            Player of team {params.rosterId}
+          </button>
+        );
+      },
+    };
+    REGISTRY.player = {
+      label: "Player",
+      title: "Player 9",
+      Icon: MembersIcon,
+      component: function PlayerBody() {
+        const navigate = useContext(NavigateContext);
+        useViewLabel("Jaxon Smith-Njigba");
+        return (
+          <button type="button" onClick={() => navigate?.({ kind: "nfl", params: { team: "SEA" } })}>
+            Seahawks
+          </button>
+        );
+      },
+      defaultSize: { w: 400, h: 400 },
+      link: (playerId) => ({ playerId }),
+      drillOnly: true,
+    };
+    REGISTRY.nfl = {
+      label: "NFL",
+      title: "Seattle Seahawks",
+      Icon: MembersIcon,
+      component: () => <p>depth chart</p>,
+      defaultSize: { w: 400, h: 400 },
+      link: (team) => ({ team }),
+      drillOnly: true,
+    };
+  });
+  afterAll(() => {
+    REGISTRY.team = realTeam;
+    delete REGISTRY.player;
+    delete REGISTRY.nfl;
+  });
+
+  const crumbs = () => nav("Breadcrumb").getAllByRole("listitem").map((li) => li.textContent);
+  const backButton = () => screen.getByRole("button", { name: /^Back to/ });
+
+  async function drillToNfl() {
+    window.history.replaceState(null, "", "/?open=standings");
+    await renderShell();
+    fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
+    fireEvent.click(screen.getByRole("button", { name: "Player of team 6" }));
+    fireEvent.click(screen.getByRole("button", { name: "Seahawks" }));
+  }
+
+  it("pushes a history entry per drill and names the path taken", async () => {
+    const before = window.history.length;
+    await drillToNfl();
+    expect(window.history.length).toBe(before + 3);
+    expect(window.location.search).toBe("?open=nfl:SEA");
+    expect(crumbs()).toEqual(["Home", "League Standings", "Team 6", "Jaxon Smith-Njigba", "Seattle Seahawks"]);
+    expect(backButton().textContent).toBe("Back to Jaxon Smith-Njigba");
+  });
+
+  it("walks back a step at a time to each page as it was left", async () => {
+    await drillToNfl();
+    const team = screen.getByRole("button", { name: "Player of team 6", hidden: true });
+    fireEvent.click(backButton());
+    await waitFor(() => expect(title().textContent).toBe("Player 9"));
+    expect(backButton().textContent).toBe("Back to Team 6");
+    fireEvent.click(backButton());
+    await waitFor(() => expect(title().textContent).toBe("Team 6"));
+    // The page kept mounted, and focus back on the link that left it.
+    expect(screen.getByRole("button", { name: "Player of team 6" })).toBe(team);
+    expect(document.activeElement).toBe(team);
+    expect(crumbs()).toEqual(["Home", "League Standings", "Team 6"]);
+    fireEvent.click(backButton());
+    await waitFor(() => expect(title().textContent).toBe("League Standings"));
+    expect(crumbs()).toEqual(["Home", "League", "League Standings"]);
+  });
+
+  it("jumps back several pages from a crumb, through the browser's history", async () => {
+    await drillToNfl();
+    fireEvent.click(nav("Breadcrumb").getByRole("link", { name: "Team 6" }));
+    await waitFor(() => expect(title().textContent).toBe("Team 6"));
+    expect(window.location.search).toBe("?open=team:6");
+    expect(backButton().textContent).toBe("Back to League Standings");
+  });
+
+  it("puts the page back where it was scrolled", async () => {
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    window.history.replaceState(null, "", "/?open=standings");
+    await renderShell();
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 640 });
+    fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 0);
+    fireEvent.click(backButton());
+    await waitFor(() => expect(title().textContent).toBe("League Standings"));
+    expect(scrollTo).toHaveBeenLastCalledWith(0, 640);
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+  });
+
+  it("starts a new path from the nav, while Back still returns to the page left", async () => {
+    window.history.replaceState(null, "", "/?open=standings");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await renderShell();
+    fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
+    fireEvent.click(nav("League pages").getByRole("link", { name: "Broken" }));
+    expect(crumbs()).toEqual(["Home", "League", "Broken"]);
+    expect(backButton().textContent).toBe("Back to Team 6");
+  });
+
+  it("sends a page opened from a link up to its group", async () => {
+    window.history.replaceState(null, "", "/?open=team:6");
+    await renderShell();
+    expect(backButton().textContent).toBe("Back to Home");
+    fireEvent.click(backButton());
+    expect(window.location.search).toBe("");
+  });
+
+  it("follows the browser's Forward too", async () => {
+    await drillToNfl();
+    fireEvent.click(backButton());
+    await waitFor(() => expect(title().textContent).toBe("Player 9"));
+    act(() => window.history.forward());
+    await waitFor(() => expect(title().textContent).toBe("Seattle Seahawks"));
+    expect(backButton().textContent).toBe("Back to Jaxon Smith-Njigba");
   });
 });
 
