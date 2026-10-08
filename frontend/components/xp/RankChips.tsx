@@ -48,7 +48,7 @@ export function RankChips({ ranks, week, compact = false }: RankChipsProps) {
     },
   ].filter((c) => !!c);
   if (chips.length === 0) return null;
-  return (
+  const list = (
     <span className="xp-ranks" data-compact={compact || undefined}>
       {chips.map((c) => (
         <span key={c.key} className="xp-rank" data-kind={c.key} title={c.title}>
@@ -57,5 +57,20 @@ export function RankChips({ ranks, week, compact = false }: RankChipsProps) {
         </span>
       ))}
     </span>
+  );
+  if (!compact) return list;
+  // A phone's token has room for one line: the position, then season, week and
+  // dynasty ranks in that order, told apart by color.
+  const position = (season ?? projected ?? dynasty)!.position;
+  return (
+    <>
+      {list}
+      <span className="xp-rank-strip" aria-hidden>
+        <span>{position}</span>
+        <span data-kind="season">{season?.rank ?? "-"}</span>
+        <span data-kind="week">{projected && week ? projected.rank : "-"}</span>
+        <span data-kind="dynasty">{dynasty?.rank ?? "-"}</span>
+      </span>
+    </>
   );
 }
