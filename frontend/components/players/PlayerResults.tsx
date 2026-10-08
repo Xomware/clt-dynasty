@@ -9,6 +9,8 @@ import type { Team } from "@/lib/league/use-league";
 import { designation } from "@/lib/nfl/injury";
 import type { SortKey } from "@/lib/players/params";
 import type { PlayerRow } from "@/lib/players/rows";
+import type { Verdict, Worth } from "@/lib/players/worth";
+import { slotLabel } from "@/lib/team/team";
 
 const pts = (n: number | null) => (n === null ? "-" : n.toFixed(1));
 const int = (n: number | null) => (n === null || n === 0 ? "-" : Math.round(n).toLocaleString("en-US"));
@@ -30,9 +32,11 @@ interface PlayerResultsProps {
   teamFor: (rosterId: number) => Team;
   week: number | null;
   showRos: boolean;
+  // How each player not on my team measures up against it; null when it can't be judged.
+  worth: ((id: string) => Worth | null) | null;
 }
 
-export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, showRos }: PlayerResultsProps) {
+export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, showRos, worth }: PlayerResultsProps) {
   const columns: Column[] = [
     { sort: "age", label: "Age", title: "Age", cell: (r) => (r.age === null ? "-" : String(r.age)) },
     { sort: "pts", label: "Pts", title: "Season points", cell: (r) => pts(r.pts) },
@@ -64,6 +68,11 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                 </button>
               </th>
             ))}
+            {worth && (
+              <th scope="col" className="pl-col-worth">
+                For you
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -80,6 +89,11 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                   {c.cell(r)}
                 </td>
               ))}
+              {worth && (
+                <td className="pl-col-worth">
+                  <WorthBadge worth={worth(r.id)} />
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -100,6 +114,7 @@ export function PlayerResults({ rows, sort, desc, onSort, mine, teamFor, week, s
                 </div>
               ))}
             </dl>
+            {worth && <WorthBadge worth={worth(r.id)} />}
           </li>
         ))}
       </ul>
@@ -136,6 +151,34 @@ function Owner({ row, mine, teamFor }: { row: PlayerRow; mine: number | null; te
     <span className="pl-owner">
       <TeamLink rosterId={row.owner} name={team.name} avatarUrl={team.avatarUrl} isMine={row.owner === mine} />
       {row.slot !== "active" && row.slot !== null && <span className="xp-tag">{SLOT_TAG[row.slot]}</span>}
+    </span>
+  );
+}
+
+export const VERDICT_LABELS: Record<Verdict, string> = {
+  starter: "Starter upgrade",
+  depth: "Depth upgrade",
+  stash: "Dynasty stash",
+  none: "Not worth it",
+};
+
+const pos = (n: number) => `${n > 0 ? "+" : ""}${Math.round(n).toLocaleString("en-US")}`;
+
+function why(w: Worth): string {
+  if (w.verdict === "starter") return `+${w.gain.toFixed(1)} pts this week at ${slotLabel(w.slot ?? "")}`;
+  if (w.verdict === "depth") return `Out-projects your weakest bench ${w.position}`;
+  if (w.floor) return `Value ${pos(w.valueDelta)} vs your lowest ${w.position}`;
+  return w.verdict === "stash" ? `You have no ${w.position}` : "";
+}
+
+function WorthBadge({ worth }: { worth: Worth | null }) {
+  if (!worth) return null;
+  return (
+    <span className="pl-worth">
+      <span className="pl-verdict" data-verdict={worth.verdict}>
+        {VERDICT_LABELS[worth.verdict]}
+      </span>
+      {worth.verdict !== "none" && <span className="pl-why">{why(worth)}</span>}
     </span>
   );
 }

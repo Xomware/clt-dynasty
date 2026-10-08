@@ -25,17 +25,19 @@ interface PlayerFiltersProps {
   teams: { rosterId: number; team: Team }[];
   mine: number | null;
   inSeason: boolean;
+  // The worth-adding check needs a linked team and this week's projections.
+  canRate: boolean;
 }
 
 // How many filters differ from the default, for the phone's Filters button.
 export function activeFilters(v: View): number {
-  return [v.pos.length > 0, v.nfl, v.owner !== "any", v.slot !== "any", v.health !== "any", v.rookies, v.ageMin !== null || v.ageMax !== null].filter(Boolean).length;
+  return [v.pos.length > 0, v.nfl, v.owner !== "any", v.slot !== "any", v.health !== "any", v.rookies, v.worth, v.ageMin !== null || v.ageMax !== null].filter(Boolean).length;
 }
 
 // Unclamped while typing: "25" passes through "2" on the way.
 const ageValue = (s: string) => (/^\d{1,2}$/.test(s) ? Number(s) : null);
 
-export function PlayerFilters({ view, onChange, query, onQuery, teams, mine, inSeason }: PlayerFiltersProps) {
+export function PlayerFilters({ view, onChange, query, onQuery, teams, mine, inSeason, canRate }: PlayerFiltersProps) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const count = activeFilters(view);
@@ -82,6 +84,12 @@ export function PlayerFilters({ view, onChange, query, onQuery, teams, mine, inS
             </button>
           </div>
         </div>
+        {canRate && (
+          <label className="pl-check pl-worth-toggle">
+            <input type="checkbox" checked={view.worth} onChange={(e) => onChange({ worth: e.target.checked })} />
+            Only free agents worth adding to my team
+          </label>
+        )}
         <button
           type="button"
           className="xp-button pl-filters-toggle"
