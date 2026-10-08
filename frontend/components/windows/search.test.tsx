@@ -39,6 +39,7 @@ const renderSearch = (params = {}) =>
   );
 
 const search = (field: string, value: string) => {
+  if (field.startsWith("Sleeper username")) fireEvent.click(screen.getByLabelText("Sleeper user"));
   fireEvent.change(screen.getByLabelText(field), { target: { value } });
   fireEvent.click(screen.getByRole("button", { name: "Search" }));
 };
@@ -80,6 +81,7 @@ describe("Search", () => {
 
   it("reads its link back into a filled-in search", () => {
     expect(REGISTRY.search.link?.("user:handle6")).toEqual({ mode: "user", q: "handle6" });
+    expect(REGISTRY.search.link?.("nfl:herbert")).toEqual({ mode: "nfl", q: "herbert" });
     expect(REGISTRY.search.link?.("player:x")).toBeNull();
   });
 
