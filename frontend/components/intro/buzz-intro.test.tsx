@@ -43,7 +43,14 @@ describe("first-load intro by theme", () => {
     expect(screen.getAllByRole("button", { name: "Skip intro" })).toHaveLength(1);
   });
 
-  it("plays the skyline for everyone else", () => {
+  it("plays Buzz City for a new visitor", () => {
+    const { container } = both();
+    expect(container.querySelector(".bzi")).not.toBeNull();
+    expect(container.querySelector(".intro")).toBeNull();
+  });
+
+  it("plays the skyline for a Classic XP visitor", () => {
+    localStorage.setItem(THEME_KEY, "xp");
     const { container } = both();
     expect(container.querySelector(".intro")).not.toBeNull();
     expect(container.querySelector(".bzi")).toBeNull();

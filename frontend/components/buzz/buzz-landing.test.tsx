@@ -51,6 +51,7 @@ describe("Buzz City landing", () => {
 
   it("switches between the two landings from either one's toggle", () => {
     stubSleeper();
+    localStorage.setItem(THEME_KEY, "xp");
     renderLanding();
     expect(screen.getByText("To begin, sign in")).toBeTruthy();
 

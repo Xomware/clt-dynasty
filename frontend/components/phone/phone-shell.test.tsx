@@ -18,6 +18,8 @@ import { AlertsProvider } from "@/lib/alerts/alerts";
 import { REGISTRY } from "@/lib/desktop/registry";
 import { MemberProvider } from "@/lib/member/use-member";
 import { registerTestWindows } from "@/lib/test/test-windows";
+import { THEME_KEY } from "@/lib/theme/script";
+import { ThemeProvider } from "@/lib/theme/theme";
 import { PHONE } from "@/lib/use-media-query";
 
 registerTestWindows();
@@ -47,11 +49,13 @@ const phone = (on: boolean) =>
 
 const mount = () =>
   render(
-    <MemberProvider>
-      <AlertsProvider>
-        <AppShell />
-      </AlertsProvider>
-    </MemberProvider>,
+    <ThemeProvider>
+      <MemberProvider>
+        <AlertsProvider>
+          <AppShell />
+        </AlertsProvider>
+      </MemberProvider>
+    </ThemeProvider>,
   );
 
 const renderPhone = async () => {
@@ -66,6 +70,7 @@ const openStandings = () => {
 };
 
 beforeEach(() => {
+  localStorage.setItem(THEME_KEY, "xp");
   phone(true);
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
 });

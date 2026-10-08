@@ -68,7 +68,7 @@ describe("AuthGate", () => {
     vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}));
     render(<AuthGate>league content</AuthGate>);
 
-    expect(await screen.findByRole("heading", { level: 1, name: "CLT Dynasty" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 1, name: "CLT Dynasty Fantasy Football" })).toBeTruthy();
     fireEvent.click(screen.getAllByRole("button", { name: "Sign in with Google" })[0]);
     expect(signInWithRedirect).toHaveBeenCalledWith({ provider: "Google" });
     expect(screen.queryByText("league content")).toBeNull();
