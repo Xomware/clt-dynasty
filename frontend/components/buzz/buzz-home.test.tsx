@@ -18,6 +18,7 @@ import { API_BASE, LEAGUE_ID } from "@/lib/config";
 import { DrillContext, NavigateContext } from "@/lib/desktop/navigation";
 import { clearLeagueCache } from "@/lib/league/cache";
 import { MemberProvider } from "@/lib/member/use-member";
+import playerFixture from "@/lib/test/fixtures/players.json";
 import { fixture, stubSleeper } from "@/lib/test/league-mock";
 import { BuzzHome } from "./BuzzHome";
 
@@ -31,6 +32,9 @@ const report = (period: string, title: string) => ({
   metadata: {},
   created_at: `2026-09-${period.slice(-2)}T12:00:00Z`,
 });
+
+const PROJECTIONS = "https://api.sleeper.com/projections/nfl/2026/4?season_type=regular&position[]=QB&position[]=RB&position[]=WR&position[]=TE&position[]=K";
+const SCHEDULE = "https://api.sleeper.com/schedule/nfl/regular/2026";
 
 const ROUTES = {
   [`${API_BASE}/announcements/list`]: { Success: true, count: 0, rows: [] },
@@ -82,10 +86,25 @@ describe("Buzz City Home", () => {
     expect(title.querySelector("img")?.getAttribute("srcset")).toMatch(/lockup.* 1x, .*lockup@2x.* 2x/);
   });
 
-  it("sends lineups out to Sleeper", () => {
+  it("checks the member's lineup against this week's projections", async () => {
+    const week4 = fixture.matchups["4"].find((m) => m.roster_id === 4)!;
+    const starters = week4.starters!;
+    const players = playerFixture as Record<string, { position?: string; last_name?: string }>;
+    const sub = week4.players!.find((id) => !starters.includes(id) && ["RB", "WR"].includes(players[id]?.position ?? ""))!;
+    const row = (id: string, rec: number) => ({ player_id: id, team: "CHA", stats: { rec }, player: { position: players[id]?.position, injury_status: null } });
+    const rosters = fixture.rosters.map((r) => (r.roster_id === 4 ? { ...r, starters, players: week4.players } : r));
+    stubSleeper({
+      ...ROUTES,
+      [`/league/${LEAGUE_ID}/rosters`]: rosters,
+      // starters[6] is a FLEX: projected 5, under a bench receiver's 12.
+      [PROJECTIONS]: [...starters.map((id, i) => row(id, i === 6 ? 5 : 10)), row(sub, 12)],
+      [SCHEDULE]: [],
+    });
     renderHub();
-    const actions = within(screen.getByRole("list", { name: "Quick actions" }));
-    expect(actions.getByRole("link", { name: /Set your lineup in Sleeper/ }).getAttribute("href")).toBe(`https://sleeper.com/leagues/${LEAGUE_ID}/team`);
+    const card = within(await screen.findByRole("region", { name: "Lineup check, Week 4" }));
+    const swap = within(card.getByRole("list", { name: "Suggested swaps" })).getByRole("listitem");
+    expect(swap.textContent).toMatch(new RegExp(`^FLEXSwap .*${players[starters[6]].last_name} 5\\.0 for .*${players[sub].last_name} 12\\.0$`));
+    expect(card.getByRole("link", { name: /Set your lineup in Sleeper/ }).getAttribute("href")).toBe(`https://sleeper.com/leagues/${LEAGUE_ID}/team`);
   });
 
   it("puts proposing a rule and stealing a taxi player on their own cards", async () => {

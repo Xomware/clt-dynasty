@@ -23,13 +23,7 @@
   filter: drop-shadow(0 10px 14px rgb(8 4 24 / 0.5));
 }
 
-.bz-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.buzz .bz-actions .xp-button {
+.buzz .bz-hub .yw-action {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -49,16 +43,16 @@
     box-shadow 0.12s;
 }
 
-.buzz .bz-actions li:first-child .xp-button {
+.buzz .bz-hub .yw-action:first-child {
   background: var(--bz-teal-light);
 }
 
-.buzz .bz-actions .xp-button:hover {
+.buzz .bz-hub .yw-action:hover {
   box-shadow: 5px 5px 0 var(--bz-ink);
   transform: translate(-2px, -2px);
 }
 
-.buzz .bz-actions .xp-button:active {
+.buzz .bz-hub .yw-action:active {
   box-shadow: 1px 1px 0 var(--bz-ink);
   transform: translate(2px, 2px);
 }
@@ -375,6 +369,71 @@
 
 .buzz .bz-hub :is(.home-row, .home-list-item) {
   border-bottom-color: var(--bz-paper-3);
+}
+
+/* Your week: the member's to-do list, a clipboard of sticker rows. */
+.buzz .bz-hub .yw {
+  box-shadow: 6px 6px 0 var(--bz-teal);
+}
+
+.buzz .bz-hub .yw-grid {
+  gap: 1rem;
+}
+
+.buzz .bz-hub .yw-sec {
+  gap: 0.75rem;
+  padding: 0.875rem 1rem 1rem;
+  border: 2px solid var(--bz-ink);
+  border-radius: 10px;
+  background: var(--bz-paper-2);
+}
+
+.buzz .bz-hub .yw-title {
+  color: var(--bz-purple);
+  font: italic 800 1.0625rem var(--bz-jersey);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.buzz .bz-hub .yw-total strong {
+  color: var(--bz-purple);
+  font: italic 400 1.375rem / 1 var(--bz-display);
+}
+
+.buzz .bz-hub .yw-gain {
+  color: var(--bz-teal-deep);
+  font: italic 800 1rem var(--bz-jersey);
+}
+
+.buzz .bz-hub .yw-item {
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  padding: 0.5rem 0;
+  border-top: 2px dashed var(--bz-paper-3);
+}
+
+.buzz .bz-hub .yw-slot {
+  justify-self: stretch;
+  padding: 0.125rem 0;
+  border: 2px solid var(--bz-ink);
+  border-radius: 6px;
+  color: var(--bz-ink);
+  background: var(--bz-teal-light);
+  font: italic 800 0.75rem var(--bz-jersey);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.buzz .bz-hub .yw-item[data-kind="warn"] .yw-slot {
+  background: var(--bz-amber);
+}
+
+.buzz .bz-hub .yw-pts {
+  font-weight: 700;
+  color: var(--bz-purple);
+}
+
+.buzz .bz-hub .yw-note {
+  color: var(--bz-muted);
 }
 
 /* Standings race: the arena's leaderboard, LED segments for points for. */
@@ -803,11 +862,7 @@
     gap: 1.75rem;
   }
 
-  .bz-actions {
-    gap: 0.5rem;
-  }
-
-  .buzz .bz-actions .xp-button {
+  .buzz .bz-hub .yw-action {
     padding: 0 0.75rem;
     font-size: 0.8125rem;
   }
@@ -888,7 +943,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .buzz .u-recap,
-  .buzz .bz-actions .xp-button {
+  .buzz .bz-hub .yw-action {
     transition: none;
   }
 }

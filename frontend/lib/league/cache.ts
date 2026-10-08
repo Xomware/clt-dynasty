@@ -106,6 +106,12 @@ export const seasonStats = (season: string) => cached(`season-stats/${season}`, 
 export const projections = (season: string, week: number) => cached(`projections/${season}/${week}`, () => getProjections(season, week), NFL_TTL);
 export const nflSchedule = (season: string) => cached(`schedule/${season}`, () => getSchedule(season), NFL_TTL);
 
+// A lineup changes in Sleeper whenever its manager taps.
+export function currentRosters(fresh = false) {
+  if (fresh) entries.delete("rosters-now");
+  return cached("rosters-now", () => getRosters(LEAGUE_ID), LIVE_TTL);
+}
+
 export function clearLeagueCache() {
   entries.clear();
   values.clear();

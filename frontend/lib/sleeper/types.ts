@@ -179,12 +179,14 @@ export interface SleeperWeekStats {
   stats: Record<string, number>;
 }
 
-// One player's line in the league-wide season stats or a week's projections.
-// A player on bye has no projection row, or one with empty stats.
+// One player's line in the league-wide season stats or a week's projections
+// (Rotowire's, in Sleeper's stat keys). A player on bye or ruled out has no
+// projection row, or one with no points in `stats`.
 export interface SleeperStatRow {
   player_id: string;
+  team?: string | null;
   stats: Record<string, number>;
-  player?: { position?: string | null } | null;
+  player?: { position?: string | null; fantasy_positions?: string[] | null; injury_status?: string | null } | null;
 }
 
 export interface SleeperGame {
