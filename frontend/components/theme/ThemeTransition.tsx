@@ -3,7 +3,6 @@ import type { CSSProperties } from "react";
 import { BrandMark } from "@/components/buzz/BrandMark";
 import type { Theme } from "@/lib/theme/script";
 
-import "@/components/intro/intro.css";
 import "@/components/buzz/buzz-tokens.css";
 import "@/components/buzz/buzz-loader.css";
 import "./transition.css";
@@ -91,7 +90,7 @@ interface ThemeTransitionProps {
 export function ThemeTransition({ to, phase, snapshot }: ThemeTransitionProps) {
   return (
     <div
-      className="theme-transition skyline-palette"
+      className="theme-transition"
       data-to={to}
       data-phase={phase}
       data-crt={to === "xp" ? (snapshot ? "snapshot" : "shutter") : undefined}

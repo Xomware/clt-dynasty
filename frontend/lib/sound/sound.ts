@@ -35,6 +35,7 @@ let ctx: AudioContext | null = null;
 let gestured = false;
 let listening = false;
 let pending: SoundName | null = null;
+let startedUp = -Infinity;
 let muted: boolean | null = null;
 const muteListeners = new Set<() => void>();
 
@@ -59,6 +60,11 @@ const allowed = () => gestured || (typeof navigator !== "undefined" && navigator
 export function play(name: SoundName) {
   listenForGesture();
   if (isMuted() || !allowed() || typeof AudioContext === "undefined") return;
+  // The intro and the signed-in greeting both chime the desktop up; one load hears it once.
+  if (name === "startup") {
+    if (performance.now() - startedUp < 5000) return;
+    startedUp = performance.now();
+  }
   ctx ??= new AudioContext();
   if (ctx.state === "suspended") void ctx.resume();
   const now = ctx.currentTime;

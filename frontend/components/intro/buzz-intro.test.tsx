@@ -49,7 +49,7 @@ describe("first-load intro by theme", () => {
     expect(container.querySelector(".intro")).toBeNull();
   });
 
-  it("plays the skyline for a Classic XP visitor", () => {
+  it("plays the XP boot for a Classic XP visitor", () => {
     localStorage.setItem(THEME_KEY, "xp");
     const { container } = both();
     expect(container.querySelector(".intro")).not.toBeNull();

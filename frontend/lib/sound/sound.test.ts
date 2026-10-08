@@ -39,6 +39,17 @@ describe("sound", () => {
     expect(calls.notes).toBeGreaterThan(0);
   });
 
+  it("plays the startup chime once when the intro and the greeting both ask", async () => {
+    const sound = await load();
+    sound.play("ding");
+    window.dispatchEvent(new Event("pointerdown"));
+    sound.play("startup");
+    const once = calls.notes;
+    sound.playWhenAllowed("startup");
+    expect(once).toBeGreaterThan(0);
+    expect(calls.notes).toBe(once);
+  });
+
   it("stays silent while muted", async () => {
     const sound = await load();
     sound.setMuted(true);
