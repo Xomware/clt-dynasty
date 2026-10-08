@@ -26,7 +26,7 @@ const streak = (s: string) => s.replace(/^(\d+)([WLT])$/, "$2$1");
 function StandingsTable({ label, rows, seedOf, playoffTeams, teamFor, myRosterId }: TableProps) {
   return (
     <div className="xp-table-scroll">
-      <table className="xp-table">
+      <table className="xp-table xp-stack">
         <caption className="sr-only">{label}</caption>
         <thead>
           <tr>
@@ -57,20 +57,20 @@ function StandingsTable({ label, rows, seedOf, playoffTeams, teamFor, myRosterId
             const seed = seedOf.get(s.rosterId) ?? 0;
             return (
               <tr key={s.rosterId} className={seed <= playoffTeams ? "xp-in" : undefined}>
-                <td className="tabular-nums">{i + 1}</td>
-                <td className="md:max-w-0">
+                <td className="stack-lead tabular-nums">{i + 1}</td>
+                <td className="stack-main md:max-w-0">
                   <TeamLink rosterId={s.rosterId} name={team.name} avatarUrl={team.avatarUrl} isMine={s.rosterId === myRosterId} />
                 </td>
-                <td className="tabular-nums">
+                <td className="tabular-nums" data-label="W-L">
                   {s.wins}-{s.losses}
                   {s.ties > 0 && `-${s.ties}`}
                 </td>
-                <td className="standings-extra tabular-nums">{streak(s.streak) || "-"}</td>
-                <td className="text-right tabular-nums">
+                <td className="standings-extra tabular-nums" data-label="Streak">{streak(s.streak) || "-"}</td>
+                <td className="text-right tabular-nums" data-label="PF">
                   <CountUp value={s.pf} decimals={2} />
                 </td>
-                <td className="standings-extra text-right tabular-nums">{s.pa.toFixed(2)}</td>
-                <td className="text-right tabular-nums">{seed <= playoffTeams ? seed : ""}</td>
+                <td className="standings-extra text-right tabular-nums" data-label="PA">{s.pa.toFixed(2)}</td>
+                <td className="text-right tabular-nums" data-label="Seed">{seed <= playoffTeams ? seed : ""}</td>
               </tr>
             );
           })}
@@ -110,7 +110,7 @@ export function StandingsWindow({ params }: { params: WindowParams }) {
                   id: "divisions",
                   label: "Divisions",
                   panel: () => (
-                    <div className="grid gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                       {divisions.map((d) => (
                         <section key={d ?? "none"} aria-labelledby={`division-${d}`}>
                           <h3 id={`division-${d}`} className="xp-group-title">

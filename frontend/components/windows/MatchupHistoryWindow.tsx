@@ -49,7 +49,7 @@ function Week({ season, week, games, open, onToggle, myRosterId }: WeekProps) {
         </span>
       </summary>
       {open && (
-        <div className="mt-2 grid gap-2" aria-live="polite">
+        <div className="mt-2 grid grid-cols-1 gap-2" aria-live="polite">
           {error ? (
             <p role="alert">Couldn&rsquo;t load week {week} ({error}).</p>
           ) : !rows ? (

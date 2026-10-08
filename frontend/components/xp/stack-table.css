@@ -1,0 +1,126 @@
+/* A table marked .xp-stack turns each row into a card on a phone: the lead cell
+   (rank, slot) beside the main one (team, player), then the rest as labelled
+   stats on the line under it, so no column pushes the page sideways. Unlayered
+   with :root, so it outranks both the XP table rules and Buzz City's skin. */
+
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  :root .xp-table.xp-stack {
+    --stack-lead: 1.75rem;
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  :root .xp-table.xp-stack :is(tbody, tfoot) {
+    display: block;
+  }
+
+  /* The headers move into each cell's label; screen readers keep the caption. */
+  :root .xp-table.xp-stack thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  :root .xp-table.xp-stack tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.125rem 0.75rem;
+    padding: 0.5rem 0.375rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  }
+
+  :root .xp-table.xp-stack tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  :root .xp-table.xp-stack tfoot tr {
+    border-top: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+    border-bottom: 0;
+  }
+
+  :root .xp-table.xp-stack :is(td, th) {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: left;
+    background: none;
+  }
+
+  :root .xp-table.xp-stack :is(td, th):empty {
+    display: none;
+  }
+
+  /* Columns a phone already left out stay out of the card too. */
+  :root .xp-table.xp-stack .standings-extra {
+    display: none;
+  }
+
+  /* Hover tints the card, not each cell's own box. */
+  :root .xp-table.xp-stack tbody tr:hover :is(td, th) {
+    background: none;
+  }
+
+  @media (hover: hover) {
+    :root .xp-table.xp-stack tbody tr:hover {
+      background: color-mix(in srgb, currentColor 6%, transparent);
+    }
+  }
+
+  /* The lead sits in the card's left margin, so the main cell and the stats
+     under it share one left edge whichever columns a phone hides. */
+  :root .xp-table.xp-stack tr:has(.stack-lead) {
+    position: relative;
+    padding-left: calc(var(--stack-lead) + 1.125rem);
+  }
+
+  :root .xp-table.xp-stack .stack-lead {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.375rem;
+    width: var(--stack-lead);
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :root .xp-table.xp-stack .stack-main {
+    position: static;
+    flex: 1 0 100%;
+    min-width: 0;
+    background: none;
+  }
+
+  /* A cell with a name in it (an owner) takes a line of its own. */
+  :root .xp-table.xp-stack .stack-wide {
+    flex: 1 0 100%;
+    min-width: 0;
+  }
+
+  :root .xp-table.xp-stack [data-label] {
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  :root .xp-table.xp-stack [data-label]::before {
+    content: attr(data-label);
+    margin-right: 0.3em;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 72%, transparent);
+  }
+
+  /* Your own row keeps its teal edge clear of the text. */
+  :root[data-theme="buzz"] .xp-table.xp-stack tr[data-mine]:not(:has(.stack-lead)) {
+    padding-left: 0.75rem;
+  }
+}

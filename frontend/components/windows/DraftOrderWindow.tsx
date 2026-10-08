@@ -37,7 +37,7 @@ function OrderTable({ label, order, standings, hpp, heldBy, teamFor, myRosterId 
   const row = (id: number) => standings.find((s) => s.rosterId === id);
   return (
     <div className="xp-table-scroll">
-      <table className="xp-table">
+      <table className="xp-table xp-stack">
         <caption className="sr-only">{label}</caption>
         <thead>
           <tr>
@@ -64,17 +64,17 @@ function OrderTable({ label, order, standings, hpp, heldBy, teamFor, myRosterId 
             const holder = heldBy.get(d.rosterId);
             return (
               <tr key={d.rosterId} className={d.playoff && !order[i - 1]?.playoff ? "xp-group-start" : undefined}>
-                <td className="tabular-nums">{d.pick}</td>
-                <td className="md:max-w-0">
+                <td className="stack-lead tabular-nums">{d.pick}</td>
+                <td className="stack-main md:max-w-0">
                   <TeamLink rosterId={d.rosterId} {...teamFor(d.rosterId)} isMine={d.rosterId === myRosterId} />
                   {d.playoff && <span className="xp-tag mt-1 block w-fit">Playoffs</span>}
                   {holder !== undefined && (
                     <span className="block text-xs">1st-round pick held by {teamFor(holder).name}</span>
                   )}
                 </td>
-                <td className="tabular-nums">{s ? `${s.wins}-${s.losses}${s.ties ? `-${s.ties}` : ""}` : ""}</td>
-                <td className="standings-extra text-right tabular-nums">{s?.pf.toFixed(2)}</td>
-                {hpp && <td className="text-right tabular-nums">{(hpp.get(d.rosterId) ?? 0).toFixed(2)}</td>}
+                <td className="tabular-nums" data-label="W-L">{s ? `${s.wins}-${s.losses}${s.ties ? `-${s.ties}` : ""}` : ""}</td>
+                <td className="standings-extra text-right tabular-nums" data-label="PF">{s?.pf.toFixed(2)}</td>
+                {hpp && <td className="text-right tabular-nums" data-label="HPP">{(hpp.get(d.rosterId) ?? 0).toFixed(2)}</td>}
               </tr>
             );
           })}

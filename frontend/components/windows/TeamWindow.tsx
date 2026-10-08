@@ -194,7 +194,7 @@ function RosterTable({ title, players, rows, labelHeader = "Pos" }: RosterTableP
         {title} <span className="team-count">({rows.length})</span>
       </h3>
       <div className="xp-table-scroll">
-        <table className="xp-table team-table">
+        <table className="xp-table xp-stack team-table">
           <thead>
             <tr>
               <th scope="col" className="w-14">{labelHeader}</th>
@@ -206,10 +206,10 @@ function RosterTable({ title, players, rows, labelHeader = "Pos" }: RosterTableP
           <tbody>
             {rows.map((row, i) => (
               <tr key={`${row.key}-${i}`}>
-                <td className="font-bold">{row.label}</td>
-                <td>{row.id ? <PlayerCell id={row.id} player={players[row.id]} /> : <span className="team-open">Empty</span>}</td>
-                <td className="text-right tabular-nums">{row.id ? (players[row.id]?.age ?? "") : ""}</td>
-                <td className="text-right tabular-nums">{row.id ? experience(players[row.id]) : ""}</td>
+                <td className="stack-lead font-bold">{row.label}</td>
+                <td className="stack-main">{row.id ? <PlayerCell id={row.id} player={players[row.id]} /> : <span className="team-open">Empty</span>}</td>
+                <td className="text-right tabular-nums" data-label="Age">{row.id ? (players[row.id]?.age ?? "") : ""}</td>
+                <td className="text-right tabular-nums" data-label="Exp">{row.id ? experience(players[row.id]) : ""}</td>
               </tr>
             ))}
           </tbody>

@@ -8,6 +8,7 @@ import { THEME_SCRIPT } from "@/lib/theme/script";
 import { ThemeProvider } from "@/lib/theme/theme";
 
 import "./globals.css";
+import "@/components/xp/stack-table.css";
 
 export const metadata: Metadata = {
   title: "CLT Dynasty League",

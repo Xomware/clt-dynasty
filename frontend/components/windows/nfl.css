@@ -133,3 +133,37 @@
     background: var(--xp-cream);
   }
 }
+
+/* Stacked on a phone, the sort headers stay as a row of chips over the cards;
+   the three rank columns sort the same way as their numbers, so they go. */
+@media (max-width: 767.98px), (max-height: 500px) and (pointer: coarse) {
+  :root .xp-table.xp-stack.nfl-roster thead {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+
+  :root .xp-table.xp-stack.nfl-roster thead tr {
+    gap: 0.375rem;
+    padding: 0 0 0.5rem;
+  }
+
+  :root .xp-table.xp-stack.nfl-roster thead th {
+    position: static;
+    min-width: 0;
+    padding: 0 0.625rem;
+    border-radius: 999px;
+  }
+
+  :root .xp-table.xp-stack.nfl-roster thead th:is(.nfl-roster-owner, .nfl-roster-rank) {
+    display: none;
+  }
+
+  .nfl-sort[data-numeric] {
+    width: auto;
+  }
+}

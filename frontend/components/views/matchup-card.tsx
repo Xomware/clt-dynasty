@@ -58,7 +58,7 @@ export function MatchupCard({ game, leagueId, teamFor, myRosterId, note, default
       </button>
       {open && (
         <div id={lineups} className="@container mt-2">
-          <div className="grid gap-2 @md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 @md:grid-cols-2">
             {game.sides.map((s) => (
               <Lineup key={s.rosterId} side={s} team={teamFor(s.rosterId).name} leagueId={leagueId} />
             ))}
