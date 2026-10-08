@@ -1,16 +1,26 @@
-/* Buzz City's first-load intro, 4.25s. Beats, in seconds:
-   0     near-black ink
-   0.05  eight slats of the road jersey drop in, left to right
-   0.5   the arena board flickers on; 0.85 CLT DYNASTY scrolls in a column at a time
-   1.05  the hornet zig-zags in on a dotted trail and lands mid-screen
-   1.98  the crown drops onto its head
-   2.22  the lockup slams down over them; 2.48 impact: shake, confetti, a
-         shockwave, a flash, and the board blinks
-   2.62  the FANTASY FOOTBALL ribbon unfurls from the centre; 2.95 a strip of tape
-   3.0   a glint across the lockup
-   3.5   the slats start to wipe away, alternately up and down, and the page's
-         own entrance starts under them; 3.55 board and lockup fade
-   4.15  the overlay's own exit, which is the clock the component waits on
+/* Buzz City's first-load intro, 5.66s: an arena's player introduction.
+   Beats, in seconds (arena.ts and arena-sound.ts share them):
+   0     the arena dark; 0.1 a spotlight sweeps the floor (canvas)
+   0.5   LED rails light around the edges and chase
+   0.6   the board flickers on; 0.8, 1.15, 1.5 it flips 3-2-1, a bass hit each
+   1.85  the board bursts and the hornet comes out of it at the camera,
+         zig-zagging and growing, with sparks and warp lines (canvas)
+   2.5   it lands; 2.62 the crown drops, 2.8 lands in a gold flash (canvas)
+   2.8   the jersey slats slam down over the arena
+   3.2   the lockup hits: shake, flash, shockwave, confetti, flares (canvas)
+   3.4   the FANTASY FOOTBALL ribbon unfurls; 3.55 a glint
+   3.7   with the week's games in hand, the lockup rises and the games land as
+         scoreboard cards from 3.9; without them, a strip of tape at 3.75
+   5.0   the slats wipe away, alternately up and down, and the page's own
+         entrance starts under them; everything else fades with them
+   5.66  the slats are gone and the overlay's own exit hides it at once; that
+         exit is the clock the component and the canvases run on
+   WebKit costs, measured at 390px: a fade on the whole stage re-rasterizes
+   all of it (a 70-90ms frame), a clip-path animation ending re-rasters its
+   image (50ms), and so does a fade starting on a subtree with no layer of its
+   own, or with one dropped when its last animation ended. So the exit hides
+   instead of fading, the ribbon unfurls by transform, and everything that
+   moves again later holds its layer (will-change) from the start.
    Every element's resting style is its finished frame with the slats still
    down, and each keyframe opens from its first. With animation off (reduced
    motion), the stage is the finished lockup on the jersey, which simply fades. */
@@ -20,9 +30,19 @@
   --lw: min(88vw, calc(54dvh * 1.2444), 36rem);
   --lh: calc(var(--lw) * 0.8036);
   --hw: calc(var(--lw) * 0.5);
-  --cy: 57dvh;
-  /* One dot of the arena board, which is 72 columns wide. */
-  --p: calc(min(90vw, 36rem) / 72);
+  --cy: 52dvh;
+  /* The LED rails round the edges, and one dot of them. */
+  --rail: clamp(14px, 2.2dvh, 22px);
+  --rp: calc(var(--rail) / 9);
+  /* The games: card height, grid, and the lockup's scale and centre above them. */
+  /* One game a row on phones, so team names fit. */
+  --cols: 1;
+  --rows: 6;
+  --ch: clamp(3.25rem, 7dvh, 4.25rem);
+  --small: 0.5;
+  --hc: calc(var(--lh) * var(--small) + 3.5rem + var(--rows) * var(--ch) + (var(--rows) - 1) * 0.625rem);
+  --ty: calc(50dvh - var(--hc) / 2 + var(--lh) * var(--small) / 2);
+  --late: 0s;
 
   position: fixed;
   inset: 0;
@@ -32,11 +52,21 @@
   overflow: hidden;
   color: var(--bz-paper);
   font-family: var(--bz-body);
+  background: radial-gradient(120% 70% at 50% 85%, #1a0f3a, #07031a 70%);
   cursor: default;
   -webkit-tap-highlight-color: transparent;
   animation:
-    bzi-ink 1ms linear 0.72s both,
-    bzi-exit 0.1s linear 4.15s forwards;
+    bzi-ink 1ms linear 3.25s forwards,
+    bzi-exit 1ms linear 5.66s forwards;
+}
+
+@media (min-width: 640px) {
+  .bzi {
+    --cols: 3;
+    --rows: 2;
+    --ch: clamp(4.5rem, 12dvh, 6.5rem);
+    --small: 0.58;
+  }
 }
 
 html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
@@ -48,20 +78,17 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   animation: bzi-exit-skip 0.25s ease-out forwards;
 }
 
-/* Ink until the slats have covered the screen, then see-through, so the
-   slats leaving uncover the page. */
+/* The arena until the slats cover it, then see-through, so the slats leaving
+   uncover the page. */
 @keyframes bzi-ink {
-  from {
-    background-color: var(--bz-ink);
-  }
   to {
-    background-color: transparent;
+    background: none;
   }
 }
 
 @keyframes bzi-exit {
   to {
-    opacity: 0;
+    visibility: hidden;
   }
 }
 
@@ -83,9 +110,33 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   }
 }
 
+@keyframes bzi-show {
+  from {
+    visibility: hidden;
+  }
+}
+
+@keyframes bzi-hide {
+  to {
+    visibility: hidden;
+  }
+}
+
 .bzi > *,
 .bzi-camera > * {
   position: absolute;
+}
+
+.bzi-bg,
+.bzi-fx {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.bzi-bg {
+  animation: bzi-hide 1ms linear 3.25s forwards;
 }
 
 /* Slats */
@@ -102,9 +153,11 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
     url("../buzz/jersey-road.svg") calc(var(--n) * -12.5vw) 0 / 384px 480px,
     var(--bz-mesh),
     var(--bz-road);
+  box-shadow: 0 0 1.5rem rgb(7 3 26 / 0.6);
+  will-change: transform;
   animation:
-    bzi-slat-in 0.4s cubic-bezier(0.6, 0, 0.3, 1.1) calc(0.05s + var(--n) * 0.04s) both,
-    bzi-slat-up 0.4s cubic-bezier(0.3, 0, 0.3, 1) calc(3.5s + var(--n) * 0.035s) forwards;
+    bzi-slat-in 0.26s cubic-bezier(0.6, 0, 0.3, 1.1) calc(2.8s + var(--n) * 0.025s) both,
+    bzi-slat-up 0.4s cubic-bezier(0.3, 0, 0.3, 1) calc(5s + var(--n) * 0.035s) forwards;
 }
 
 .bzi-slats i:nth-child(even) {
@@ -132,7 +185,7 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
 /* Everything that shakes on the slam. */
 .bzi-camera {
   inset: 0;
-  animation: bzi-shake 0.4s linear 2.48s both;
+  animation: bzi-shake 0.4s linear 3.2s both;
 }
 
 @keyframes bzi-shake {
@@ -141,148 +194,181 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
     transform: none;
   }
   10% {
-    transform: translate(calc(var(--lw) * -0.016), calc(var(--lw) * 0.012));
+    transform: translate(calc(var(--lw) * -0.022), calc(var(--lw) * 0.016));
   }
   25% {
-    transform: translate(calc(var(--lw) * 0.014), calc(var(--lw) * -0.012));
+    transform: translate(calc(var(--lw) * 0.018), calc(var(--lw) * -0.016));
   }
   40% {
-    transform: translate(calc(var(--lw) * -0.01), calc(var(--lw) * 0.006));
+    transform: translate(calc(var(--lw) * -0.012), calc(var(--lw) * 0.008));
   }
   55% {
-    transform: translate(calc(var(--lw) * 0.007), calc(var(--lw) * -0.005));
+    transform: translate(calc(var(--lw) * 0.008), calc(var(--lw) * -0.006));
   }
   75% {
     transform: translate(calc(var(--lw) * -0.003), calc(var(--lw) * 0.002));
   }
 }
 
-/* Arena light behind the lockup and a vignette at the edges. */
-.bzi-glow {
-  inset: 0;
+/* Dark amber dots of an unlit board. */
+.bzi-board,
+.bzi-rail,
+.bzi-card {
   background:
-    radial-gradient(calc(var(--lw) * 0.75) calc(var(--lw) * 0.6) at 50% var(--cy), rgb(127 221 226 / 0.3), transparent 70%),
-    radial-gradient(130% 90% at 50% 50%, transparent 45%, rgb(12 6 36 / 0.7));
-  animation:
-    bzi-fade-in 0.5s ease-out 0.4s both,
-    bzi-out 0.3s ease-in 3.55s forwards;
+    radial-gradient(circle, rgb(255 181 46 / 0.1) 0 34%, transparent 42%) 0 0 / var(--rp) var(--rp),
+    #0c0620;
 }
 
-/* The arena board */
+/* The countdown board */
 
 .bzi-board-at {
-  top: calc(var(--cy) - var(--lh) / 2 - var(--p) * 3);
+  --fh: clamp(6rem, 22dvh, 11rem);
+
+  top: 45dvh;
   left: 50%;
-  transform: translate(-50%, -100%);
-  animation: bzi-out 0.2s ease-in 3.55s forwards;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  animation: bzi-board-life 1.55s linear 0.6s both;
 }
 
-.bzi-board {
-  position: relative;
-  padding: calc(var(--p) * 1.5) calc(var(--p) * 1.25);
-  border-radius: calc(var(--p) * 1.25);
-  background: #0c0620;
-  box-shadow:
-    0 0 0 3px var(--bz-ink-3),
-    0 0 0 5px var(--bz-purple),
-    0 calc(var(--p) * 2) calc(var(--p) * 5) rgb(8 4 24 / 0.6);
-  animation: bzi-flicker 0.45s linear 0.5s both;
-}
-
-/* Fluorescent tubes catching: on, a dip, on, a dip, then full. */
-@keyframes bzi-flicker {
+/* Fluorescent tubes catching, a hold through the count, then it bursts at the
+   camera as the hornet comes through it (80.6% is 1.85s). */
+@keyframes bzi-board-life {
   0% {
     opacity: 0;
   }
-  20% {
+  4% {
     opacity: 0.8;
   }
-  30% {
+  7% {
     opacity: 0.1;
   }
-  55% {
+  12% {
     opacity: 0.9;
   }
-  65% {
+  15% {
     opacity: 0.3;
   }
-}
-
-/* Chase bulbs along the top and bottom rails: bright and dim alternate, and
-   stepping the pattern by one bulb makes them run. */
-.bzi-board::before,
-.bzi-board::after {
-  position: absolute;
-  right: calc(var(--p) * 1.25);
-  left: calc(var(--p) * 1.25);
-  height: calc(var(--p) * 1.5);
-  content: "";
-  background:
-    radial-gradient(circle, var(--bz-amber-light) 0 22%, transparent 30%) 0 50% / calc(var(--p) * 4) 100% repeat-x,
-    radial-gradient(circle, rgb(255 181 46 / 0.3) 0 22%, transparent 30%) calc(var(--p) * 2) 50% / calc(var(--p) * 4) 100% repeat-x;
-  animation: bzi-chase 0.5s steps(2, jump-none) 0.95s infinite;
-}
-
-.bzi-board::before {
-  top: 0;
-}
-
-.bzi-board::after {
-  bottom: 0;
-}
-
-@keyframes bzi-chase {
-  to {
-    background-position:
-      calc(var(--p) * 2) 50%,
-      calc(var(--p) * 4) 50%;
-  }
-}
-
-/* The dark dots of the whole board, with the lit text scrolled over them. */
-.bzi-board-dots {
-  position: relative;
-  width: calc(var(--p) * var(--cols));
-  height: calc(var(--p) * 11);
-  overflow: hidden;
-  background: radial-gradient(circle, rgb(255 181 46 / 0.12) 0 34%, transparent 42%) 0 0 / var(--p) var(--p);
-}
-
-.bzi-led {
-  position: absolute;
-  top: calc(var(--p) * 2);
-  left: 0;
-  width: calc(var(--p) * var(--w));
-  height: calc(var(--p) * 7);
-  fill: var(--bz-amber-light);
-  filter: drop-shadow(0 0 calc(var(--p) * 0.6) var(--bz-amber));
-  transform: translateX(calc(var(--p) * var(--to)));
-  animation:
-    bzi-scroll 0.85s steps(68, jump-start) 0.85s both,
-    bzi-blink 0.45s steps(1, end) 2.48s;
-}
-
-/* 68 steps: from just off the right edge (column 72) to centred (column 4),
-   one column a step, as an arena board does it. */
-@keyframes bzi-scroll {
-  from {
-    transform: translateX(calc(var(--p) * var(--from)));
-  }
-}
-
-@keyframes bzi-blink {
-  0%,
-  50% {
-    opacity: 0.15;
-  }
-  25%,
-  75% {
+  20%,
+  80.6% {
     opacity: 1;
+    transform: translate(-50%, -50%);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+}
+
+.bzi-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--fh) * 0.1);
+  padding: calc(var(--fh) * 0.1) calc(var(--fh) * 0.16) calc(var(--fh) * 0.14);
+  border-radius: calc(var(--fh) * 0.08);
+  box-shadow:
+    0 0 0 3px var(--bz-ink-3),
+    0 0 0 5px var(--bz-purple),
+    0 0 calc(var(--fh) * 0.4) rgb(127 221 226 / 0.25),
+    0 calc(var(--fh) * 0.12) calc(var(--fh) * 0.3) rgb(7 3 26 / 0.7);
+}
+
+.bzi-board-label {
+  height: calc(var(--fh) * 0.09);
+  width: calc(var(--fh) * 0.09 / 7 * var(--w));
+  fill: var(--bz-teal-light);
+}
+
+/* A split-flap digit: top halves swap in under the old top flap as it falls,
+   and each new bottom flap drops over the old one. Later digits stack higher. */
+.bzi-flip {
+  position: relative;
+  width: calc(var(--fh) * 0.78);
+  height: var(--fh);
+  border-radius: calc(var(--fh) * 0.06);
+  background: #140a33;
+  perspective: calc(var(--fh) * 4);
+}
+
+.bzi-flip::after {
+  position: absolute;
+  top: calc(50% - 1px);
+  right: 0;
+  left: 0;
+  z-index: 50;
+  height: 2px;
+  content: "";
+  background: #07031a;
+}
+
+.bzi-half {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: calc(1 + var(--i));
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+.bzi-half-top {
+  top: 0;
+  border-radius: calc(var(--fh) * 0.06) calc(var(--fh) * 0.06) 0 0;
+  background: linear-gradient(#22144f, #170c3c);
+  transform-origin: 50% 100%;
+  animation: bzi-show 1ms linear calc(0.8s + var(--i) * 0.35s) both;
+}
+
+.bzi-half-bot {
+  top: 50%;
+  border-radius: 0 0 calc(var(--fh) * 0.06) calc(var(--fh) * 0.06);
+  background: linear-gradient(#150a36, #0f0729);
+  transform-origin: 50% 0;
+}
+
+.bzi-half svg {
+  position: absolute;
+  top: calc(var(--fh) * 0.14);
+  left: 50%;
+  height: calc(var(--fh) * 0.72);
+  width: calc(var(--fh) * 0.72 / 7 * var(--w));
+  fill: var(--bz-amber-light);
+  transform: translateX(-50%);
+}
+
+.bzi-half-bot svg {
+  top: calc(var(--fh) * 0.14 - var(--fh) / 2);
+}
+
+.bzi-fall {
+  z-index: calc(10 + var(--i));
+  animation:
+    bzi-show 1ms linear calc(0.45s + var(--i) * 0.35s) both,
+    bzi-fall 0.13s cubic-bezier(0.55, 0, 1, 0.45) calc(0.8s + var(--i) * 0.35s) forwards;
+}
+
+@keyframes bzi-fall {
+  to {
+    transform: rotateX(-90deg);
+  }
+}
+
+.bzi-drop {
+  z-index: calc(10 + var(--i));
+  animation: bzi-drop 0.15s cubic-bezier(0, 0.55, 0.45, 1) calc(0.92s + var(--i) * 0.35s) both;
+}
+
+@keyframes bzi-drop {
+  from {
+    transform: rotateX(90deg);
   }
 }
 
 /* The slot the lockup fills, which the hornet lands in the middle of. */
 .bzi-slot {
+  will-change: transform;
   top: var(--cy);
   left: 50%;
   width: var(--lw);
@@ -296,124 +382,57 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
 
 /* The flight */
 
-/* x in vw and y in dvh, the units of FLIGHT; its right edge is the landing point
-   and its width (set inline) the flight's run. */
-.bzi-trail {
-  top: calc(50% - 18dvh);
-  right: 50%;
-  height: 36dvh;
-  overflow: visible;
-  fill: none;
-  stroke: var(--bz-amber-light);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  /* Screen px: non-scaling-stroke dashes ignore the viewBox. */
-  stroke-dasharray: 0 11;
-  opacity: 0;
-  animation:
-    bzi-trail 0.85s linear 1.05s both,
-    bzi-trail-fade 0.35s ease-in 1.95s both;
-}
-
-.bzi-trail path {
-  vector-effect: non-scaling-stroke;
-}
-
-/* Drawn up to wherever the hornet is: each keyframe matches one of its points. */
-@keyframes bzi-trail {
-  0% {
-    clip-path: inset(-10% var(--c0) -10% 0);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  20% {
-    clip-path: inset(-10% var(--c1) -10% 0);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  40% {
-    clip-path: inset(-10% var(--c2) -10% 0);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  60% {
-    clip-path: inset(-10% var(--c3) -10% 0);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  80% {
-    clip-path: inset(-10% var(--c4) -10% 0);
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  100% {
-    clip-path: inset(-10% 0 -10% 0);
-  }
-}
-
-@keyframes bzi-trail-fade {
-  from {
-    opacity: 0.85;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/* Positioned so its centre is the slot's centre; the head is 400x369. */
+/* Centred on the slot; the head is 400x369. */
 .bzi-fly {
   top: 50%;
   left: 50%;
   width: var(--hw);
+  height: calc(var(--hw) * 0.9225);
   margin: calc(var(--hw) * -0.46) 0 0 calc(var(--hw) / -2);
+}
+
+/* Its speed lines and sparks are on the effects canvas, which tracks it. */
+.bzi-buzz {
+  position: absolute;
+  inset: 0;
   opacity: 0;
   animation:
-    bzi-fly 0.85s linear 1.05s both,
-    bzi-gone 0.12s ease-in 2.34s both;
+    bzi-fly 0.65s linear 1.85s both,
+    bzi-out 0.08s linear 3.2s forwards;
 }
 
 @keyframes bzi-fly {
   0% {
-    transform: translate(var(--x0), var(--y0)) rotate(var(--r0));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+    opacity: 0;
+    transform: translate(var(--x0), var(--y0)) scale(var(--s0)) rotate(var(--r0));
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
   }
-  20% {
-    transform: translate(var(--x1), var(--y1)) rotate(var(--r1));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  40% {
-    transform: translate(var(--x2), var(--y2)) rotate(var(--r2));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  60% {
-    transform: translate(var(--x3), var(--y3)) rotate(var(--r3));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  80% {
-    transform: translate(var(--x4), var(--y4)) rotate(var(--r4));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
-  }
-  100% {
-    transform: translate(var(--x5), var(--y5)) rotate(var(--r5));
-  }
-}
-
-@keyframes bzi-gone {
-  from {
+  8% {
     opacity: 1;
   }
-  to {
-    opacity: 0;
+  20% {
+    transform: translate(var(--x1), var(--y1)) scale(var(--s1)) rotate(var(--r1));
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
   }
-}
-
-/* Wings buzzing: a fast shiver for the length of the flight. */
-.bzi-buzz {
-  animation: bzi-shiver 0.06s linear 1.05s 14 alternate both;
-}
-
-@keyframes bzi-shiver {
-  from {
-    transform: rotate(-3deg) translateY(calc(var(--hw) * -0.01));
+  40% {
+    transform: translate(var(--x2), var(--y2)) scale(var(--s2)) rotate(var(--r2));
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
   }
-  to {
-    transform: rotate(3deg) translateY(calc(var(--hw) * 0.01));
+  60% {
+    transform: translate(var(--x3), var(--y3)) scale(var(--s3)) rotate(var(--r3));
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  80% {
+    transform: translate(var(--x4), var(--y4)) scale(var(--s4)) rotate(var(--r4));
+    animation-timing-function: cubic-bezier(0.3, 0, 0.3, 1);
+  }
+  92% {
+    transform: translate(var(--x5), var(--y5)) scale(var(--s5)) rotate(var(--r5));
+    animation-timing-function: ease-out;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -421,35 +440,49 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
 .bzi-mark {
   position: relative;
   transform-origin: 50% 100%;
-  animation: bzi-land 0.5s linear 1.9s both;
+}
+
+.bzi-mark {
+  animation: bzi-land 0.6s linear 2.5s both;
 }
 
 @keyframes bzi-land {
   0% {
-    transform: scale(1.08, 0.88);
-    animation-timing-function: ease-out;
-  }
-  16%,
-  74% {
-    transform: none;
-  }
-  80% {
     transform: scale(1.1, 0.86);
     animation-timing-function: ease-out;
   }
-  92% {
+  14%,
+  46% {
+    transform: none;
+  }
+  52% {
+    transform: scale(1.1, 0.86);
+    animation-timing-function: ease-out;
+  }
+  66% {
     transform: none;
   }
   100% {
-    transform: scale(1.12);
+    transform: scale(1.14);
   }
 }
 
+/* Wings buzzing: a fast shiver for the length of the flight. */
 .bzi-head {
   display: block;
   width: 100%;
   height: auto;
   filter: drop-shadow(0 calc(var(--hw) * 0.04) calc(var(--hw) * 0.05) rgb(8 4 24 / 0.55));
+  animation: bzi-shiver 0.05s linear 1.85s 13 alternate;
+}
+
+@keyframes bzi-shiver {
+  from {
+    transform: rotate(-3deg) translateY(calc(var(--hw) * -0.012));
+  }
+  to {
+    transform: rotate(3deg) translateY(calc(var(--hw) * 0.012));
+  }
 }
 
 /* Where the head mark wears it: 27.9% in, 44% wide, its top 18.7% of the head's height above it. */
@@ -459,13 +492,13 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   left: 27.9%;
   width: 44%;
   height: auto;
-  animation: bzi-crown 0.32s cubic-bezier(0.5, 0, 0.75, 0) 1.98s both;
+  animation: bzi-crown 0.18s cubic-bezier(0.5, 0, 0.75, 0) 2.62s both;
 }
 
 @keyframes bzi-crown {
   from {
     opacity: 0;
-    transform: translateY(-420%) rotate(-12deg);
+    transform: translateY(-520%) rotate(-14deg);
   }
   30% {
     opacity: 1;
@@ -476,21 +509,22 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
 
 .bzi-lockup-out {
   inset: 0;
-  animation: bzi-out 0.2s ease-in 3.55s forwards;
+  will-change: opacity;
+  animation: bzi-out 0.2s ease-in 5s forwards;
 }
 
 .bzi-lockup {
   position: relative;
   width: 100%;
   height: 100%;
-  animation: bzi-slam 0.42s linear 2.22s both;
+  animation: bzi-slam 0.36s linear 2.98s both;
 }
 
-/* Falls at the camera from huge, hits at 62%, squashes and settles. */
+/* Falls at the camera from huge, hits at 62% (3.2s), squashes and settles. */
 @keyframes bzi-slam {
   0% {
     opacity: 0;
-    transform: scale(2.2) rotate(-5deg);
+    transform: scale(2.6) rotate(-6deg);
     animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
   }
   20% {
@@ -501,7 +535,7 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
     animation-timing-function: ease-out;
   }
   78% {
-    transform: scale(1.03, 0.95);
+    transform: scale(1.04, 0.94);
     animation-timing-function: ease-in-out;
   }
   100% {
@@ -519,22 +553,17 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
 
 /* Unrolls out from the middle, rising into place from behind the letters. */
 .bzi-ribbon {
-  animation: bzi-unfurl 0.42s cubic-bezier(0.2, 0.8, 0.3, 1) 2.62s both;
+  will-change: transform;
+  animation: bzi-unfurl 0.42s cubic-bezier(0.2, 0.8, 0.3, 1) 3.4s both;
 }
 
 @keyframes bzi-unfurl {
-  /* Never fully clipped away, since a lazy image with no visible area doesn't
-     load; the opacity hides the sliver that leaves. */
   from {
     opacity: 0;
-    clip-path: inset(0 49% 0 49%);
-    transform: translateY(5%);
+    transform: translateY(5%) scaleX(0.04);
   }
   20% {
     opacity: 1;
-  }
-  to {
-    clip-path: inset(0 0 0 0);
   }
 }
 
@@ -556,7 +585,7 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   background: linear-gradient(105deg, transparent 35%, rgb(255 251 234 / 0.7) 50%, transparent 65%);
   transform: translateX(110%);
   will-change: transform;
-  animation: bzi-glint 0.6s ease-in-out 3s both;
+  animation: bzi-glint 0.6s ease-in-out 3.55s both;
 }
 
 @keyframes bzi-glint {
@@ -565,12 +594,31 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   }
 }
 
-/* A strip of tape slapped on under the lockup. */
+/* With the games up, the lockup rises over them at half size. */
+.bzi[data-week] .bzi-slot {
+  animation: bzi-rise 0.5s cubic-bezier(0.3, 0, 0.2, 1) calc(3.7s - var(--late)) both;
+}
+
+@keyframes bzi-rise {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(calc(var(--ty) - var(--cy))) scale(var(--small));
+  }
+}
+
+/* A strip of tape slapped on under the lockup, when there are no games to show. */
 .bzi-tape {
   top: calc(var(--cy) + var(--lh) / 2 + 1.25rem);
   left: 50%;
   transform: translateX(-50%);
-  animation: bzi-out 0.2s ease-in 3.55s forwards;
+  will-change: opacity;
+  animation: bzi-out 0.2s ease-in 5s forwards;
+}
+
+.bzi[data-week] .bzi-tape {
+  display: none;
 }
 
 .bzi-tape p {
@@ -583,7 +631,7 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   white-space: nowrap;
   text-transform: uppercase;
   transform: skewX(-10deg) rotate(-1.5deg);
-  animation: bzi-tape 0.3s cubic-bezier(0.2, 0.8, 0.3, 1.3) 2.95s both;
+  animation: bzi-tape 0.3s cubic-bezier(0.2, 0.8, 0.3, 1.3) 3.75s both;
 }
 
 @keyframes bzi-tape {
@@ -593,89 +641,242 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   }
 }
 
-/* The impact */
+/* The week's games, as scoreboard cards */
 
-.bzi-ring {
-  top: 50%;
+.bzi-week {
+  top: calc(var(--ty) + var(--lh) * var(--small) / 2 + 1rem);
   left: 50%;
-  width: calc(var(--lw) * 0.7);
-  aspect-ratio: 1;
-  margin: calc(var(--lw) * -0.35) 0 0 calc(var(--lw) * -0.35);
-  border: calc(var(--lw) * 0.012) solid var(--bz-amber-light);
-  border-radius: 50%;
-  opacity: 0;
-  animation: bzi-ring 0.5s cubic-bezier(0.1, 0.7, 0.3, 1) 2.48s forwards;
+  width: min(100vw - var(--rail) - 2rem, 56rem);
+  transform: translateX(-50%);
+  will-change: opacity;
+  animation: bzi-out 0.2s ease-in 5s forwards;
 }
 
-@keyframes bzi-ring {
-  from {
-    opacity: 0.9;
-    transform: scale(0.4);
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.6);
-  }
+.bzi-week-label {
+  display: block;
+  height: 1rem;
+  width: calc(1rem / 7 * var(--w));
+  margin: 0 auto 0.875rem;
+  fill: var(--bz-amber-light);
+  animation: bzi-board-on 0.35s linear calc(3.85s - var(--late)) both;
 }
 
-/* Speed lines thrown out from behind the lockup. */
-.bzi-streak {
-  top: 50%;
-  left: 50%;
-  width: calc(var(--lw) * 0.22);
-  height: max(2px, calc(var(--lw) * 0.008));
-  margin-top: max(-1px, calc(var(--lw) * -0.004));
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, var(--bz-paper));
-  opacity: 0;
-  transform-origin: 0 50%;
-  animation: bzi-streak 0.42s cubic-bezier(0.1, 0.7, 0.3, 1) 2.48s forwards;
-}
-
-@keyframes bzi-streak {
-  from {
-    opacity: 1;
-    transform: rotate(var(--a)) translateX(calc(var(--lw) * 0.3)) scaleX(0.2);
-  }
-  to {
-    opacity: 0;
-    transform: rotate(var(--a)) translateX(calc(var(--lw) * 0.62)) scaleX(1);
-  }
-}
-
-.bzi-spark {
-  top: 50%;
-  left: 50%;
-  width: max(5px, calc(var(--lw) * 0.022));
-  aspect-ratio: 1;
-  background: var(--bz-amber);
-  opacity: 0;
-  animation: bzi-spark 0.8s cubic-bezier(0.1, 0.7, 0.3, 1) 2.48s forwards;
-}
-
-.bzi-spark[data-kind="1"] {
-  background: var(--bz-teal-light);
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  width: max(7px, calc(var(--lw) * 0.03));
-}
-
-.bzi-spark[data-kind="2"] {
-  border-radius: 50%;
-  background: var(--bz-paper);
-}
-
-/* Out and a little down, as if it had weight. */
-@keyframes bzi-spark {
+@keyframes bzi-board-on {
   0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0;
   }
-  75% {
+  25% {
+    opacity: 0.9;
+  }
+  40% {
+    opacity: 0.15;
+  }
+  70% {
     opacity: 1;
+  }
+  85% {
+    opacity: 0.4;
+  }
+}
+
+.bzi-games {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Thrown in from alternate sides, tumbling, and settling with a bump. */
+.bzi-card {
+  --rp: 3px;
+  --dir: 1;
+
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  height: var(--ch);
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  box-shadow:
+    0 0 0 2px var(--bz-purple),
+    0 0 0 4px #0c0620,
+    0 0.75rem 1.5rem rgb(7 3 26 / 0.55);
+  animation: bzi-card-in 0.5s linear calc(3.9s + var(--i) * 0.06s - var(--late)) both;
+}
+
+.bzi-card:nth-child(odd) {
+  --dir: -1;
+}
+
+@keyframes bzi-card-in {
+  0% {
+    opacity: 0;
+    transform: translate(calc(var(--dir) * 70vw), -30%) rotate(calc(var(--dir) * -14deg)) scale(1.3);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  20% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(4%) scale(0.98, 1.04);
+    animation-timing-function: ease-out;
+  }
+  85% {
+    transform: translateY(-2%);
   }
   100% {
-    opacity: 0;
-    transform: translate(calc(-50% + var(--dx) * var(--lw)), calc(-50% + var(--dy) * var(--lw) + var(--lw) * 0.08)) rotate(var(--spin)) scale(0.6);
+    transform: none;
+  }
+}
+
+.bzi-side {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.bzi-side + .bzi-side {
+  border-top: 1px solid rgb(140 111 214 / 0.25);
+}
+
+.bzi-avatar {
+  display: grid;
+  place-items: center;
+  width: calc(var(--ch) * 0.3);
+  height: calc(var(--ch) * 0.3);
+  border-radius: 50%;
+  object-fit: cover;
+  color: var(--bz-paper);
+  background: var(--bz-purple);
+  box-shadow: 0 0 0 1.5px var(--bz-teal);
+  font: italic 800 0.625rem var(--bz-jersey);
+}
+
+.bzi-team {
+  overflow: hidden;
+  color: var(--bz-paper);
+  font: italic 700 clamp(0.8125rem, 1.5dvh + 0.25rem, 1.1875rem) / 1.1 var(--bz-jersey);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.bzi-score {
+  height: calc(var(--ch) * 0.19);
+  width: calc(var(--ch) * 0.19 / 7 * var(--w));
+  fill: rgb(255 181 46 / 0.62);
+}
+
+.bzi-side[data-lead] .bzi-score {
+  fill: var(--bz-amber-light);
+}
+
+/* LED rails round the screen */
+
+.bzi-ribbons {
+  inset: 0;
+  pointer-events: none;
+  will-change: opacity;
+  animation:
+    bzi-board-on 0.4s linear 0.5s both,
+    bzi-out 0.2s ease-in 5s forwards;
+}
+
+.bzi-rail {
+  position: absolute;
+  overflow: hidden;
+}
+
+.bzi-rail-top,
+.bzi-rail-bottom {
+  right: 0;
+  left: 0;
+  height: var(--rail);
+}
+
+/* Clear of the notch and the home indicator, where the text can't be read. */
+.bzi-rail-top {
+  top: env(safe-area-inset-top);
+  box-shadow: 0 2px 0 var(--bz-purple);
+}
+
+.bzi-rail-bottom {
+  bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -2px 0 var(--bz-purple);
+}
+
+.bzi-rail-left,
+.bzi-rail-right {
+  top: calc(var(--rail) + env(safe-area-inset-top));
+  bottom: calc(var(--rail) + env(safe-area-inset-bottom));
+  width: calc(var(--rail) * 0.45);
+}
+
+.bzi-rail-left {
+  left: 0;
+  box-shadow: 2px 0 0 var(--bz-purple);
+}
+
+.bzi-rail-right {
+  right: 0;
+  box-shadow: -2px 0 0 var(--bz-purple);
+}
+
+/* The text holds the ribbon twice, so sliding it by half loops seamlessly. */
+.bzi-rail-text {
+  position: absolute;
+  top: var(--rp);
+  left: 0;
+  display: flex;
+  height: calc(var(--rp) * 7);
+  animation: bzi-marquee 14s linear 0.5s infinite;
+}
+
+.bzi-rail-bottom .bzi-rail-text {
+  animation-direction: reverse;
+}
+
+.bzi-rail-text svg {
+  height: 100%;
+  width: calc(var(--rp) * var(--w));
+  fill: var(--bz-amber-light);
+}
+
+@keyframes bzi-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Chase lights: bright bars stepping along the rail. */
+.bzi-rail::after {
+  position: absolute;
+  inset: 0 0 0 calc(var(--rp) * -16);
+  content: "";
+  background: repeating-linear-gradient(90deg, transparent 0 calc(var(--rp) * 13), rgb(127 221 226 / 0.55) calc(var(--rp) * 13) calc(var(--rp) * 16));
+  animation: bzi-chase 0.45s steps(4) 0.5s infinite;
+}
+
+.bzi-rail-left::after,
+.bzi-rail-right::after {
+  inset: calc(var(--rp) * -16) 0 0;
+  background: repeating-linear-gradient(180deg, transparent 0 calc(var(--rp) * 13), rgb(127 221 226 / 0.55) calc(var(--rp) * 13) calc(var(--rp) * 16));
+  animation-name: bzi-chase-down;
+}
+
+@keyframes bzi-chase {
+  to {
+    transform: translateX(calc(var(--rp) * 16));
+  }
+}
+
+@keyframes bzi-chase-down {
+  to {
+    transform: translateY(calc(var(--rp) * 16));
   }
 }
 
@@ -684,51 +885,73 @@ html[data-theme="buzz"]:not([data-intro="skip"]) .bzi {
   background: var(--bz-paper);
   opacity: 0;
   pointer-events: none;
-  animation: bzi-flash 0.3s ease-out 2.48s both;
+  animation: bzi-flash 0.35s ease-out 3.2s both;
 }
 
 @keyframes bzi-flash {
   0% {
     opacity: 0;
   }
-  15% {
-    opacity: 0.32;
+  12% {
+    opacity: 0.3;
   }
   100% {
     opacity: 0;
   }
 }
 
-/* Skip */
+/* Sound and Skip */
 
-.bzi-skip {
-  right: max(1rem, env(safe-area-inset-right));
-  bottom: max(1rem, env(safe-area-inset-bottom));
+.bzi-btn {
+  bottom: calc(var(--rail) + env(safe-area-inset-bottom) + 0.75rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
   min-width: 2.75rem;
   min-height: 2.75rem;
-  padding: 0 1.125rem;
   border: 2px solid var(--bz-paper);
   border-radius: 999px;
   color: var(--bz-paper);
-  font: italic 800 0.9375rem var(--bz-jersey);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   background: rgb(23 13 49 / 0.7);
   cursor: pointer;
   animation: bzi-fade-in 0.3s ease-out 0.3s both;
 }
 
-.bzi-skip:hover {
+.bzi-skip {
+  right: max(1rem, env(safe-area-inset-right));
+  padding: 0 1.125rem;
+  font: italic 800 0.9375rem var(--bz-jersey);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bzi-sound {
+  left: max(1rem, env(safe-area-inset-left));
+  padding: 0;
+}
+
+.bzi-sound svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.bzi-sound[aria-pressed="true"] {
+  border-color: var(--bz-teal-light);
+  color: var(--bz-teal-light);
+}
+
+.bzi-btn:hover {
   border-color: var(--bz-amber);
   color: var(--bz-amber);
 }
 
-.bzi-skip:active {
+.bzi-btn:active {
   background: rgb(23 13 49 / 0.92);
   transform: translateY(1px);
 }
 
-.bzi-skip:focus-visible {
+.bzi-btn:focus-visible {
   outline: 3px solid var(--bz-focus);
   outline-offset: 3px;
 }
