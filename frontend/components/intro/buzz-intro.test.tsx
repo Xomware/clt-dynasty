@@ -1,20 +1,25 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SEEN_KEY } from "@/lib/intro/seen";
+import { calls, fixture, stubSleeper } from "@/lib/test/league-mock";
 import { THEME_KEY } from "@/lib/theme/script";
 import { BuzzIntro } from "./BuzzIntro";
 import { Intro } from "./Intro";
 
 // Node's own localStorage stub shadows jsdom's; the theme store reads the global.
-// jsdom has no HTMLImageElement.decode, which the stage calls on mount.
+// jsdom has no HTMLImageElement.decode, which the stage calls on mount, no
+// matchMedia once unstubAllGlobals drops the setup's, and no 2D canvas.
 beforeEach(() => {
   HTMLImageElement.prototype.decode ??= () => Promise.resolve();
   vi.stubGlobal("localStorage", (globalThis as unknown as { jsdom: { window: Window } }).jsdom.window.localStorage);
+  vi.stubGlobal("matchMedia", () => ({ matches: false }));
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
   localStorage.clear();
   vi.unstubAllGlobals();
   sessionStorage.clear();
@@ -112,7 +117,54 @@ describe("BuzzIntro", () => {
   it("uncovers the page even if no animation event ever comes", () => {
     vi.useFakeTimers();
     const { container } = render(<BuzzIntro />);
-    act(() => vi.advanceTimersByTime(6000));
+    act(() => vi.advanceTimersByTime(7500));
     expect(container.querySelector(".bzi")).toBeNull();
+  });
+
+  it("turns the arena sound on and off from its speaker without skipping", () => {
+    const { container } = render(<BuzzIntro />);
+    const speaker = screen.getByRole("button", { name: "Arena sound" });
+    expect(speaker.getAttribute("aria-pressed")).toBe("false");
+
+    fireEvent.click(speaker);
+    expect(speaker.getAttribute("aria-pressed")).toBe("true");
+    expect(localStorage.getItem("clt.muted")).toBe("0");
+    expect(container.querySelector(".bzi")?.getAttribute("data-phase")).toBe("play");
+
+    fireEvent.click(speaker);
+    expect(speaker.getAttribute("aria-pressed")).toBe("false");
+    expect(localStorage.getItem("clt.muted")).toBe("1");
+  });
+});
+
+describe("BuzzIntro's games", () => {
+  // jsdom runs no CSS animations; this stands in for the stage's exit clock.
+  let clock = 0;
+  beforeEach(() => {
+    localStorage.setItem(THEME_KEY, "buzz");
+    HTMLElement.prototype.getAnimations = () => [{ animationName: "bzi-exit", currentTime: clock } as unknown as Animation];
+    stubSleeper();
+  });
+  afterEach(() => {
+    delete (HTMLElement.prototype as Partial<HTMLElement>).getAnimations;
+  });
+
+  it("lands this week's games as scoreboard cards when they're in before the lockup rises", async () => {
+    clock = 1200;
+    const { container } = render(<BuzzIntro />);
+    await waitFor(() => expect(container.querySelectorAll(".bzi-card")).toHaveLength(6));
+    const stage = container.querySelector<HTMLElement>(".bzi")!;
+    expect(stage.hasAttribute("data-week")).toBe(true);
+    expect(stage.style.getPropertyValue("--late")).toBe("1.2s");
+    expect(container.querySelector(".bzi-card")?.textContent).toMatch(/Team \d+.*Team \d+/);
+  });
+
+  it("keeps the lockup and its tape when the games come too late", async () => {
+    clock = 3700;
+    const { container } = render(<BuzzIntro />);
+    await waitFor(() => expect(calls(`/matchups/${fixture.state.week}`)).toBe(1));
+    await act(() => new Promise((r) => setTimeout(r, 20)));
+    expect(container.querySelector(".bzi-card")).toBeNull();
+    expect(container.querySelector(".bzi")?.hasAttribute("data-week")).toBe(false);
   });
 });

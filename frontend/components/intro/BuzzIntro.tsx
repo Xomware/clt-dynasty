@@ -1,74 +1,199 @@
 "use client";
 
-import { type CSSProperties, useEffect, useRef } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 
 import { BrandMark } from "@/components/buzz/BrandMark";
+import { type IntroWeek, introWeek } from "@/lib/intro/week";
+import { isMuted, setMuted } from "@/lib/sound/sound";
 import { useStoredTheme } from "@/lib/theme/theme";
+import { playArena } from "./arena-sound";
+import { runArena } from "./arena";
 import { ledPath, ledWidth } from "./led";
 import { useIntro } from "./use-intro";
 
 import "@/components/buzz/buzz-tokens.css";
 import "./buzz-intro.css";
 
-const WORD = "CLT DYNASTY";
-const COLS = 72;
+const RIBBON = "CLT DYNASTY * CHARLOTTE NC * EST 2024 * TWELVE TEAMS * SUPERFLEX * ";
+const COUNT = ["3", "2", "1"];
+// The games only join if they're in hand this far in, before the lockup rises for them.
+const WEEK_BY = 3.6;
 
-// The hornet's zig-zag in, as offsets from where it lands: x in vw, y in dvh,
-// tilt in degrees, one point every fifth of the flight. The flight keyframes,
-// the dotted trail and the trail's reveal all read these, so they stay on one path.
+// The hornet's run at the camera, as offsets from where it lands: x in vw, y
+// in dvh, scale and tilt, one point every fifth of the flight. It leaves the
+// board small and zig-zags in, growing, to overshoot and land.
 const FLIGHT = [
-  [-92, -16, 14],
-  [-60, 7, -16],
-  [-36, -10, 14],
-  [-17, 6, -12],
-  [-6, -4, 8],
-  [0, 0, 0],
+  [0, -4, 0.12, 0],
+  [-24, -14, 0.3, -20],
+  [22, -6, 0.52, 18],
+  [-15, 5, 0.78, -14],
+  [7, -2, 1.02, 9],
+  [0, 0, 1.14, 0],
 ];
 
 const flightVars = Object.fromEntries(
-  FLIGHT.flatMap(([x, y, r], i) => [
+  FLIGHT.flatMap(([x, y, s, r], i) => [
     [`--x${i}`, `${x}vw`],
     [`--y${i}`, `${y}dvh`],
+    [`--s${i}`, s],
     [`--r${i}`, `${r}deg`],
-    [`--c${i}`, `${((x / FLIGHT[0][0]) * 100).toFixed(2)}%`],
   ]),
 ) as CSSProperties;
 
-const TRAIL = FLIGHT.map(([x, y]) => `${x} ${y}`).join(" L");
+function Led({ text, className }: { text: string; className?: string }) {
+  return (
+    <svg className={className} viewBox={`0 0 ${ledWidth(text)} 7`} style={{ "--w": ledWidth(text) } as CSSProperties} focusable="false">
+      <path d={ledPath(text)} />
+    </svg>
+  );
+}
 
-// Confetti off the slam: amber squares, teal diamonds and paper dots, thrown
-// wider than tall, as fractions of the lockup's width.
-const SPARKS = Array.from({ length: 20 }, (_, i) => {
-  const a = (i / 20) * Math.PI * 2 + 0.2;
-  const r = 0.5 + ((i * 7) % 5) * 0.07;
-  return { dx: Math.cos(a) * r, dy: Math.sin(a) * r * 0.7, spin: (i % 2 ? -1 : 1) * (180 + i * 23), kind: i % 3 };
-});
+// One split-flap digit change: the old top half falls away, the new bottom half drops into place.
+function Flip({ value, from, i }: { value: string; from: string | null; i: number }) {
+  return (
+    <>
+      <span className="bzi-half bzi-half-top" style={{ "--i": i } as CSSProperties}>
+        <Led text={value} />
+      </span>
+      {from && (
+        <span className="bzi-half bzi-half-top bzi-fall" style={{ "--i": i } as CSSProperties}>
+          <Led text={from} />
+        </span>
+      )}
+      <span className="bzi-half bzi-half-bot bzi-drop" style={{ "--i": i } as CSSProperties}>
+        <Led text={value} />
+      </span>
+    </>
+  );
+}
 
-const STREAKS = Array.from({ length: 10 }, (_, i) => (i / 10) * 360 + 9);
+function Card({ game, i }: { game: IntroWeek["games"][number]; i: number }) {
+  const lead = game[0].points === game[1].points ? -1 : game[0].points > game[1].points ? 0 : 1;
+  return (
+    <li className="bzi-card" style={{ "--i": i } as CSSProperties}>
+      {game.map((side, n) => (
+        <div key={n} className="bzi-side" data-lead={n === lead || undefined}>
+          {side.avatarUrl ? (
+            // Eager and decoded as soon as the games arrive (below): a team's
+            // upload can be full size, and decoding it on the frame the cards
+            // land stalls WebKit. next/image would load it lazily instead.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="bzi-avatar" src={side.avatarUrl} alt="" />
+          ) : (
+            <span className="bzi-avatar">{side.name.charAt(0).toUpperCase()}</span>
+          )}
+          <span className="bzi-team">{side.name}</span>
+          <Led className="bzi-score" text={side.points.toFixed(1)} />
+        </div>
+      ))}
+    </li>
+  );
+}
 
-// Buzz City's first-load intro, about 4.3s: jersey slats sweep down, the arena
-// board flickers on and scrolls the league's name, the hornet zig-zags in and
-// the crown drops on it, then the lockup slams down over them with a shake and
-// confetti, the ribbon unfurls, a glint runs and the slats wipe away. Server
-// rendered like the XP intro and shown by CSS only under data-theme="buzz", so
-// a Buzz City visitor gets it from the first frame.
-// Its marks load lazily: every page carries this stage, and lazy images under
+const SpeakerIcon = ({ on }: { on: boolean }) => (
+  <svg viewBox="0 0 20 20" aria-hidden focusable="false">
+    <path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor" />
+    {on ? (
+      <path d="M13 6.5a5 5 0 0 1 0 7M15.5 4a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    ) : (
+      <path d="m13.5 7.5 5 5m0-5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    )}
+  </svg>
+);
+
+// Seconds into the intro, read off the stage's own exit animation, which
+// starts with the first frame; null once a Skip has replaced it.
+function introClock(el: HTMLElement | null): number | null {
+  const a = el?.getAnimations?.().find((x) => (x as CSSAnimation).animationName === "bzi-exit");
+  return a && a.currentTime !== null ? Number(a.currentTime) / 1000 : null;
+}
+
+// Buzz City's first-load intro, about 5.7s, an arena's player introduction:
+// a spotlight sweeps the dark arena, LED ribbons light the edges, the board
+// counts down 3-2-1, the hornet bursts out of it at the camera, takes its
+// crown, the lockup slams onto the jersey with confetti, then this week's real
+// games land as scoreboard cards before the slats wipe to the page. Server
+// rendered and shown by CSS under data-theme="buzz", so a Buzz City visitor
+// gets it from the first frame; the canvases and the games join on hydration,
+// on the stage's own CSS clock. Its marks load lazily: lazy images under
 // display:none are never fetched, so XP visitors don't download them.
 export function BuzzIntro() {
   // Undefined while hydrating: keep the prerendered stage until the theme is known.
   const theme = useStoredTheme();
-  // The page starts its entrance as the slats start to clear, so its own lockup
-  // is landing as they go.
-  const { shown, phase, skip, onAnimationStart, onAnimationEnd } = useIntro(theme === undefined || theme === "buzz", "bzi-exit", "bzi-slat-up");
+  // The page starts its entrance as the slats start to clear.
+  const { shown, phase, skip, onAnimationStart, onAnimationEnd } = useIntro(theme === undefined || theme === "buzz", "bzi-exit", "bzi-slat-up", 7500);
   const stage = useRef<HTMLDivElement>(null);
+  const bg = useRef<HTMLCanvasElement>(null);
+  const fx = useRef<HTMLCanvasElement>(null);
+  const [week, setWeek] = useState<{ data: IntroWeek; late: number } | null>(null);
+  const [sound, setSound] = useState(false);
+  const stopSound = useRef<(() => void) | null>(null);
+  const live = shown && theme === "buzz";
 
   // WebKit decodes an image the first time it paints, which for the lockup is
   // the frame of the slam, and that frame stalls. Decoding up front moves the
-  // cost to the quiet first second; a failed decode only means it happens later.
+  // cost to the quiet countdown; a failed decode only means it happens later.
+  // The games' avatars mount later, so this runs again for them.
   useEffect(() => {
-    if (!shown) return;
+    if (!live) return;
     for (const img of stage.current?.querySelectorAll("img") ?? []) img.decode().catch(() => {});
-  }, [shown]);
+  }, [live, week]);
+
+  useEffect(() => {
+    const el = stage.current;
+    // No CSS clock (no animations at all, as in jsdom) means nothing to sync to.
+    if (!live || !el || introClock(el) === null || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let on = true;
+    introWeek()
+      .then((data) => {
+        const t = introClock(el);
+        if (on && data && t !== null && t < WEEK_BY) setWeek({ data, late: t });
+      })
+      .catch(() => {});
+    const stop = runArena({
+      bg: bg.current!,
+      fx: fx.current!,
+      clock: () => introClock(el),
+      hornet: el.querySelector(".bzi-buzz")!,
+      lockup: el.querySelector(".bzi-lockup")!,
+      cards: () => [...el.querySelectorAll(".bzi-card")],
+    });
+    return () => {
+      on = false;
+      stop();
+    };
+  }, [live]);
+
+  // Sound only ever starts from a tap on the intro's speaker, or when this
+  // tab has already been interacted with and the visitor hasn't muted the site.
+  useEffect(() => {
+    if (!live || isMuted() || !navigator.userActivation?.hasBeenActive || typeof AudioContext === "undefined") return;
+    const t = introClock(stage.current);
+    if (t === null) return;
+    stopSound.current = playArena(t);
+    setSound(true);
+  }, [live]);
+
+  useEffect(() => {
+    if (phase === "play" || phase === "leave") return;
+    stopSound.current?.();
+    stopSound.current = null;
+  }, [phase]);
+  useEffect(() => () => stopSound.current?.(), []);
+
+  const toggleSound = () => {
+    if (sound) {
+      stopSound.current?.();
+      stopSound.current = null;
+      setMuted(true);
+      setSound(false);
+      return;
+    }
+    const t = introClock(stage.current);
+    setMuted(false);
+    setSound(true);
+    if (t !== null && typeof AudioContext !== "undefined") stopSound.current = playArena(t);
+  };
 
   if (!shown) return null;
 
@@ -79,11 +204,14 @@ export function BuzzIntro() {
       ref={stage}
       className="bzi"
       data-phase={phase}
+      data-week={week ? "" : undefined}
       onClick={skip}
       onAnimationStart={onAnimationStart}
       onAnimationEnd={onAnimationEnd}
-      style={flightVars}
+      style={{ ...flightVars, ...(week && { "--late": `${week.late}s` }) } as CSSProperties}
     >
+      <canvas ref={bg} className="bzi-bg" aria-hidden />
+
       <div className="bzi-slats" aria-hidden>
         {Array.from({ length: 8 }, (_, n) => (
           <i key={n} style={{ "--n": n } as CSSProperties} />
@@ -91,37 +219,18 @@ export function BuzzIntro() {
       </div>
 
       <div className="bzi-camera" aria-hidden>
-        <i className="bzi-glow" />
         <div className="bzi-board-at">
           <div className="bzi-board">
-            <div className="bzi-board-dots" style={{ "--cols": COLS } as CSSProperties}>
-              <svg
-                className="bzi-led"
-                viewBox={`0 0 ${ledWidth(WORD)} 7`}
-                style={{ "--w": ledWidth(WORD), "--from": COLS, "--to": Math.ceil((COLS - ledWidth(WORD)) / 2) } as CSSProperties}
-                focusable="false"
-              >
-                <path d={ledPath(WORD)} />
-              </svg>
+            <Led className="bzi-board-label" text="KICKOFF IN" />
+            <div className="bzi-flip">
+              {COUNT.map((v, i) => (
+                <Flip key={v} value={v} from={COUNT[i - 1] ?? null} i={i} />
+              ))}
             </div>
           </div>
         </div>
 
         <div className="bzi-slot">
-          <svg
-            className="bzi-trail"
-            viewBox={`${FLIGHT[0][0]} -18 ${-FLIGHT[0][0]} 36`}
-            preserveAspectRatio="none"
-            style={{ width: `${-FLIGHT[0][0]}vw` }}
-            focusable="false"
-          >
-            <path d={`M${TRAIL}`} />
-          </svg>
-          <i className="bzi-ring" />
-          {STREAKS.map((a) => (
-            <i key={a} className="bzi-streak" style={{ "--a": `${a}deg` } as CSSProperties} />
-          ))}
-
           <div className="bzi-fly">
             <div className="bzi-buzz">
               <div className="bzi-mark">
@@ -138,27 +247,54 @@ export function BuzzIntro() {
               <i className="bzi-glint" />
             </div>
           </div>
-
-          {SPARKS.map((s, i) => (
-            <i
-              key={i}
-              className="bzi-spark"
-              data-kind={s.kind}
-              style={{ "--dx": s.dx, "--dy": s.dy, "--spin": `${s.spin}deg` } as CSSProperties}
-            />
-          ))}
         </div>
 
         <div className="bzi-tape">
           <p>Charlotte, NC &middot; Est. 2024</p>
         </div>
+
+        {week && (
+          <div className="bzi-week">
+            <Led className="bzi-week-label" text={week.data.label} />
+            <ol className="bzi-games">
+              {week.data.games.map((g, i) => (
+                <Card key={i} game={g} i={i} />
+              ))}
+            </ol>
+          </div>
+        )}
       </div>
 
+      <div className="bzi-ribbons" aria-hidden>
+        {(["top", "bottom"] as const).map((edge) => (
+          <div key={edge} className={`bzi-rail bzi-rail-${edge}`}>
+            <div className="bzi-rail-text">
+              <Led text={RIBBON + RIBBON} />
+            </div>
+          </div>
+        ))}
+        <div className="bzi-rail bzi-rail-left" />
+        <div className="bzi-rail bzi-rail-right" />
+      </div>
+
+      <canvas ref={fx} className="bzi-fx" aria-hidden />
       <i className="bzi-flash" aria-hidden />
 
       <button
         type="button"
-        className="bzi-skip"
+        className="bzi-btn bzi-sound"
+        aria-pressed={sound}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleSound();
+        }}
+      >
+        <SpeakerIcon on={sound} />
+        <span className="sr-only">Arena sound</span>
+      </button>
+      <button
+        type="button"
+        className="bzi-btn bzi-skip"
         onClick={(e) => {
           e.stopPropagation();
           skip();

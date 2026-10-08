@@ -6,8 +6,9 @@ import { markSeen } from "@/lib/intro/seen";
 
 // How long the Skip fade runs before the overlay goes; matches both intros' CSS.
 const SKIP_MS = 250;
-// Both intros run under 4.5s. If animationend never comes (a background tab
-// throttles it, a browser drops it), the page still gets uncovered.
+// If animationend never comes (a background tab throttles it, a browser
+// drops it), the page still gets uncovered this long after the intro starts.
+// Comfortably past the XP intro's 4.5s; Buzz City's 5.7s passes its own.
 const FALLBACK_MS = 6000;
 
 // The head script hides it before first paint: seen this session, or the
@@ -22,7 +23,7 @@ const noSubscribe = () => () => {};
  * The phase turns "leave" when the `leave` animation starts (the overlay
  * beginning to uncover the page), so the page can start its entrance under it.
  */
-export function useIntro(playing: boolean, exit: string, leave: string) {
+export function useIntro(playing: boolean, exit: string, leave: string, fallbackMs = FALLBACK_MS) {
   const [phase, setPhase] = useState<"play" | "leave" | "skip" | "done">("play");
   const hidden = useSyncExternalStore(noSubscribe, hiddenByHead, () => false);
   const live = playing && !hidden;
@@ -35,14 +36,14 @@ export function useIntro(playing: boolean, exit: string, leave: string) {
 
   useEffect(() => {
     if (!live) return;
-    const fallback = setTimeout(finish, FALLBACK_MS);
+    const fallback = setTimeout(finish, fallbackMs);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && skip();
     window.addEventListener("keydown", onKey);
     return () => {
       clearTimeout(fallback);
       window.removeEventListener("keydown", onKey);
     };
-  }, [live, finish, skip]);
+  }, [live, finish, skip, fallbackMs]);
 
   useEffect(() => {
     if (phase !== "skip") return;
