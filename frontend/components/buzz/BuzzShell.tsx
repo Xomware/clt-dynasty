@@ -143,7 +143,7 @@ export function BuzzShell() {
           >
             <LineIcon d={LINE.search} size={18} />
             <span className="bz-search-text">
-              Search<span className="bz-search-hint"> pages and teams</span>
+              Search<span className="bz-search-hint"> pages, teams and players</span>
             </span>
             <kbd aria-hidden>{isMac() ? "⌘K" : "Ctrl K"}</kbd>
           </button>
