@@ -20,12 +20,12 @@ import { useMember } from "@/lib/member/use-member";
 import { ViewLabelContext } from "@/lib/nav/label";
 import { useOpeners } from "@/lib/nav/openers";
 import { useEdgeSwipe } from "@/lib/phone/use-edge-swipe";
+import { useHideOnScroll } from "@/lib/phone/use-hide-on-scroll";
 import { PHONE_KEEP, usePhoneStack } from "@/lib/phone/use-phone-stack";
 import { ViewParamsContext } from "@/lib/view-params";
 import { BODIES } from "./bodies";
 import { BrandMark } from "./BrandMark";
 import { BuzzHome } from "./BuzzHome";
-import { BuzzTicker } from "./BuzzTicker";
 
 import "./buzz.css";
 import "./buzz-skin.css";
@@ -40,9 +40,9 @@ const TABS: { link: WindowLink; label: string; d: string }[] = [
 type SheetName = "more" | "account";
 
 // Buzz City on a phone: Home under a short arena bar, every other page stacked
-// over it with one Back row, four destinations and More on a tab bar, the
-// groups in More's sheet and the member's own pages in the account sheet.
-// Same stack and history as the XP phone.
+// over it with Back in the bar, four destinations and More on a tab bar, the
+// groups in More's sheet and the member's own pages in the account sheet. Both
+// bars slide away while the page scrolls down. Same stack and history as the XP phone.
 export function BuzzPhone() {
   const { stack, top, open, back, patch, home, setLabel, labelAt } = usePhoneStack();
   const [sheet, setSheet] = useState<SheetName | null>(null);
@@ -69,6 +69,7 @@ export function BuzzPhone() {
   // A page off the tab bar files under More.
   const onTab = tabs.some((t) => t.link.kind === current);
   const backTo = labelAt(stack.length - 1);
+  const tucked = useHideOnScroll(stack.length) && !sheet && !searching;
   useEdgeSwipe(main, stack.length, back);
 
   // The tapped link went with the old screen, so the new title takes focus.
@@ -105,11 +106,19 @@ export function BuzzPhone() {
   return (
     <div className="buzz bz-phone">
       <i className="bz-backdrop" aria-hidden />
-      <div className="bz-phone-top">
+      <div className="bz-phone-top" data-tucked={tucked || undefined}>
         <header className="bz-bar">
-          <button type="button" className="bz-bar-home" aria-label="CLT Dynasty, home" onClick={home}>
-            <BrandMark mark="monogram" alt="" className="bz-bar-mark" priority />
-          </button>
+          {top ? (
+            <button type="button" className="bz-bar-back" onClick={back}>
+              <LineIcon d={LINE.back} size={20} />
+              {/* The space outside the spans: a name trims each child's text. */}
+              <span className="sr-only">Back to</span> <span className="truncate">{backTo}</span>
+            </button>
+          ) : (
+            <button type="button" className="bz-bar-home" aria-label="CLT Dynasty, home" onClick={home}>
+              <BrandMark mark="monogram" alt="" className="bz-bar-mark" priority />
+            </button>
+          )}
           <h1 ref={heading} tabIndex={-1} className="bz-bar-title">
             {title}
           </h1>
@@ -128,15 +137,8 @@ export function BuzzPhone() {
             <TeamAvatar name={name || "Account"} url={myRosterId === null ? null : teamFor(myRosterId).avatarUrl} size={30} className="u-avatar" />
           </button>
         </header>
-        {top && (
-          <button type="button" className="bz-backrow" onClick={back}>
-            <LineIcon d={LINE.back} size={18} />
-            <span className="truncate">Back to {backTo}</span>
-          </button>
-        )}
       </div>
       <DrillContext value={go}>
-        {!top && <BuzzTicker />}
         <NavigateContext value={go}>
           <main ref={main} className="bz-screen">
             <div className="bz-route" data-dir={depth.dir} data-restored={(top === undefined && depth.dir === "back") || undefined} hidden={top !== undefined}>
@@ -160,7 +162,7 @@ export function BuzzPhone() {
           </main>
         </NavigateContext>
       </DrillContext>
-      <nav aria-label="Primary" className="bz-dock">
+      <nav aria-label="Primary" className="bz-dock" data-tucked={tucked || undefined}>
         {tabs.map((t) => (
           <button
             key={t.label}

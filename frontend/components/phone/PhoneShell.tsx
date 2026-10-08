@@ -17,6 +17,7 @@ import { useMember } from "@/lib/member/use-member";
 import { ViewLabelContext } from "@/lib/nav/label";
 import { useOpeners } from "@/lib/nav/openers";
 import { useEdgeSwipe } from "@/lib/phone/use-edge-swipe";
+import { useHideOnScroll } from "@/lib/phone/use-hide-on-scroll";
 import { PHONE_KEEP, usePhoneStack } from "@/lib/phone/use-phone-stack";
 import { ViewParamsContext } from "@/lib/view-params";
 
@@ -31,7 +32,8 @@ const TABS: { link: WindowLink; label: string; Icon: typeof HomeIcon }[] = [
 ];
 
 // One column: the program list, and any window opened full-screen over it,
-// with Start and four destinations on the taskbar.
+// with Start and four destinations on the taskbar. The title bar and taskbar
+// slide away while the page scrolls down.
 export function PhoneShell() {
   const { state } = useMember();
   const { signOut } = useAuth();
@@ -42,6 +44,7 @@ export function PhoneShell() {
   const shown = useRef(stack.length);
   const launchers = useLaunchers();
   const [searching, setSearching] = useState(false);
+  const tucked = useHideOnScroll(stack.length);
   const tabs = TABS.filter((t) => launchers.some((l) => l.kind === t.link.kind));
   useEdgeSwipe(screens, stack.length, back);
 
@@ -66,7 +69,7 @@ export function PhoneShell() {
 
   return (
     <DrillContext value={go}>
-      <div ref={screens}>
+      <div ref={screens} className="m-screens" data-tucked={tucked || undefined}>
         <main className="m-home" hidden={top !== undefined}>
           <header className="m-bar">
             <BrandMark mark="monogram" alt="" height={36} className="flex-none" priority />
@@ -109,7 +112,7 @@ export function PhoneShell() {
           />
         ))}
       </div>
-      <nav className="m-taskbar" aria-label="Taskbar">
+      <nav className="m-taskbar" aria-label="Taskbar" data-tucked={tucked || undefined}>
         <button type="button" className="xp-start" aria-label="Start: all programs" aria-current={top ? undefined : "page"} onClick={() => (top ? home() : window.scrollTo(0, 0))}>
           <BrandMark mark="crown" alt="" height={18} className="flex-none" />
           start

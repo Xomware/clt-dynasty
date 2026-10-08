@@ -441,3 +441,27 @@
 .m-spot .u-spot-option[aria-selected="true"] .nfl-hit-owner {
   color: var(--xp-text);
 }
+
+/* Scrolling down tucks the title bar and taskbar away; scrolling up or
+   tabbing into one brings it back. */
+.m-bar,
+.m-window-bar,
+.m-taskbar {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.m-screens[data-tucked] :is(.m-bar, .m-window-bar):not(:focus-within) {
+  transform: translateY(calc(env(safe-area-inset-top) - 100%));
+}
+
+.m-taskbar[data-tucked]:not(:focus-within) {
+  transform: translateY(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-bar,
+  .m-window-bar,
+  .m-taskbar {
+    transition: none;
+  }
+}

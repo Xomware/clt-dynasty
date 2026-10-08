@@ -1292,13 +1292,24 @@
 /* Phone */
 
 .bz-phone {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
 
 .bz-phone-top {
   position: sticky;
   top: 0;
   z-index: 30;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Scrolling down tucks both bars away; a keyboard user tabbing into one brings it back. */
+/* The safe-area strip stays, so an installed app's status bar keeps its backing. */
+.bz-phone-top[data-tucked]:not(:focus-within) {
+  transform: translateY(calc(env(safe-area-inset-top) - 100%));
+}
+
+.bz-dock[data-tucked]:not(:focus-within) {
+  transform: translateY(100%);
 }
 
 .bz-bar {
@@ -1347,32 +1358,32 @@
   outline: none;
 }
 
-/* Above every screen but Home: one row naming where Back goes, like iOS. */
-.bz-backrow {
-  display: flex;
+/* Back names where it goes, like iOS: a chevron and the screen underneath. */
+.bz-bar-back {
+  display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: 0.25rem;
-  width: 100%;
+  gap: 0.125rem;
+  max-width: 38%;
   min-height: 2.75rem;
-  padding: 0 1rem 0 0.625rem;
+  margin-right: 0.25rem;
+  padding: 0 0.5rem 0 0.125rem;
+  border-radius: 999px;
   color: var(--bz-teal-light);
-  font: italic 800 0.9375rem var(--bz-jersey);
+  font: italic 800 0.875rem var(--bz-jersey);
   letter-spacing: 0.04em;
-  text-align: left;
   text-transform: uppercase;
-  background: var(--bz-ink);
-  box-shadow: 0 2px 0 var(--bz-teal);
 }
 
-.bz-backrow svg {
+.bz-bar-back svg {
   flex: none;
 }
 
-.bz-backrow:active {
-  background: var(--bz-ink-2);
+.bz-bar-back:active {
+  background: rgb(127 221 226 / 0.18);
 }
 
-.bz-backrow:focus-visible {
+.bz-bar-back:focus-visible {
   outline: 3px solid var(--bz-focus);
   outline-offset: -3px;
 }
@@ -1389,12 +1400,6 @@
 
 .bz-icon:active {
   background: rgb(127 221 226 / 0.18);
-}
-
-.bz-phone .bz-led {
-  position: sticky;
-  top: calc(3.25rem + env(safe-area-inset-top));
-  z-index: 29;
 }
 
 .bz-screen {
@@ -1443,26 +1448,28 @@
   z-index: 30;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  padding: 0.375rem 0.25rem calc(0.375rem + env(safe-area-inset-bottom));
+  padding: 0.25rem 0.25rem calc(0.25rem + env(safe-area-inset-bottom));
   background: var(--bz-ink);
   box-shadow: 0 -3px 0 var(--bz-teal);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .bz-dock button {
   display: grid;
   justify-items: center;
-  gap: 0.125rem;
-  min-height: 3.25rem;
-  padding: 0.25rem 0;
+  align-content: center;
+  gap: 0.0625rem;
+  min-height: 2.75rem;
+  padding: 0.125rem 0;
   color: rgb(246 242 231 / 0.72);
-  font: italic 800 0.6875rem var(--bz-jersey);
+  font: italic 800 0.625rem var(--bz-jersey);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .bz-dock button svg {
-  width: 2.75rem;
-  height: 1.75rem;
+  width: 2.5rem;
+  height: 1.5rem;
   padding: 0.125rem 0.625rem;
   border-radius: 999px;
 }
