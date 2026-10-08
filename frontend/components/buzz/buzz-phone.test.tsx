@@ -130,7 +130,7 @@ describe("Buzz City phone", () => {
     expect(window.location.search).toBe("?open=standings");
     expect(screen.getByRole("button", { name: "Menu" }).getAttribute("aria-expanded")).toBe("false");
 
-    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
     await waitFor(() => expect(bar().textContent).toBe("CLT Dynasty"));
   });
 
@@ -139,8 +139,58 @@ describe("Buzz City phone", () => {
     await renderPhone();
     fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
     expect(bar().textContent).toBe("Team 6");
-    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
     await waitFor(() => expect(bar().textContent).toBe("League Standings"));
+  });
+
+  it("names where Back goes, and keeps the screen under the top one as it was left", async () => {
+    window.history.replaceState(null, "", "/?open=standings");
+    await renderPhone();
+    const team = screen.getByRole("button", { name: "Team 6" });
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 300 });
+    fireEvent.click(team);
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+    expect(screen.getByRole("button", { name: /^Back to/ }).textContent).toBe("Back to League Standings");
+
+    fireEvent.click(screen.getByRole("button", { name: "Back to League Standings" }));
+    await waitFor(() => expect(bar().textContent).toBe("League Standings"));
+    expect(screen.getByRole("button", { name: "Team 6" })).toBe(team);
+    expect(document.activeElement).toBe(team);
+    expect(window.scrollTo).toHaveBeenLastCalledWith(0, 300);
+    expect(screen.getByRole("button", { name: /^Back to/ }).textContent).toBe("Back to Home");
+  });
+
+  it("rebuilds the stack when the browser goes Forward", async () => {
+    window.history.replaceState(null, "", "/?open=standings");
+    await renderPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Back to/ }));
+    await waitFor(() => expect(bar().textContent).toBe("League Standings"));
+    window.history.forward();
+    await waitFor(() => expect(bar().textContent).toBe("Team 6"));
+    expect(screen.getByRole("button", { name: /^Back to/ }).textContent).toBe("Back to League Standings");
+  });
+
+  it("goes Back on a swipe from the left edge when installed to the home screen", async () => {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: query === PHONE || query === "(display-mode: standalone)",
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    window.history.replaceState(null, "", "/?open=standings");
+    await renderPhone();
+    fireEvent.click(screen.getByRole("button", { name: "Team 6" }));
+    const main = screen.getByRole("main");
+    const touch = (type: string, x: number) =>
+      main.dispatchEvent(Object.assign(new Event(type, { bubbles: true, cancelable: true }), { touches: [{ clientX: x, clientY: 400 }] }));
+    touch("touchstart", 10);
+    touch("touchmove", 60);
+    touch("touchmove", 240);
+    expect(main.style.transform).toBe("translateX(230px)");
+    touch("touchend", 240);
+    await waitFor(() => expect(bar().textContent).toBe("League Standings"));
+    expect(main.style.transform).toBe("");
   });
 
   it("closes the menu on Escape and holds the theme toggle and sign-out", async () => {
